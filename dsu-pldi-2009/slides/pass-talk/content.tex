@@ -1,0 +1,118 @@
+\begin{frame}{What we have now}%{A Sub-title is optional}
+\begin{itemize}
+\item \DSU{} - A Dynamic Software Updating system for Java
+\item Demonstrated on 3 open source Java applications
+  \begin{itemize}
+  \item Jetty webserver, JavaEmailServer, CrossFTP server
+  \end{itemize}
+\item Run a version of an application, bring in a new version,\\
+      \DSU system will examine differences, update to the new one
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Not quite there yet}%{A Sub-title is optional}
+\begin{itemize}
+\item Understands nothing about semantics
+\item Guarantees type safety, but nothing else
+\item Generates nothing but the simplest state transformers
+\end{itemize}
+
+\begin{block}{}
+Need to relieve programmer of the burden of safety as much as possible.
+\end{block}
+\end{frame}
+
+\begin{frame}{Can we automate state-transformer generation?}%{A Sub-title is optional}
+\begin{itemize}
+\item Start with simple bugfixes, memory leaks, null pointer exceptions
+\item The patch is usually one line of code
+  \begin{itemize}
+  \item Set a field to null
+  \item Remove an entry from some collection
+  \item Don't set a field to null
+  \item Create a new object
+  \end{itemize}
+\item Dynamically applying the patch is easy
+\item Can we repair application state at update time?
+  \begin{itemize}
+  \item Free already leaked objects
+  \item Create new objects and prevent a future crash
+  \item ...
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Example}%{A Sub-title is optional}
+\begin{center}
+\begin{minipage}{0.55\textwidth}
+\begin{lstlisting}[frame=single,basicstyle=\footnotesize\ttfamily,numbers=left,numberstyle=\tiny]
+  class Foo {
+    void bar() {
+      ...
+      if (...) {
+        ...
++       this.field = null;
+        ...
+      }
+    }
+  }
+  \end{lstlisting}
+\end{minipage}
+\end{center}
+\uncover<2>{
+\begin{itemize}
+\item Applying this patch is easy
+\item Can we free already leaked objects?
+\item What is the condition under which an object got to line 6?
+\item Can we recover this condition from heap state?
+\end{itemize}
+}
+\end{frame}
+
+\begin{frame}{Conditions such as}%{A Sub-title is optional}
+For all leaky objects, o is leaky if and only if
+\begin{itemize}
+\item o.some\_field == false
+\item o.p == null
+\item o is/is not pointed by object of type Bar
+\item ...
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile,shrink=10]{Eclipse leak}%{A Sub-title is optional}
+\begin{lstlisting}[basicstyle=\footnotesize\ttfamily]
+ class NavigationHistory {
+   private ArrayList<History> history;
+   private ArrayList<Editor> editors;
+
+   // Each object in editors stores a refcount
+   // of the number of history objects that point to
+   // it. In one instance an object is removed from
+   // history, but the refcount not updated.
+
+   private void updateNavigationHistory() {
+     for (History h : history) {
+       Editor editor = h.editorInfo;
+       if (editor ...) {
++        h.editorInfo.refCount--;
++        if (h.editorInfo.refCount == 0)
++          editors.remove(h.editorInfo);
+         h.dispose();
+       }
+     }
+   }
+ }
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}{How can we discover these conditions?}%{A Sub-title is optional}
+\begin{itemize}
+\item Static analysis ???
+\item Dynamic analysis
+  \begin{itemize}
+  \item Instrument patched function and mark leaky objects
+  \item Periodically dump all objects
+  \item Mine differences between marked and unmarked objects
+  \end{itemize}
+\end{itemize}
+\end{frame}

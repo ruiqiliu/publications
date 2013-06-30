@@ -1,0 +1,635 @@
+% Section 4: Experience & Performance
+%   Describe the applications we could update
+%   Updates we couldn't support
+%   Measurements
+%     How long until updates take effect in certain circumstances
+%       (i.e., how onerous is our timing-based safety condition?)
+%     How long do updates take
+%       (i.e., what's the cost of a full GC?)
+%     What's the impact on performance?
+%       (i.e., is there any impact to performance after an update is done?)
+%       (i.e., how much is end-to-end application performance hampered by an
+%         update?  E.g., to web connections time out, etc.?)
+%     We're doing micro- and macro-benchmarks, right?  What are they?
+
+\section{Experience}
+\label{sec:experience}
+
+\suriya{Changes to experience section marked up by Kathryn have to
+incorporated. This involves running additional experiments as well. All
+other sections done.}
+
+To evaluate \DSU, we used it to update three open-source servers written
+in Java: the Jetty webserver\footnote{\url{http://www.mortbay.org}},
+JavaEmailServer,\footnote{\url{http://www.ericdaugherty.com/java/mailserver}}
+an SMTP and POP e-mail server, and CrossFTP server\footnote{\url{http://www.crossftp.com/}}.
+These programs belong to a class that
+should benefit from DSU because they typically run continuously. DSU
+would enable deployments to incorporate bug fixes or add new features
+without having to halt currently-running sessions.  We explored
+updates corresponding to releases made over roughly a year and a half
+of each program's lifetime.  Of 22 updates we considered, \DSU{} could
+support 20 of them---the two updates we could not apply changed
+classes with infinitely-running methods, and thus no safe point could
+be reached.  To our knowledge, no existing DSU system
+for Java could support these updates, and furthermore previous systems
+would support only 9 of 22 updates.  \DSU{} is the first DSU system for Java
+that has been shown to support changes to realistic programs as they
+occur in practice over a long period.  The remainder of this section
+describes this experience.
+
+\subsection{Jetty webserver}
+\label{subsec:jetty}
+
+Jetty is a widely-used webserver written in Java, in development since
+1995.  It supports static and dynamic content and can be embedded
+within other Java applications.  The \JikesRVM{} is not able to run the
+most recent versions of Jetty (6.x), therefore we considered 11
+versions, consisting of 5.1.0 through 5.1.10 (the last one prior to
+version 6).  Version 5.1.10 contains 317 classes and about 45000 lines
+of code.  Table~\ref{tab:jetty-changes} shows a summary of the changes
+in each update.  Each row tabulates the changes relative
+to the prior version. For the column listing changed methods, the
+notation $x/y$ indicates that $x+y$ methods were changed, where $x$
+changed in body only, and $y$ changed their type signature as well.
+For dynamic updating systems that only support changes to method
+bodies, only the first and last three of the ten updates could be
+expressed, since the remainder either change method signatures
+and/or add or delete fields.
+
+% \DSU{} was able to successfully update from
+% each version to the next for all versions except 5.1.3 and 5.1.5.
+% Both of these updates were precluded by our update preparation tool
+% because it fails to properly identify changes to anonymous inner
+% classes.  We believe this limitation is the only one needed to support
+% these updates and we plan to have this functionality for the final
+% paper.
+
+\newcommand{\ChangedClassesColumn}{third}
+\begin{table}
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c||c|c|c|c|c|c|} \hline
+Ver.    & \#      & \multicolumn{6}{c|}{\# changed} \\
+        & classes & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields} \\
+        & added   &         & add & del & chg              & add & del \\ \hline \hline
+5.1.1   & 0       & 14      & 4   & 1   & 38/0             & 0   & 0   \\
+5.1.2   & 1       & 5       & 0   & 0   & 12/1             & 0   & 0   \\
+5.1.3   & 3       & 15      & 19  & 2   & 59/0             & 10  & 1   \\
+5.1.4   & 0       & 6       & 0   & 4   & 9/6              & 0   & 2   \\
+5.1.5   & 0       & 54      & 21  & 4   & 112/8            & 5   & 0   \\
+5.1.6   & 0       & 4       & 0   & 0   & 20/0             & 5   & 6   \\
+5.1.7   & 0       & 7       & 8   & 0   & 11/2             & 9   & 3   \\
+5.1.8   & 0       & 1       & 0   & 0   & 1/0              & 0   & 0   \\
+5.1.9   & 0       & 1       & 0   & 0   & 1/0              & 0   & 0   \\
+5.1.10  & 0       & 4       & 0   & 0   & 4/0              & 0   & 0   \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Summary of updates to Jetty}
+\label{tab:jetty-changes}
+\end{table}
+
+With \DSU{} we were able to successfully write dynamic updates to all
+versions of Jetty we examined.  However, we could not apply an update
+to version 5.1.3 because \DSU{} was never able to reach a safe point.
+To understand why, we instrumented the VM to emit information about
+restricted method set and, if a safe point cannot be reached, which
+restricted method was active.  For each version, starting at 5.1.0, we
+ran Jetty under full load.  After 30 seconds we tried to apply the
+update to the next version; if a safe point could not be immediately
+reached, we deemed the attempt as failed (i.e., we did not retry).  
+The results are presented in
+Table~\ref{tab:inlining}.  Column 2 shows the number of times (out of
+five such runs) the application reached a safe point.  The methods
+whose presence on a thread stack precluded the application from
+reaching a safe point are mentioned below the table.  For the update
+to 5.1.3, the offending method was always
+active (it contained an infinite loop).  The other updates either
+always succeeded, or did most of the time, implying that with retries
+they could be applied fairly quickly.
+
+Column 3 contains the total number
+of methods in the program at runtime, where the number in parentheses is the
+number of these the compiler inlined when using aggressive optimization
+(which provides an upper bound on the effect of inlining in reaching a
+safe point).  The next group of columns contains the restricted method
+set. Each column in the group specifies the number of methods loaded at
+run time by the VM, followed by the total number of methods in that
+category in the program. The first column in this group is the number of methods in
+classes involved in a class update. Recall that when a class is updated, say by adding
+a field, all its methods are considered restricted. The second column in this group is the number of methods whose
+bodies are updated, the third is the number of methods
+indirectly updated, and the fourth sums these, with the number of the
+total that were inlined written in parentheses. % The first and second
+% columns in this group together constitute all the methods of classes that
+% were changed, as enumerated in the \ChangedClassesColumn{} column in table~\ref{tab:jetty-changes}.
+The final column is
+the total number of methods in the restricted set; it differs from the
+first number in the fourth column by the number of (transitively)
+inlined callers of the restricted methods that were not already
+restricted.
+
+The table shows that both indirect method calls and inlining 
+significantly add to the size of the restricted set,
+though inlining is small by comparison because all callers of an
+updated class's methods are \emph{already} included in the indirect
+set, so inlining these methods adds no further restriction.
+Interestingly, having a greater number of restricted methods overall
+does not necessarily reduce the likelihood that an update will take
+effect; rather, it depends on the frequency with which methods in this
+set are on the stack.
+% In the
+% case of Jetty, none of this had any impact on the update failing:
+% version 5.1.3 changed the bodies of the infinite loops of active
+% threads' \texttt{run} methods, and thus reaching a safe point was
+% not possible.  
+% Future support 
+% for updates based on on-stack replacement may alleviate this problem.
+
+\begin{table*}
+\begin{small}
+\begin{center}
+\begin{tabular}{|c|c|r|rrrr|r|} \hline
+Upd.    &                   & Number of  & \multicolumn{4}{c|}{\# methods not allowed on stack, due to}                 & Number of \\
+to      & Reached           & methods at & \emph{class}   & \emph{method body} & \emph{indirect method}  &              & restricted \\
+ver.    & safe point?       & runtime    & \emph{updates} & \emph{updates}     & \emph{updates}          & Total        & methods   \\ \hline \hline
+5.1.1   &  always           & 1378 (376) & 26/49          & 7/12               & 20/29                   & 53/90  (17)  & 67        \\
+5.1.2   &  4/5$^\dagger$    & 1374 (375) & 25/25          & 3/5                & 35/43                   & 63/73  (35)  & 67        \\
+5.1.3   &  0/5$^*$          & 1374 (375) & 326/382        & 4/6                & 42/45                   & 370/433 (97) & 373       \\
+5.1.4   &  always           & 1384 (374) & 82/82          & 5/6                & 15/16                   & 101/104 (24) & 101       \\
+5.1.5   &  always           & 1380 (372) & 14/80          & 39/60              & 13/15                   & 62/155 (17)  & 62        \\
+5.1.6   &  3/5$^\dagger$    & 1394 (378) & 203/219        & 3/3                & 16/19                   & 222/241 (40) & 223       \\
+5.1.7   &  always           & 1394 (380) & 186/187        & 1/2                & 53/69                   & 239/258 (74) & 243       \\
+5.1.8   &  always           & 1402 (379) & 0/0            & 1/1                & 0/0                     & 1/1   (1)    & 1         \\
+5.1.9   &  always           & 1402 (379) & 0/0            & 0/1                & 0/0                     & 0/1   (0)    & 0         \\
+5.1.10  &  always           & 1402 (379) & 0/0            & 4/5                & 0/0                     & 4/5   (2)    & 6         \\ \hline
+\end{tabular}
+\end{center}
+\begin{tabular}{l}
+$^\dagger$Restricted method \texttt{HttpConnection.handleNext()} was
+active \\
+$^*$Restricted method \texttt{ThreadedServer.acceptSocket()} was
+(always) active
+\end{tabular}
+\end{small}
+\vspace{1ex}
+\caption{Impact of safe point restrictions on updates to Jetty}
+\label{tab:inlining}
+\end{table*}
+
+\subsection{JavaEmailServer}
+\label{subsec:jes}
+
+For JavaEmailServer we looked at 10 versions---1.2.1 through
+1.4---spanning a duration of about two years.  The final version of
+the code consists of 20 classes and about 5000 lines of code.
+Table~\ref{tab:jes-changes} shows the summary of changes for each new
+version. Approaches that only support updates to method bodies will be able
+to handle only four of the nine updates we considered. We
+could successfully construct updates for all versions we examined, and
+we could successfully apply all of them but the update to version 1.3.  This
+update reworked the configuration framework of the server, among other
+things removing a GUI tool for user administration and added several
+new classes to implement a file-based system.  As a result, many of
+the classes were modified to point to a new configuration object,
+among these threads with infinite processing loops (e.g., to accept
+POP and SMTP requests).  Because these classes are always active, the
+safety condition can never be met and thus the update cannot be
+applied.
+
+In addition, for the update from 1.3 to 1.3.1, the processing loop of
+one class was \emph{indirectly} updated, and this initially precluded
+the update from taking place.  To remedy this problem, we manually
+extracted the body of the loop and made it a separate function,
+essentially a manual application of the ``loop extraction''
+transformation used in other work~\cite{neamtiu06dsu}.  However, even
+in this case the update would only take effect if the server was idle;
+a similar situation occurred for the update to version 1.3.3.  We
+could avoid this transformation and the need for idleness by using a
+limited form of on-stack replacement 
+(OSR) in combination with stack barriers, as mentioned in
+Section~\ref{sec:safe}.  Note that loop extraction would 
+not help for our other problematic updates because it was the
+\texttt{run} methods themselves whose code was changed, and not some
+method that they call.
+
+%% This application was defensively written in terms of handling exceptions.
+%% There were several top-level exception handlers that kept the application
+%% going even if a particular piece of code or a particular thread threw an
+%% exception. The application relied on very little soft persistent state.
+%% State about user accounts, mail queue were maintained in disk outside the
+%% application in configuration files and mailbox files. These were
+%% periodically watched for changes. This made updates also easier. Any
+%% incorrect update would respawn a new thread, and have persistent state
+%% (since it is outside the program).
+
+\begin{table}
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c|c||c|c|c|c|c|c|} \hline
+Ver.   & \multicolumn{2}{c||}{\# classes} &    \multicolumn{6}{c|}{\# changed} \\
+       & add & del & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields} \\
+       &     &     &         & add & del & chg   & add & del \\ \hline \hline
+1.2.2  & 0   & 0   & 3       & 0   & 0   & 3/0   & 0   & 0   \\
+1.2.3  & 0   & 0   & 7       & 0   & 0   & 14/2  & 12  & 0   \\
+1.2.4  & 0   & 0   & 2       & 0   & 0   & 4/0   & 0   & 0   \\
+1.3    & 4   & 9   & 2       & 11  & 3   & 6/9   & 12  & 5   \\
+1.3.1  & 0   & 0   & 2       & 0   & 0   & 4/0   & 0   & 0   \\
+1.3.2  & 0   & 0   & 8       & 4   & 2   & 4/2   & 3   & 1   \\
+1.3.3  & 0   & 0   & 4       & 0   & 0   & 3/0   & 0   & 0   \\
+1.3.4  & 0   & 0   & 6       & 2   & 0   & 6/0   & 2   & 0   \\
+1.4    & 0   & 0   & 7       & 6   & 1   & 4/1   & 6   & 0   \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Summary of updates to JavaEmailServer}
+\label{tab:jes-changes}
+\end{table}
+
+% 
+% Summary of JES safe-point-convergence
+% update to v1.3 does not happen even when idle.
+% update to 1.3.1 and update to 1.3.3 
+% happens when idle, but never happens with load
+% In both cases the offending function is SMTPProcessor.handleCommands()
+% All other updates happened all the time.
+%
+
+\subsection{CrossFTP server}
+\label{subsec:crossftp}
+CrossFTP server is an easily configurable, secure-enabled FTP server.
+CrossFTP allows simple configuration through a GUI and more advanced
+customization using configuration files. We did not use the GUI interface
+and therefore do not consider changes to that part of the program.  We
+looked at 4 versions --- 1.05 through 1.08 --- spanning a duration of more
+than a year. Version 1.08 contains about 18000 lines of code spread across
+161 classes. We could successfully handle all three updates to this
+application, though one update would apply only rarely under
+load. Note that since all updates either add or delete fields, simple 
+method body updating support on its own would be insufficient.
+
+% \begin{table}
+% \begin{scriptsize}
+% \begin{center}
+% \begin{tabular}{|l||c|c||c|c|c|c|c|c||c|} \hline
+% Ver.   & \multicolumn{2}{c||}{\# classes} &    \multicolumn{6}{c||}{\# changed}            & Reached \\
+%        & add & del & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c||}{fields} & safe    \\
+%        &     &     &         & add & del & chg   & add & del                               & point?  \\ \hline \hline
+% 1.06   & 4   & 1   & 1       & 0   & 0   & 3/0   & 1   & 0                                 & always \\
+% 1.07   & 0   & 0   & 3       & 4   & 0   & 14/0  & 5   & 0                                 & 3/5$^1$ \\
+% 1.08   & 0   & 1   & 3       & 2   & 0   & 10/0  & 0   & 2                                 & 1/5$^2$ \\ \hline
+% \end{tabular}
+% \end{center}
+% \begin{tabular}{l}
+% $^1$Restricted method \texttt{RequestHandler.run()} was active \\
+% $^2$Restricted methods \texttt{FTPWriter.send()}, \texttt{RequestHandler.run()} were active \\
+% \end{tabular}
+% \end{scriptsize}
+% \caption{Summary of updates to CrossFTP server}
+% \label{tab:crossftp-changes}
+% \end{table}
+
+\begin{table}
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c|c||c|c|c|c|c|c|} \hline
+Ver.   & \multicolumn{2}{c||}{\# classes} &    \multicolumn{6}{c|}{\# changed}             \\
+       & add & del & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields}  \\
+       &     &     &         & add & del & chg   & add & del                               \\ \hline \hline
+1.06   & 4   & 1   & 1       & 0   & 0   & 3/0   & 1   & 0                                 \\
+1.07   & 0   & 0   & 3       & 4   & 0   & 14/0  & 5   & 0                                 \\
+1.08   & 0   & 1   & 3       & 2   & 0   & 10/0  & 0   & 2                                 \\ \hline
+\end{tabular}
+\end{center}
+\begin{tabular}{l}
+% $^1$Restricted method \texttt{RequestHandler.run()} was active \\
+% $^2$Restricted methods \texttt{FTPWriter.send()},
+% \texttt{RequestHandler.run()}, and a native method were active \\
+\end{tabular}
+\end{footnotesize}
+\caption{Summary of updates to CrossFTP server}
+\label{tab:crossftp-changes}
+\end{table}
+
+\section{Performance}
+\label{sec:performance}
+
+The main performance impact of \DSU{} is the cost of applying an update;
+once updated, the application runs without further overhead.  To confirm
+this, we measured the throughput of Jetty when started from scratch and
+following an update and found them to be essentially identical.  We report
+on this experiment in Section~\ref{subsec:jetty-perf}.
+
+The cost of applying an update is the time to load any new classes, invoke a
+full heap garbage collection, and to apply the transformation methods on
+objects belonging to updated classes.
+Roughly, on a uniprocessor system: the time to suspend threads and check
+that the application is in a safe-point is around 1ms; the classloading
+time is usually less than 20ms; the time to resume execution is usually
+less than 20ms. 
+% (Classloading could occur in parallel with normal execution.) 
+Therefore the update disruption time is primarily
+due to the GC and object transformers, and the cost of these is proportional
+to the size of the heap and the fraction of objects being transformed.  We
+wrote a simple microbenchmark to measure this.
+Section~\ref{subsec:microbench} reports our results, which show object
+transformation to be the dominant cost.
+
+We conducted all our experiments on a dual P4@3GHz machine with 2 GB of RAM.
+The machine ran Ubuntu 6.06, Linux kernel version 2.6.19.1. We implemented
+\DSU{} on top of \JikesRVM{} 2.9.1. The VM was configured with one virtual
+processor and utilized only one of the machine's CPUs.
+
+% We also have microbenchmarks where we compare the
+% overhead added as a result of running the transformer function.
+
+%% \suriya{There is also the additional cost of recompiling new
+%% methods, which is amortized over the initial phase of execution after the
+%% update.}
+
+\subsection{Jetty performance}
+\label{subsec:jetty-perf}
+
+To see the effect of updating on application performance, we measured Jetty
+under various configurations using httperf,\footnote{\url{http://www.hpl.hp.com/research/linux/httperf}} a webserver
+benchmarking tool.  We used httperf to issue roughly 100 new connection
+requests/second, which we observed to be Jetty's saturation rate.  Each
+connection makes 5 serial requests to a 10Kbyte file. The tests were carried
+out for 60 seconds. The client and server were run on different processors
+in the same machine. Thus, these experiments do not take into account
+network traffic.
+
+
+\begin{table}[t]
+\begin{small}
+\begin{center}
+\begin{tabular}{|lcc|} \hline
+Config.                & Req. rate (/s) & Resp. time (ms) \\ \hline
+5.1.5 (\DSU)           & 361.3 +/- 33.2 & 19.2 \\
+5.1.6 (\JikesRVM{})    & 352.8 +/- 28.5 & 17.4 \\
+5.1.6 (\DSU)           & 366.2 +/- 26.0 & 15.9 \\
+5.1.6 (upd. idle)      & 357.4 +/- 34.9 & 15.2 \\
+5.1.6 (upd. midway)    & 357.5 +/- 41.6 & 17.5 \\ \hline
+\end{tabular}
+\end{center}
+\end{small}
+\caption{Throughput measurements for Jetty webserver\label{tab:jetty}}
+\end{table}
+
+Table~\ref{tab:jetty} shows our results.  The second column reports the
+average rate at which requests were handled, measured every five
+seconds over the 
+sixty second run, along with the standard deviation.  The third column is
+the average response time per request.  The first row
+illustrates the performance of Jetty version 5.1.5 using the \DSU{} VM,
+while the remaining measurements consider Jetty version 5.1.6 under various
+configurations.  The second and third lines measure the performance of
+5.1.6 started from scratch, under the \JikesRVM{} and \DSU{} VMs, while the
+fourth line measures the performance of 5.1.6 updated from 5.1.5 before the
+benchmark starts.  The performance of these three configurations is
+essentially the same (all within the margin of error), illustrating that
+neither the \DSU{} VM nor the updated program is impacted relative to the
+stock \JikesRVM{}.
+
+The last line of the table measures the performance of Jetty version 5.1.6 updated from
+version 5.1.5 midway through the benchmarking run, thus causing the system to pause
+during the measurement, which correspondingly affects the processing rate.
+We can see this pictorially in Figure~\ref{fig:jetty-rate}, which plots
+throughput (the Y-axis) over time for the last three configurations in
+Table~\ref{tab:jetty} (the others are not shown to avoid cluttering
+the graph).  Two details are worth mentioning.  First, the
+throughput during the run is quite variable in general.  Second, when the
+update occurs at time 30, the throughput dips quite noticeably shortly
+thereafter.  We measured this pause at about 1.36 seconds total, where
+roughly 99\% of the time is due to the garbage collector, and less than
+0.1\% is due to transformer execution. When updating Jetty
+when it is idle, the total pause is about 0.76 seconds, with 99.6\% of the
+time due to GC and 0.01\% due to transformer execution.
+
+% \suriya{Jetty pause times.}
+% \begin{verbatim}
+% Without any load.
+% time to do GC: 762.04 ms
+% time to run transformers: 0.15 ms
+% DSU pause time: 765.75 ms
+% 
+% With load (httperf)
+% time to do GC: 1352.36 ms
+% time to run transformers: 2.13 ms
+% DSU pause time: 1364.24 ms
+% \end{verbatim}
+
+%% \suriya{Please read this.}
+%% We measured pause times for performing the update in an idle webserver and
+%% one supporting peak load. The pause time to perform the update in an idle
+%% webserver was 765.75 ms. The pause time for a fully loaded webserver was
+%% 1364.24 ms. Garbage collection time dominated the pause times, and the time
+%% to run state transformers were negligible. In the following section, we
+%% examine in detail the factors that contribute to \DSU{} pause time.
+
+% \begin{table*}[t]
+% \begin{center}
+% \begin{tabular}{|r|rrrrrrrrrrr|} \hline
+% \# objects & \multicolumn{11}{c|}{Fraction of \texttt{Change} objects} \\
+%       &   0.00&   0.10&   0.20&   0.30&   0.40&   0.50&   0.60&   0.70&   0.80&   0.90&   1.00 \\ \hline
+%   1000& 331.40& 337.07& 341.60& 340.70& 342.97& 343.12& 355.47& 361.76& 344.08& 401.86& 355.64 \\
+%  10000& 330.39& 356.18& 362.99& 376.65& 391.33& 421.52& 439.91& 428.01& 447.20& 455.74& 469.88 \\
+%  50000& 330.78& 400.85& 468.83& 537.08& 601.80& 671.21& 745.84& 804.74& 897.90& 933.11& 999.13 \\
+% 100000& 331.83& 469.73& 601.34& 755.28& 867.82& 997.58&1138.11&1306.26&1400.36&1577.10&1658.08 \\
+% 500000& 334.08&1081.24&1662.34&2454.98&3153.35&3842.81&4403.73&4729.04&5469.16&5995.35&6174.35 \\ \hline
+% \end{tabular}
+% \caption{\DSU{} pause time (in ms) for various heap sizes \label{tab:microbench}}
+% \end{center}
+% \end{table*}
+
+\begin{table*}[t]
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|r|rrrrrrrrrrr|} \hline
+\# objects & \multicolumn{11}{c|}{Fraction of \texttt{Change} objects} \\
+          &   0.00 &  0.10&   0.20&   0.30&   0.40&   0.50&   0.60&   0.70& 0.80&   0.90&   1.00 \\ \hline
+
+    \multicolumn{12}{|c|}{Total pause (ms)} \\ \hline
+      1000& 381.21 &387.66& 389.61& 390.28& 392.14& 391.21& 394.40& 395.90& 397.41& 399.47& 400.77 \\
+     10000& 382.62 &433.23& 436.40& 433.09& 474.41& 461.82& 479.59& 496.99& 510.60& 528.99& 544.46 \\
+     50000& 382.73 &463.11& 541.53& 619.35& 702.17& 779.67& 886.48&1559.58&1802.33&1990.18&2152.32 \\
+    100000& 383.64 &541.03& 698.73& 852.36&1067.21&1276.26&3347.12&3968.23&4738.28&6712.72&7903.21 \\ \hline
+
+    \multicolumn{12}{|c|}{Running transformation functions (ms)} \\ \hline
+      1000&   0.22 &  1.20&   2.05&   2.89&   3.77&   4.62&   5.43&   6.29&   7.21&   8.03&   8.89 \\
+     10000&   0.22 &  9.55&  17.36&  25.80&  36.32&  44.05&  51.40&  61.74&  68.36&  78.98&  85.39 \\
+     50000&   0.22 & 42.92&  86.01& 128.87& 176.29& 215.94& 267.37& 928.25&1132.23&1288.18&1423.34 \\
+    100000&   0.22 & 86.97& 170.81& 256.17& 392.32& 511.02&2539.37&3088.71&3789.88&5693.90&6809.91 \\ \hline
+
+    \multicolumn{12}{|c|}{Garbage collection time (ms)} \\ \hline
+      1000& 376.83 &382.29& 383.45& 383.19& 384.27& 382.47& 384.73& 385.40& 386.06& 387.27& 387.78 \\
+     10000& 378.25 &419.11& 414.94& 403.02& 433.65& 413.64& 422.63& 431.04& 438.11& 445.85& 454.95 \\
+     50000& 378.36 &416.04& 451.41& 486.34& 521.74& 559.62& 614.63& 627.00& 663.25& 697.86& 723.43 \\
+    100000& 379.29 &449.92& 522.38& 591.98& 673.23& 756.01& 803.67& 875.33& 944.38&1014.69&1089.16 \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Microbenchmark results: \DSU{} pause time (in ms) due to update application, for various heap sizes}
+\label{tab:microbench}
+\end{table*}
+
+
+
+
+% \begin{table*}[t]
+% \begin{center}
+% \begin{tabular}{lcccccccccccc}
+% Program \\
+% Jetty 5.1.9 & 30.0 & 44.0 & 48.0 & 50.0 & 49.0 & 44.0 & 36.8 & 36.4 & 45.8  & 38.0 & 44.0 & 46.2\\
+% Jetty 5.1.10 & 29.0 & 44.2 & 47.8 & 49.0 & 46.0 & 41.0 & 44.0 & 25.8 & 31.2  & 43.0 & 46.0 & 36.0\\
+% Upgraded to 5.1.10 at start & 29.0 & 50.0 & 50.0 & 38.0 & 47.2 & 46.0 & 40.4 & 30.2 & 37.4  & 44.8 & 42.2 & 39.6\\
+% Upgraded to 5.1.10 in middle & 35.0 & 50.0 & 44.0 & 30.2 & 36.2 & 36.0 & 19.0 & 33.6 & 40.4  & 44.0 & 48.0 & 39.6\\
+% \end{tabular}
+% \caption{Request rate (measured at 5 second intervals) should make this a graph. Note the 19.0\label{tab:}}
+% \end{center}
+% \end{table*}
+
+\begin{figure}[t]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{jetty}
+\caption{Webserver request rate over time\label{fig:jetty}}
+\label{fig:jetty-rate}
+\end{center}
+\end{figure}
+
+\subsection{Microbenchmarks}
+\label{subsec:microbench}
+
+The two factors that determine \DSU{} update time are the time to
+perform a GC, determined by the number of objects, and the time to run
+object transformers, determined by the fraction of objects being
+updated. To measure the costs of each, we devised a simple
+microbenchmark that creates objects and transforms a specified
+fraction of these objects when a \DSU{} update is triggered. The
+microbenchmark has two simple classes, \texttt{Change} and
+\texttt{NoChange}.  Both start with a single integer field.  The
+update adds another integer field to \texttt{Change}.  The
+user-provided object transformation function copies the first field and
+initializes the new field to zero.  The benchmark contains two arrays,
+one for \texttt{Change} objects and one for \texttt{NoChange} objects.
+We measure the cost of performing an update while varying the total
+number of objects and the fraction of objects of each type.
+
+Table~\ref{tab:microbench} shows the \DSU{} pause time for 1000 to 100000
+objects (the rows) while varying the fraction of the objects that are of
+type \texttt{Change} (the columns).  The first group of rows measures the
+total pause time, the second group measures the portion of this time due to
+running transformer functions, and the final group measures the portion of
+this time due to running the garbage collector.  The first column of the
+table shows that there is large fixed cost of performing a whole heap
+collection even for a small number of objects.  This time includes the time
+to stop the running threads and perform other setup.  As we move right in
+the table, we can see that the cost of object transformation can outweigh
+the cost of the garbage collection by quite a bit. Also, with more objects
+to be transformed, the time to run object transformation functions
+increases non-linearly, because of caching effects.
+
+The highly optimized original copying sequence does a \texttt{memcopy}, whereas
+our transformer functions use reflection and copy one field at a time.
+For each transformed object, \DSU{} looks up and invokes an object's
+\texttt{jvolve\_object} function using reflection, and then copies
+each of the fields one by one.  The cost of reflection could be
+reduced by caching the lookup, but a na\"ively compiled field-by-field
+copy is much slower than the collector's highly-optimized copying loop.
+Note however that the number of transformed objects in our actual
+benchmarks was usually very low, less than 25 objects in the
+applications we considered, as illustrated by Jetty pause times reported
+above.
+
+% \begin{verbatim}
+% Total DSU Pause
+%               0.00    0.10    0.20    0.30    0.40    0.50    0.60    0.70    0.80    0.90    1.00
+%       1000  538.96  540.57  587.53  554.98  552.78  550.44  561.87  557.66  564.31  567.02  773.40
+%      10000  529.42  584.29  597.35  624.16  647.52  675.41  721.26  738.99  811.14  773.39  799.17
+%      50000  379.79  462.63  542.68  622.79  702.85  785.25  867.00 1536.62 1779.80 2020.53    None
+%     100000  377.46  588.79  703.45  862.07 1777.40    None    None    None    None    None    None
+%     500000  380.02 2468.65    None    None    None    None    None    None    None    None    None
+%    1000000  405.53    None    None    None    None    None    None    None    None    None    None
+% 
+% Running transformation functions
+%               0.00    0.10    0.20    0.30    0.40    0.50    0.60    0.70    0.80    0.90    1.00
+%       1000    0.24    2.29    3.93    5.05    6.60    7.72    8.95   10.47   11.78   13.15   19.92
+%      10000    0.24   14.64   28.45   42.66   58.38   70.13   84.34  109.72  114.00  125.96  140.16
+%      50000    0.18   43.92   87.46  132.97  177.81  220.91  263.90  901.65 1108.51 1312.36    None
+%     100000    0.18   96.34  175.59  262.64 1106.61    None    None    None    None    None    None
+%     500000    0.17 1649.37    None    None    None    None    None    None    None    None    None
+%    1000000    0.17    None    None    None    None    None    None    None    None    None    None
+% 
+% Garbage collection
+%               0.00    0.10    0.20    0.30    0.40    0.50    0.60    0.70    0.80    0.90    1.00
+%       1000  535.50  531.06  575.74  542.62  538.93  535.42  545.64  540.06  545.20  546.65  743.59
+%      10000  525.84  562.48  561.50  574.23  581.97  598.06  629.68  622.11  689.90  640.29  651.72
+%      50000  377.46  414.06  450.64  485.18  520.44  559.70  598.41  630.29  666.66  703.40    None
+%     100000  375.16  487.49  523.03  594.53  665.91    None    None    None    None    None    None
+%     500000  377.71  813.98    None    None    None    None    None    None    None    None    None
+%    1000000  403.19    None    None    None    None    None    None    None    None    None    None
+% \end{verbatim}
+
+% \begin{verbatim}
+% Jetty-5.1.10 - 5 January 2006
+% slloccount: 44102 lines
+%  + Fixed path aliasing with // on windows.
+%  + Fix for AJP13 with multiple headers
+%  + Fix for AJP13 with encoded path
+%  + Remove null dispatch attributes from getAttributeNames
+%  + Put POST content default back to iso_8859_1. GET is UTF-8 still
+% 
+% Jetty-5.1.9 - 7 December 2005
+% slloccount: 44084 lines
+%  + Fixed wantClientAuth(false) overriding netClientAuth(true) 
+% 
+% Jetty-5.1.8 - 7 December 2005
+% slloccount: 44082 lines
+%  + Fixed space in URL issued created in 5.1.6
+% 
+% Jetty-5.1.7 - 7 December 2005
+% slloccount: 44081 lines
+%  + Improved collection of statistics
+%  + Better support for requst encoding.
+% 
+% Jetty-5.1.6 - 18 November 2005
+% slloccount: 43948 lines
+%  + Fixed JSP visibility security issue.
+%  + Improved jetty-web.xml access to org.mortbay classes.
+% 
+% Jetty-5.1.5 - 10 November 2005
+% slloccount: 44027 lines
+%  + Improved shutdown hook
+%  + Improved URL Decoding
+%  + Improved mapping of JSP files.
+% 
+% Jetty-5.1.4 - 5 June 2005
+% slloccount: 43578 lines
+%  + Fixed FTP close issue.
+%  + setup MX4J with JDK1.5 in start.config
+%  + set classloader during webapp doStop
+%  + NPE protection in ThreadedServer
+%  + ModelMBean handles null signatures
+%  + Change JAAS impl to be more flexible on finding roles
+% 
+% Jetty-5.1.3 - 7 April 2005
+% slloccount: 43612 lines
+%  + Some minor code janitorial services
+% 
+% Jetty-5.1.2 - 18 January 2005
+% slloccount: 43277 lines
+%  + Added id and ref support to XmlConfiguration
+%  + Cleaned up AbstractSessionManager synchronization.
+%  + Fixed potential concurrent login problem with JAAS
+%  + Apply patch #1103953
+% 
+% Jetty-5.1.1 - 1 December 2004
+% slloccount: 43073 lines
+%  + Changes to key pair handling for SSL.
+% 
+% Jetty-5.1.0 - 14 November 2004
+% slloccount: 42981 lines
+% \end{verbatim}
+
+% vim:ft=tex:spell:

@@ -1,0 +1,95 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Arnold and Kaashoek(2009)]{ksplice}
+J.~Arnold and F.~Kaashoek.
+\newblock {Ksplice: Automatic rebootless kernel updates}.
+\newblock In \emph{EuroSys}, 2009.
+
+\bibitem[Bond and McKinley(2006)]{BM:06}
+M.~D. Bond and K.~S. McKinley.
+\newblock {B}ell: {B}it-{E}ncoding {O}nline {M}emory {L}eak {D}etection.
+\newblock In \emph{ASPLOS}, 2006.
+
+\bibitem[Bond and McKinley(2009)]{BM:09}
+M.~D. Bond and K.~S. McKinley.
+\newblock Leak pruning.
+\newblock In \emph{ASPLOS}, 2009.
+
+\bibitem[Chen et~al.(2007)Chen, Yu, Chen, Zang, and Yew]{chen:icse07}
+H.~Chen, J.~Yu, R.~Chen, B.~Zang, and P.-C. Yew.
+\newblock {POLUS: A POwerful Live Updating System}.
+\newblock In \emph{ICSE}, 2007.
+
+\bibitem[Gulwani(2011)]{Gulwani:popl:2011}
+S.~Gulwani.
+\newblock Automating string processing in spreadsheets using input-output
+  examples.
+\newblock In \emph{POPL}, 2011.
+
+\bibitem[Harris and Gulwani(2011)]{Gulwani:pldi:2011}
+W.~R. Harris and S.~Gulwani.
+\newblock Spreadsheet table transformations from examples.
+\newblock In \emph{PLDI}, 2011.
+
+\bibitem[Hayden et~al.(2011)Hayden, Smith, Hardisty, Hicks, and
+  Foster]{hayden11testing-journal}
+C.~M. Hayden, E.~K. Smith, E.~A. Hardisty, M.~Hicks, and J.~S. Foster.
+\newblock Evaluating dynamic software update safety using efficient systematic
+  testing.
+\newblock \emph{IEEE Transactions on Software Engineering}, 99\penalty0
+  (PrePrints), Sept. 2011.
+
+\bibitem[Hicks and Nettles(2005)]{HicksNettles03}
+M.~Hicks and S.~M. Nettles.
+\newblock {Dynamic Software Updating}.
+\newblock \emph{Transactions on Programming Languages and Systems}, 27\penalty0
+  (6):\penalty0 1049--1096, November 2005.
+
+\bibitem[Jump and McKinley(2007)]{JM:07}
+M.~Jump and K.~S. McKinley.
+\newblock Cork: {D}ynamic {M}emory {L}eak {D}etection for {J}ava.
+\newblock In \emph{POPL}, 2007.
+
+\bibitem[Makris and Bazzi(2009)]{upstare}
+K.~Makris and R.~Bazzi.
+\newblock {Immediate Multi-Threaded Dynamic Software Updates Using Stack
+  Reconstruction}.
+\newblock In \emph{USENIX ATC}, 2009.
+
+\bibitem[Mitchell and Sevitsky(2007)]{MS:07}
+N.~Mitchell and G.~Sevitsky.
+\newblock The causes of bloat, the limits of health.
+\newblock In \emph{OOPSLA}, 2007.
+
+\bibitem[Mitchell and Sevitzky(2003)]{MS:03}
+N.~Mitchell and G.~Sevitzky.
+\newblock Leak{B}ot: {A}n {A}utomated and {L}ightweight {T}ool for {D}iagnosing
+  {M}emory {L}eaks in {L}arge {J}ava {A}pplications.
+\newblock In \emph{ECOOP}, 2003.
+
+\bibitem[Neamtiu et~al.(2006)Neamtiu, Hicks, Stoyle, and Oriol]{neamtiu06dsu}
+I.~Neamtiu, M.~Hicks, G.~Stoyle, and M.~Oriol.
+\newblock {Practical Dynamic Software Updating for C}.
+\newblock In \emph{{PLDI}}, 2006.
+
+\bibitem[Subramanian et~al.(2009)Subramanian, Hicks, and McKinley]{jvolve}
+S.~Subramanian, M.~Hicks, and K.~S. McKinley.
+\newblock {Dynamic Software Updates: A VM-centric Approach}.
+\newblock In \emph{{PLDI}}, 2009.
+
+\bibitem[Xu and Rountev(2010)]{XR:10}
+G.~Xu and A.~Rountev.
+\newblock Detecting inefficiently-used containers to avoid bloat.
+\newblock In \emph{PLDI}, 2010.
+
+\bibitem[ZeroTurnaround()]{javarebel}
+ZeroTurnaround.
+\newblock {LiveRebel}.
+\newblock \url{http://www.zeroturnaround.com/liverebel}.
+
+\end{thebibliography}

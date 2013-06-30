@@ -1,0 +1,38 @@
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.98\textwidth}
+\begin{lstlisting}[frame=single]
+import org.mortbay.http.HttpResponse;
+import org.mortbay.http.r_5_1_1_HttpResponse;
+
+public final class JvolveTransformers {
+  public static void jvolveObject(HttpResponse to,
+                          r_5_1_1_HttpResponse from) {
+    to._status = from._status;
+    to._reason = from._reason;
+    to._httpContext = from._httpContext;
+  }
+  public static void jvolveClass(HttpResponse unused) {
+    HttpResponse.log = r_5_1_1_HttpResponse.log;
+    HttpResponse.__100_Continue =
+          r_5_1_1_HttpResponse.__100_Continue;
+    HttpResponse.__101_Switching_Protocols =
+          r_5_1_1_HttpResponse.__101_Switching_Protocols;
+    ...
+    HttpResponse.__505_HTTP_Version_Not_Supported =
+          r_5_1_1_HttpResponse.__505_HTTP_Version_Not_Supported;
+    HttpResponse.__507_Insufficient_Storage =
+          r_5_1_1_HttpResponse.__507_Insufficient_Storage;
+    HttpResponse.__statusMsg =
+          r_5_1_1_HttpResponse.__statusMsg;
+    HttpResponse.__Continue =
+          r_5_1_1_HttpResponse.__Continue;
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\hangcaption{UPT-generated transformers for the update to Jetty v5.1.2}
+% These transformers were correct and used for the update.}
+\label{fig:jetty-update-to-5.1.2}
+\VspaceFixForHangcaption
+\end{figure}

@@ -1,0 +1,214 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf360
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fnil\fcharset0 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red127\green0\blue85;\red0\green0\blue192;}
+\margl1440\margr1440\vieww9820\viewh17040\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs28 \cf0 \ul \ulc0 Snapshotting\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \ulnone java -agentlib:hprof=heap=dump,format=b,net=localhost:7000,doe=n Main\
+java DumpServer\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 \ul Java Email Server Snapshotting\
+v1.3.1 - 1.3.2
+\f1\fs24 \ulnone \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 working dir:
+\b0 \
+/Users/smagill/Documents/research/DSU/automatic state correction/examples/JavaEmailServer/\
+\
+
+\b build command:
+\b0 \
+ant -f Version-1-3-1/bin/build.xml release\
+or\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\cf0 ant -f Version-1-3-2/bin/build.xml release\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 \ul \ulc0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs24 \cf0 \ulnone run command:
+\b0 \
+cd run/docs\
+./bin/run-jes.sh ../../Version-1-3-1/build/jes-1.3.1.jar\
+or\
+./bin/run-jes.sh ../../Version-1-3-2/build/jes-1.3.2.jar
+\fs28 \ul \ulc0 \
+\
+Azureus Snapshotting\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \ulnone \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 working dir:
+\b0 \
+/Users/smagill/Documents/research/DSU/automatic state correction/utexas-repo/Azureus-experiments\
+
+\b command:
+\b0\fs28 \ul \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \ulnone ./snapshot.sh <git-version-number> <input script basename>\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 example:
+\b0 \
+./snapshot.sh 
+\f1 82ba9018db12772653655a65f8df563c917779ec leak-1
+\f0\fs28 \ul \
+\
+jEdit leak-1 (r14026 to r14027)\ulnone \
+
+\b\fs24 \
+working dir:
+\b0 \
+/Users/smagill/Documents/research/DSU/automatic state correction/snapshots/jEdit/all-snapshots\
+
+\b command:
+\b0 \
+java -jar ../../../utexas-repo/Azureus-experiments/match-snapshots.jar r14026/run-1 r14026/run-2 r14027/run-1 org.gjt.sp.jedit.syntax.TokenMarker tokenHandler\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 \ul Azureus leak-1 (cc61212e65f7a3e7252c4fce36c064a8b4d90965)
+\f1\fs24 \ulnone \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 working dir:
+\b0 \
+\
+\
+
+\b command:
+\b0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs28 \cf0 \ul Azureus leak-1 (cc61212e65f7a3e7252c4fce36c064a8b4d90965)
+\f1\fs24 \ulnone \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 working dir:
+\b0 \
+\
+\
+
+\b command:
+\b0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs28 \cf0 \ul Azureus leak-3 (82ba9018db12772653655a65f8df563c917779ec)
+\f1\fs24 \ulnone \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 working dir:
+\b0 \
+/Users/smagill/Documents/research/DSU/automatic state correction/utexas-repo/Azureus-experiments\
+\
+
+\b command:
+\b0 \
+java -Xmx2048m -jar match-snapshots.jar leak-3/old1 leak-3/old2 leak-3/new org.gudy.azureus2.core3.peer.impl.transport.base.PEPeerTransportImpl readBuffer.position\
+\
+or (if subclasses are included in the search)\
+\
+java -Xmx2048m -jar match-snapshots.jar leak-3/old1 leak-3/old2 leak-3/new org.gudy.azureus2.core3.peer.impl.transport.PEPeerTransportProtocol readBuffer.position\
+\
+
+\b snapshot command:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b0 \cf0 cd ../Azureus\
+git reset --hard 
+\f0 cc61212e65f7a3e7252c4fce36c064a8b4d90965\
+(edit\
+  azureus2/org/gudy/azureus2/core3/peer/impl/transport/PEPeerTrasnportProtocol.java\
+line 401\
+to introduce bug)\
+before fix:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f2 \cf0 	\cf2 if\cf0  (\cf3 readBuffer\cf0  != \cf2 null\cf0  && !\cf3 readingLength\cf0 ) \{\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0 \cf0 after fix:
+\f2 \
+\pard\pardeftab720\ql\qnatural
+\cf0 	\cf2 if\cf0  (\cf3 readBuffer\cf0  != \cf2 null\cf0 ) \{
+\f1 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0 \cf0 ./noupd-snapshot.sh 
+\f1 leak-1\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b0\fs28 \cf0 \ul Java Email Server Snapshotting\
+v1.3.1 - 1.3.2
+\f1\fs24 \ulnone \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 \
+working dir:
+\b0 \
+/Users/smagill/Documents/research/DSU/automatic state correction/snapshots/javaEmailServer\
+\
+
+\b command:
+\b0 \
+jav
+\f0 a -jar ../../utexas-repo/Azureus-experiments/match-snapshots.jar old1 old2 new com.ericdaugherty.mail.server.info.User fo
+\f1 rwardAddresses\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs28 \cf0 \ul Synthetic Examples\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs24 \cf0 \ulnone \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 string-to-non-null
+\b0 \
+java -jar ../../match-snapshots.jar old1 old2 new Sobj str_field\
+\
+
+\b email-simulation-v1/2 (from v1 directory)
+\b0 \
+java -jar ../../match-snapshots.jar old1 old2 new Sobj username\
+java -jar ../../match-snapshots.jar old1 old2 new Sobj domain\
+\
+
+\b string-to-non-null
+\b0 \
+java -agentlib:hprof=heap=dump,format=b,net=localhost:7000,doe=n\
+java -jar ../../match-snapshots.jar old1 old2 new Sobj str_field\
+\
+
+\b string-to-non-null
+\b0 \
+java -jar ../../match-snapshots.jar old1 old2 new Sobj str_field\
+\
+
+\b email-simulation-v1/3 (from v3 directory)
+\b0 \
+java -jar ../../match-snapshots.jar old1 old2 new Sobj username\
+java -jar ../../match-snapshots.jar old1 old2 new Sobj domain\
+}

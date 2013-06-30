@@ -1,0 +1,19 @@
+\begin{figure}[t]
+\begin{small}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|} \hline \T
+Config.                & \multicolumn{2}{c|}{Throughput (MB/s)}  & \multicolumn{2}{c|}{Latency (ms)} \\ \cline{2-5}
+                       & Median   & Quartiles \T                 & Median & Quartiles                \\ \hline \T
+\JikesRVM{}            & 122.437  & 121.44--123.32               & 0.442  & 0.394--0.496             \\
+\DSU{}                 & 121.308  & 121.12--121.41               & 0.349  & 0.341--0.351             \\
+\DSU{} upd             & 121.242  & 121.09--121.29               & 0.345  & 0.341--0.349             \\ \hline
+\end{tabular}
+\end{center}
+\end{small}
+% \caption{Throughput and latency measurements for Jetty webserver v5.1.6
+% showing median and semi-interquartile range\label{tab:jetty}}
+\begin{center}
+\scalebox{0.63}{\includegraphics{graphs/jetty-throughput-latency}}
+\caption{Throughput and latency measurements of Jetty webserver v5.1.6\label{fig:jetty}}
+\end{center}
+\end{figure}

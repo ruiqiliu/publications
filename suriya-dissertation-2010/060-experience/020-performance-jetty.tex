@@ -1,0 +1,39 @@
+% \input{experience/performance-jetty-table}
+% \input{experience/performance-jetty-graph}
+% \input{experience/performance-microbench-table}
+
+\input{100-floats/experience/jetty-table}
+
+\subsection{Jetty Webserver performance}
+\label{subsec:jetty-webserver-performance}
+
+To see the effect of updating on application performance, we measured Jetty
+under various request rates using httperf\index{httperf}, a webserver
+benchmarking tool~\cite{httperf}, and determined Jetty's saturation rate to
+be roughly 800 new connection requests/second. We then measured Jetty's
+performance by issuing connections at this rate.  Each connection makes 5
+serial requests for a 40 Kbyte file. Httperf reports average throughput and
+average per-request latency over a 60 second period. We ran this experiment
+21 times and report the median and quartiles of the throughput and latency
+reports. With 21 runs, the range between the quartiles serves as a 98\%
+confidence interval~\cite{PrattGibbons81}. In order to eliminate network
+traffic effects, we ran the server on two cores of a quad-core machine and
+the client on another core.
+
+Figure~\ref{fig:jetty} shows our results in tabular form and plotted
+graphically.  The second and third columns of the table report the median
+throughput and the range between the two quartiles.  The third column and
+fourth column report the median latency and the inter-quartile range.  The
+first and second rows illustrate the performance of Jetty version 5.1.6
+running on stock \RVM and \JV, respectively. The third row shows the
+performance on \JV of Jetty 5.1.6 dynamically updated from version 5.1.5
+prior to the start of the experiment.  The performance of the two \JV
+configurations are statistically indistinguishable.  The two configurations'
+corresponding inter-quartile ranges largely overlap.  The performance of
+\JV is also quite similar to the performance of stock \RVM.  There are many
+small differences between \JV and the stock implementation that change VM
+code size, code layout, and garbage collection behavior. These differences
+may impact performance directly and they may indirectly affect other
+elements of the VM, such as the timing of garbage collections and JIT
+optimizations (such indirect effects make VMs notoriously difficult to
+benchmark~\cite{dacapo-cacm, diwan-measurement}).

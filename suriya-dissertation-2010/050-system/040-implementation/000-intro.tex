@@ -1,0 +1,17 @@
+
+\section{Implementation}
+\label{sec:implementation}
+
+This section describes how \JV supports dynamic updating by extending
+common virtual machine services.  \JV is built on \RVM, a
+high-performance Java-in-Java Research VM~\cite{AAB+:99,VMperf:webpage}.
+\JV integrates and extends \RVM's dynamic classloader, JIT compiler,
+thread scheduler, copying garbage collector (GC), and support for return
+barriers and on-stack replacement to implement dynamic updating.
+
+After the user prepares and tests a program's modifications, the update
+process in \JV proceeds in five steps.  (1)~\UPT generates an update
+specification.  (2)~The user signals \JV.  (3)~\JV stops running threads
+at a DSU safe point. (4)~It loads the updated classes, the transformer
+functions, and installs the modified methods and classes.  (5)~\JV then
+applies object and class transformers following a modified GC\@.

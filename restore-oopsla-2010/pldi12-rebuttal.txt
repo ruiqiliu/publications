@@ -1,0 +1,55 @@
+We thank the reviewers for their thoughtful comments and will address
+them all in the revision, but cannot answer detailed questions here
+due to the 500 word limit.
+
+The reviewers expressed concern about the following aspects of our
+technique: the heuristics; limiting the form of generated
+transformers; and input data from actual program runs (rather than the
+program text) creating correctness concerns.  These limitations are
+the result of aiming for a useful tool; alternative approaches, while
+worth exploring, may be less effective.
+
+Our choice of synthesis building blocks is heuristic to keep the
+algorithm understandable and scalable.  The heuristics are motivated
+by common situations from our experience of dynamically updating more
+than a dozen C and Java applications, covering roughly 60 upgrades in
+all.  The examples in this paper include the most challenging cases in
+Subramanian's thesis (which focused on manually constructed dynamic
+updates) along with new examples, such as fixes for memory leaks. We
+note that no prior work has considered transformers that free leaked
+memory.  Just as a contribution of [Gulwani] was the identification
+of a versatile language for string transformers with a tractable
+synthesis problem, we view the identification of an effective language
+for realistic updates as a contribution of this paper.
+
+Keeping the transformer language simple has two benefits.  One is that
+it is easier for programmers to understand the updates that the system
+will discover, which may allow them to place more trust in the system.
+The other is that by making the language targeted and less
+general-purpose, we minimize the chance that the system will discover
+a transformer that is close, but not spot on.  The best case for
+automated synthesis is to favor failure over synthesizing a
+possibly-wrong transformer.  Keeping the language small helps with
+this balance, and our experience suggests the balance is effective in
+practice. The algorithm usually succeeds.
+
+The success of example-based synthesis depends On good and
+varied examples.  These examples must form a "representative" set;
+e.g. to infer a conditional we need at least two examples, one for
+each branch.  Robust software that might desire dynamic updates is
+often well tested, and such tests enable a ready source of
+representative examples.  While there is no guarantee of correctness,
+we think the task of manually examining and testing a generated
+transformer is easier than the task of writing it by hand.  By
+contrast, using a static analysis or more complicated transformer
+language seems to us the wrong choice: semantic analysis of large
+programs scales poorly, and the desire to ensure correctness in every
+case would almost certainly result in frequent analysis failures due
+to conservatism.
+
+Finally, we agree with the reviewers that the experimental evaluation
+could be expanded; we will include more examples in the revised paper,
+including the time to synthesize, which uses entire heaps, and was not
+excessive.  We believe that the current evaluation is sufficient to
+demonstrate the promise of our idea, hopefully spurring further work
+in this area..

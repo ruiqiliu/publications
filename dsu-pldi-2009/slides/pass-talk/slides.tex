@@ -1,0 +1,58 @@
+
+% This is for rubber to remove slides.vrb automatically created by tikz
+% rubber: watch $job.vrb
+% rubber: clean $job.vrb
+% rubber: rules rules.ini
+
+\documentclass[xcolor=dvipsnames,12pt]{beamer}
+
+% Include packages
+\usepackage{colortbl}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[normalem]{ulem}
+\usepackage[override]{cmtt}
+\usepackage{graphicx}
+\usepackage{ifdraft}
+\usepackage{tikz}
+\usetikzlibrary{arrows,backgrounds}
+\usepackage{xspace}
+\usepackage{listings}
+\lstset{language=Java,basicstyle=\small\ttfamily,lineskip=-0.25ex}
+
+% Commands
+\newcommand{\DSU}{{\sc Jvolve}\xspace}
+
+% Include customized theme
+\input{theme/customized}
+
+\title[Generating Heap Updates for Dynamic Software Updating]
+{Generating Heap Updates for\\Dynamic Software Updating}
+
+% \subtitle
+% {Presentation Subtitle} % (optional)
+
+\author[Suriya Subramanian]{%
+Suriya Subramanian\inst{1} \and
+Michael Hicks\inst{2}      \\ \and
+Kathryn S\@. McKinley\inst{1}}
+\institute[The University of Texas at Austin] % (optional, but mostly needed)
+{
+  \inst{1}Department of Computer Science\\
+  The University of Texas at Austin
+  \and
+  \inst{2}Department of Computer Science\\
+  University of Maryland, College Park
+}
+
+% \author[Suriya Subramanian]{Suriya Subramanian}
+% \institute[]{Department of Computer Science\\
+% The University of Texas at Austin}
+
+\input{occasion}
+
+\begin{document}
+
+\input{theme/titlepage}
+\input{content}
+
+\end{document}

@@ -1,0 +1,175 @@
+
+{
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}{}
+\setbeamertemplate{navigation symbols}{}
+\begin{frame}
+\begin{block}{}
+\begin{quote}
+The only thing that is constant is change.\\
+\hfill Heraclitus of Ephesus
+\end{quote}
+\end{block}
+\end{frame}
+}
+
+\section{Introduction}
+\subsection{Motivation}
+\begin{frame}{Motivation}%{A Sub-title is optional}
+\begin{itemize}
+\item Software applications change all the time
+\item Deployed systems must be updated with bug fixes, new features
+\item The straightforward approach is to stop and restart applications
+\item Stopping not desirable
+  \begin{itemize}
+  \item Safety concerns
+  \item Revenue loss
+  \item Inconvenience
+  \end{itemize}
+\end{itemize}
+% \item Might not be affordable for some applications
+%   \begin{itemize}
+%   \item Applications that retain state that cannot be externalized
+%   \end{itemize}
+\end{frame}
+
+{
+\setbeamercovered{invisible}
+\begin{frame}{Applications}%{A Sub-title is optional}
+\begin{itemize}
+\item Personal operating system
+\item High availability enterprise applications
+\item Even a cache with lots of state
+\uncover<2>{
+  \begin{itemize}
+    \item LinkedIn.com architecture\footnote{\scriptsize{\url{http://hurvitz.org/blog/2008/06/linkedin-architecture}}}
+    \begin{itemize}
+      \item ``The Cloud'': In memory representation of the LinkedIn network graph
+      \item Network size - 22M nodes, 120M edges
+      \item Rebuilding an instance takes 8 hours
+    \end{itemize}
+  \end{itemize}
+}
+\end{itemize}
+\end{frame}
+}
+
+\subsection{Solutions}
+\begin{frame}{Solutions to updating software}%{A Sub-title is optional}
+\begin{itemize}
+\item Move state out of the process
+  \begin{itemize}
+  \item State stored externally, for instance databases
+  \item Redundant systems: start a new process and stop this one
+  \item Not always possible
+  \end{itemize}
+\item<2-> Dynamic Software Updating (DSU)
+  \begin{itemize}
+    \item Update process state without restarting application
+    \item Non-redundant systems benefit as well
+    \item Decouples fault-tolerance from software updating
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{DSU requirements}%{A Sub-title is optional}
+A Dynamic Software Updating solution should \emph{ideally} be
+\begin{description}
+\item[Safe] Updating is as correct as starting from scratch
+\item[Flexible] Be able to support changes encountered in practice
+\item[Efficient] No performance impact on the original application
+\end{description}
+\end{frame}
+
+\begin{frame}{State of the art}%{A Sub-title is optional}
+Significant progress for C
+\begin{itemize}
+\item Server feature upgrades
+  \begin{itemize}
+  \item Ginseng \cite{neamtiu06dsu}
+  \item POLUS \cite{chen:icse07}
+  \end{itemize}
+\item Security patches: OPUS \cite{altekar05opus}
+\item Operating system upgrades
+  \begin{itemize}
+  \item K42 \cite{K42reconfig}
+  \item DynAMOS \cite{dynamos_eurosys_07}
+  \item LUCOS \cite{chen06vee}
+  \item Ksplice \cite{Ksplice}
+  \end{itemize}
+\end{itemize}
+% \item<2-> Primitive support for managed languages
+%   \begin{itemize}
+%   \item Very restrictive
+%   \item Space and time overheads
+%   \item Not proven on realistic applications
+%   \end{itemize}
+\end{frame}
+
+\begin{frame}{Opportunities for managed languages}%{A Sub-title is optional}
+Solutions for C typically
+\begin{itemize}
+\item Require special compilation
+\item Statically/dynamically insert indirection for function calls
+\item Restrict structure updates, require extra allocation
+\item Impose space/time overheads on normal execution
+\item Make type-safety for updates difficult
+\item Not multi-threaded
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Existing solutions for managed languages}%{A Sub-title is optional}
+\begin{itemize}
+\item VM-based solutions
+  \begin{itemize}
+  \item JDrums \cite{ritzau00dynamic}, DVM \cite{Mala00a}
+  \item Not well evaluated
+  \item Provide an interface similar to \DSU{}
+  \item Perform lazy updates
+  \item Overheads during normal execution
+  \end{itemize}
+\item Standard VM with DSU support
+  \begin{itemize}
+  \item DJVCS \cite{BarrE03}, DUSC \cite{orso:java}, \cite{Milazzo05updates}
+  \item Special classloaders, compilers
+  \item Very restrictive
+  \item Space/time overheads
+  \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+% \begin{frame}{Related work}%{A Sub-title is optional}
+% Nobody can beat us.
+% \end{frame}
+
+\begin{frame}{Our solution}%{A Sub-title is optional}
+\begin{itemize}
+\item \DSU{} - a Java Virtual Machine with DSU support
+\item Key insight: Naturally extend existing VM services
+  \begin{itemize}
+  \item Classloading
+  \item Bytecode verification\footnote{Jikes RVM does not have a bytecode
+  verifier}
+  \item Thread synchronization
+  \item JIT Compilation
+  \item On-stack replacement
+  \item Garbage collection
+  \end{itemize}
+\item No DSU-related overhead during normal execution
+\item Support updates to real world applications
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Claim}%{A Sub-title is optional}
+\setbeamercovered{invisible}
+\begin{block}{}
+\emph{Dynamic software updating in managed languages can be achieved in a
+safe, flexible and efficient manner by naturally extending existing VM
+services.}
+\end{block}
+
+\begin{block}<2->{Corollary}
+\emph{DSU support should be a standard feature of future VMs.}
+\end{block}
+\end{frame}

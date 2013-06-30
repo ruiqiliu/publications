@@ -1,0 +1,496 @@
+===========================================================================
+                           OSDI 2008 Review #98A
+                 Updated Monday 19 May 2008 9:18:07am EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 4. Accept
+
+                ===== Paper strengths and weaknesses =====
+
+This is a well-done paper. It is clear, presents and interesting system,
+and describes both the strengths and weaknesses of the system. Their tests
+are excellent-- showing that they can deal with existing sets of updates
+gives me confidence that the system really works.
+
+If there is a weakness in the paper, it is that the approach is not all
+that exciting-- they do the sorts of things that you would expect one would
+do in trying to do dynamic updates. Their use of a full mark-and-sweep gc
+for a transition seems to work, but the price is pretty high; I'd love to
+see if they could figure out a way to do this with other forms of garbage
+collection. But these are suggestions for future research; the current
+paper is still quite nice.
+
+                      ===== Comments for author =====
+
+It would be interesting to know if there is anything about the JIKES VM
+(other than it being available) that made the approach possible. In
+particular, is there any reason to think that this sort of approach
+couldn't be done with other VMs (easier to find out now that there are
+other open-source VMs).
+
+===========================================================================
+                           OSDI 2008 Review #98B
+                Updated Wednesday 4 Jun 2008 6:46:15am EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+
+                ===== Paper strengths and weaknesses =====
+
+The paper presents JVOLVE, a virtual machine that supports dynamic software
+updating in Java. In order to perform an update, a programmer has to provide
+JVOLVE with the actual patches as well as transformer instructions that indicate
+how to transfer an object or a class into its updated version. Based on this
+information, the VM executes the update, as soon as the application has reached
+a safe point, by loading and JIT-compiling all classes affected by changes.
+Finally, the transformation process adjusts class signatures using a modified
+version of Jikes' semi-space copying collector. 
+
+The paper is well structured and presents the different steps of JVOLVE's
+updating process in great detail. Thereby referring to the very same example
+throughout the paper simplifies understanding.
+
+A strength of this paper clearly is the broad analysis of real application
+updates (Jetty, JavaEmailServer, CrossFTP) in the evaluation section, which
+proves the claim that it is not sufficient for DSU implementations to only allow
+method body changes. Instead, additions and deletions of fields and
+modifications of method signatures have to be dealt with as well - and JVOLVE
+does that. Furthermore, the fact that the costs of DSU in JVOLVE are strictly
+limited to the update interval is an obvious advantage.
+
+My only major point of criticism regards a missing discussion of JVOLVE's
+application field: In section 5.1, for example, it is mentioned that an update
+of Jetty, a relatively small application, from version 5.1.5 to version 5.1.6
+results (under load) in 1.36 seconds of system unavailability. Even when the
+system is idle, there is a pause of 0.76 seconds. In my opinion, this raises two
+questions that are not addressed in the paper:
+
+1. Instead of updating a Java virtual machine dynamically, would it not be
+easier to set up a second VM that has all new patches applied, duplicate the
+application's state and finally switch service provision? Examples from other
+virtualized environments (e.g. Xen) show that for transferring the state of a
+VM, it does not even has to be stopped. Especially in cases of applications
+with small internal states, like web servers, this approach is quite efficient.
+Furthermore, no complications with reaching update safe points are to expect.
+So what are the advantages of doing DSU in Java under the given circumstances?
+
+2. What is the typical use case of JVOLVE, i.e. what are the applications that
+on the one hand cannot tolerate pauses caused by other update approaches (like
+1.), but on the other allow a service downtime beyond hundreds of milliseconds?
+(No doubt that hard real-time systems are beyond the scope of JVOLVE.) So, what
+is a realistic scenario?
+
+                      ===== Comments for author =====
+
+Reading about all the updates you tested for your evaluation, I'm interested
+in the object and class transformers you must have written (Or did you use the
+default transformers?). Did you experience any difficulties, i.e. are there
+certain changes to fields that are not as easy to accomplish as others? What is
+the extent of a typical transformer?
+
+Section 4.2: it is mentioned that the update to JavaEmailServer's version
+1.3 could not be successfully applied due to "several" new classes added and
+"many" others modified. Table 3, on the other hand, shows that in this update
+just four classes were added and only two were modified.
+
+Section 4.3: it is mentioned that one of the three CrossFTP server updates
+rarely succeeded. Which one? Why? What means "rarely"?
+
+In general: research on dynamically alterable (software) systems goes back to
+the seventies. Since then, there have been ups and downs, "sinusoid-like".
+These sorts of systems, offering very fine-grain dynamic changes, were not
+really successful. Do you believe that your approach succeeds in this sense?
+Why?
+
+===========================================================================
+                           OSDI 2008 Review #98C
+                Updated Thursday 17 Jul 2008 1:05:21pm EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Reject
+
+                ===== Paper strengths and weaknesses =====
+
+This paper describes a system (JVOLVE) for dynamically updating running
+Java programs.  JVOLVE allows updates to Java programs to change fields,
+method signatures, and method bodies.  The work is primarily incremental;
+other systems have allowed similar dynamic updates but by requiring an
+extra level of indirection between references and objects.  JVOLVE avoids
+this cost by updating object instances at the time of garbage collection.
+Object instances are updated by programmer-supplied routines that update a
+new object based on the state in the old object.  JVOLVE is evaluated by
+showing how it can handle 22 minor updates to three Java programs.
+
+The primary weakness of this paper in any venue is the non-critical
+evaluation.  The work is incremental and yet the authors compare JVOLVE
+continually to less functional systems, but do not conduct a performance
+evaluation of JVOLVE versus prior art with similar functionality but
+differing implementations.  The evaluation also feels somewhat rigged as
+the authors only target minor updates, even for the programs with very long
+revision histories.  If JVOLVE is so great, why not show that it handles
+not only 5.1.1 to 5.1.2 releases but say 4.x to 5.x type releases.  If it
+can't handle such major releases, the authors need to explain why JVOLVE
+has real merit and is not merely an academic curiosity.
+
+The primary weakness of this submission to OSDI is that it holds little
+interest to the OSDI community.  The ideas are very specific to managed
+language runtimes like JVM and seem to have no special application to
+either operating systems or large scale systems.  The paper would be much
+better suited to an OOSPLA or PLDI audience.
+
+Ranked 28 of 33 of all the papers I reviewed (from most to least likely to
+accept).
+
+                      ===== Comments for author =====
+
+Given the apparent strength of JVOLVE, why didn't you try updates over
+several major versions?  Is the class of applications that are 1) written
+in Java code, and 2) can't afford to be restarted, really a significant
+set?  If uptime is so important, would servers tend to use clusters?
+
+I really liked the idea of writing transforms where the reference types
+have already been replaced with their new types very appealing!
+
+Section 2.2, Is there any reason why [24] isn't listed with [16, 11, 10,
+13, 26, 30, 15]?  (How about ordering the papers?)
+
+Section 2.3, If an object can only transformed once the referenced objects
+are transformed, do you run into problems with cycles?
+
+Section 3.4, Can you quantify the cost of having old objects persist until
+the *NEXT* collection after the update collection?
+
+Section 4, why did you pick a 18 month time span?  Was there no longer
+history available?
+
+Section 4.1, Having a greater number of restricted methods does not
+necessarily reduce the likelihood that an update will take place, but don't
+the results show a strong correlation?  After all the update with the
+highest number of failures (5) aso had the highest number of restricted
+methods.
+
+Section 5. Given that you are using a dual-proc machine, why do you talk
+about uniprocessor times?  Why did you only use one processor?  The
+expected explanation is that your system doesn't work on multi-proc
+configurations.
+
+Section 5, it would be nice to have tables of the # of objects updated in
+each upgrade.
+
+Section 5.1, Why does Table 5 mix JVOVLE and Jikes times?
+
+Section 5.1, a 1.36 second pause seems pretty big.  What are the pause
+times from non-update GCs?
+
+Figure 5, The lines are very hard to tell apart. Can you pick better line
+patterns?  Wouldn't it be perhaps more instructive to plot CPU usage?  If
+you are I/O bound, then your CPU usage could be significantly increasing
+for upgrades without necessarily effecting response rate.
+
+Section 6.2, What do you mean by "JVOVLE has a richer evaluation"?
+
+Section 6.2, Why did the JDrums and DVM systems believe that lazy upgrade
+was necessary?
+
+Section 6.2, The accusation that JDrums and DVM only consider a handful of
+toy upgrades seems a bit harsh given that you only checked 22 updates and
+none of the across major upgrades.  How do you define "toy"?
+
+Section 6.2, Are the extensive optimizations in PROSE relevant to your
+work?
+
+Section 6.3, Do you really support multi-threaded programs or only
+multi-threaded programs on single-processor systems?
+
+Section 6.3, Yes, the C/C++ systems don't benefit from a garbage collected
+memory model, but they work on a large body of existing code (code widely
+used in the OSDI community).
+
+Section 7, Where is the experimental data to support the claim that JVOLVE
+is the best-performing DSU for Java published to date?
+
+===========================================================================
+                           OSDI 2008 Review #98D
+                 Updated Monday 23 Jun 2008 1:47:25am EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+
+                ===== Paper strengths and weaknesses =====
+
+The paper presents an approach for dynamically updating running Java
+applications without restarting them.  The empirical results show that
+20 out of 22 patches to real applications can be handled, and the
+proposed approach imposes no performance overheads except when
+applying the patch, which is very nice.  Updates are atomic and type
+safe, which are also nice and important properties.  My main complaint
+is that it's not clear that this functionality is desperately needed.
+For the three real applications considered in the paper, were talking
+about a total of two dozen restarts over a period of several years.
+I'm guessing that in many installations of these applications, they
+are restarted more frequently than that for other reasons.  And some
+would argue that OSDI is not the best forum for this paper.
+Nonetheless I think this paper deserves to be considered because the
+contribution seems quite nice.
+
+                      ===== Comments for author =====
+
+Section 2.3 states that "the code in transformer methods is
+essentially a kind of constructor".  This should be stated earlier; I
+was worried that the transformer methods were complex and difficult to
+write.
+
+The total overhead of patching in the worst case (Table 6) is only
+about eight seconds, which seems pretty good to me considering what is
+going on.  Nice.
+
+I would like to see a discussion of to what extent, if at all, you can
+leverage the techniques and learnings of this contribution in more
+systems-y contexts.  What other kinds of software can potentially be
+patched on the fly?  E.g., is it crazy to dream of dynamically linked
+libraries used by running C/C++ programs being changed on the fly in
+an analogous fashion?
+
+Minor points:
+
+Because this paper is outside of my area, I asked a few colleagues to
+have a look:
+
++++++ second opinion +++++
+
+Summary
+
+Availability is increasingly important for a wide range of
+applications.  Naturally, the ability to update software dynamically
+is useful for such applications.  This paper presents extensions to
+the JIKES Java virtual machine that allow Java programs to be updated
+dynamically.  The proposed extensions 1) overwrite all places where
+non-updated code reside, especially in the JIT and 2) identify
+safe-points at which to perform code updates and data structure
+changes.  The exact changes to data structures are specified by
+developers via transformer methods.
+
+My primary complaint with this paper is that it may not fall within
+the scope of OSDI.  The proposed solution requires significant
+background in programming languages, especially Java.  Further, a lot
+of the cited work comes from OOPSLA.  I this work more appropriate for
+VEE or ASPLOS.
+
+Relevance aside, the work seems like a novel combination of
+straightforward extensions to the JVM for dynamic code replacement.
+The proposed extensions have been implemented and tested on real
+software applications.
+
++++++ third opinion +++++
+
+Overall conclusion: accept
+
+Self-evaluation: average, I understand the content of the paper, but
+was not familiar with the previous work.  I read the most relevant
+previous work papers (JDrums and DVM) to get me up to date.
+
+This paper describes a dynamic software update facility for Java
+applications.  The key point stressed throughout the paper is that it
+has zero overhead other than when updating.  Another important
+contribution is that it supports far more updates than simple method
+field updates.
+
+Overall, I enjoyed reading this paper.  The paper is well written and
+the arguments are articulated nicely.  I specifically like the
+discussion for each section that discusses many design/implementation
+issues.  The paper is well-rounded and one can easily extend it to be
+even better.
+
+Specific comments:
+
+1. How do you know that the updates you are making are "correct"? For
+   example, how do I know that the Jetty 5.1.6 (Jvolve) is the same as
+   Jetty 5.1.6? Is there a way to compare class signatures after the
+   update with the real one?
+2. What happens if the copying takes too long? Authors discuss this in
+   section 3.4. It would be nice to figure out what updates require
+   what kind of mechanism (lazy, early, combination?) Perhaps the
+   developer can provide a hint in the transformer?
+3. I like the insight in section 4.1:
+   "... Interestingly, having a greater number of restricted methods
+   overall does not necessarily reduce ..."
+   It may be obvious after reading it, but good insight to have.
+4. How can you improve the object copying? Why can't you optimize
+   similar to memcopy in GC? Authors mention this and say that the
+   number of objects copies were few. I guess one can work on the
+   optimization easily.
+5. How to protect mistakes in transformers? Authors mention this as
+   well, and detect cycles. Again, more extensions are possible.
+
+===========================================================================
+                           OSDI 2008 Review #98E
+                  Updated Monday 7 Jul 2008 1:25:31pm EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 2. Reject
+
+                      ===== Comments for author =====
+
+Interesting paper about applying the concept of continous updates (aka DSU) to Java.
+This is a well writen paper with evaluation results.
+
+My main concern with this paper is that the continuous update problem for
+Java is relatively easy compared to C/C++ code (which the authors have
+already published).  A lot of the continuous update complexity is handled
+by the managed runtime system and the dynamic code generator.
+
+There is are more advanced results over [4] in IBM's AS/400 and mainframe
+systems where they dynamically update the running operating systems and
+applications all the time. This is one of the reasons why they achieve high
+uptimes.
+
+===========================================================================
+                           OSDI 2008 Review #98F
+                Updated Saturday 12 Jul 2008 5:17:38am EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+
+                ===== Paper strengths and weaknesses =====
+
+Summary:
+
+The paper describes an extension to the Jikes RVM that enables dynamic
+software updates like reloading classes whose signature or implementation
+has changed. The new classes are loaded in the VM in such a way that
+applications do not need to be stopped, and existing objects are
+transformed (to comply with new class definitions) as they are found
+reachable when a full heap GC takes place. An extended class loader infers
+the modifications to be performed and verifies they are type-safe.
+
+Strengths:
+
+In-depth work. It advances the state of the art in this area by
+allowing more types of software updates or improving performance.
+The survey of related work is quite complete, including references
+to dynamic updates in other types of systems.
+
+Paper is well-written. The motivating examples help the reader. Some
+limitations of the current implementation are addressed in the
+discussion section with a clear analysis, and references to solutions
+in the literature.
+
+The approach was tested with three long-running open-source
+applications (the ones that benefit more from dynamic updates),
+using real updates, and the results show some degree of success,
+and are thoroughly analyzed.
+
+Weaknesses:
+
+Novelty of problem statement. There are many proposals for solving the same
+problem. While it is clear that this improves on previous proposals, the
+motivation only discusses how it improves on each of the existing systems,
+and then moves on to a complete description of the system. The paper would
+improve if you could summarize in a concise way what are the key ideas that
+other systems didn't apply, which make this one more interesting.
+
+The motivation presented for a VM-centric approach is transparency to the
+programmer, but nothing is said about the issue of portability, i.e.,
+requiring the use of a modified VM (or at least, the need for a VM
+plug-in). The paper would improve with a discussion of why a bytecode
+extension approach would not be feasible (or as effective).
+
+The approach for object transformation by piggybacking on a full-heap,
+stop-the-world GC is rather inflexible (how different would a simpler
+checkpoint-transform-reload approach be?). How frequent can a full-heap GC
+be in practice? Even though you mention using a concurrent collector, it is
+not clear if the solution you propose would be safe in presence of
+interleaved GC/transformation and application/mutator phases. This is a
+very important limitation and source of inefficiency, especially if the
+approach were to be used in high-end servers, with multi-threaded
+applications running on multi-cores, with very large memory heaps.
+
+The restriction of only allowing updates to proceed when none of the
+(directly or indirectly) involved types are referred from any thread stacks
+is limitative, and either requires a polling-based technique where the VM
+periodically tries to reissue an update, or leaves this to the admin by
+returning an error.  Simply trying to stop all threads at the same time
+brings no assurance that more intricate updates, with a larger number of
+updated classes, will ever succeed. Sometimes one thread must be able to
+make progress to eliminate from the stack references to a type/class
+involved in the dynamic update. This goes beyond the issue of "top-level"
+classes with infinite-loop methods which is well addressed in the paper.
+
+Regarding the evaluation, you state that the object transformation overhead
+is negligible and most of the overhead is due to GC, somehow defending your
+approach. But from what can be gathered from the performance numbers, the
+time for a full GC (in itself already a penalty) as the number of
+transformed objects grows increases almost threefold. This overhead is also
+attributable to the DSU mechanism, and not only object transformation.
+Furthermore, this can be problematic since you can expect a large number of
+objects in a server application.
+
+                      ===== Comments for author =====
+
+Other questions: Couldn't find any reference about removed methods. I
+would assume they are not allowed, but sometimes they happen in
+software updates.
+
+The comment on page 9 about the likelihood of an update taking effect
+being a function not of the number of restricted methods but on the
+frequency with which they appear on the stack is somewhat misleading:
+The more they are, the higher the probability that at least one of
+them is in stack. Therefore, very large updates might never succeed.
+
+How do you avoid an exhaustive search to identify indirect method
+updates? Could this kind of backward inference be a major source of
+overhead for very large code bases?
+
+===========================================================================
+                           OSDI 2008 Review #98G
+                Updated Thursday 24 Jul 2008 2:15:45pm EDT
+---------------------------------------------------------------------------
+    Paper #98: Dynamic Software Updates for Java: A VM-Centric Approach
+---------------------------------------------------------------------------
+
+                      Overall merit: 3. Weak accept
+
+                ===== Paper strengths and weaknesses =====
+
++ Advances the state of the art in Dynamic Software Update for Java
+
++ Strong evaluation using a number of open source java server apps
+
+- Although a nicely executed piece of work, nothing stood out as being
+a particularly surprising result. Possibly this work would be a better
+fit for another venue.
+
+                      ===== Comments for author =====
+
+Although the evaluation methodology is good, picking applications that
+are more representative of the typical use of Java would be better
+(e.g. business logic tier implementations etc). The current
+applications are all examples of services that are easily replicated
+for high availability, and not great candidates for DSU. It certainly
+wouldn't hurt to present some clear examples of the real-world
+relevance of DSU for Java, if you have some.
+
+Since the work adds no additional performance overhead before or after
+application of an update, the critical metric would seem to be the
+application downtime during update. Section 5.1 labors this point. I
+would have expected to see a table showing downtime measurements for
+each of the three applications being exercised under a reasonably
+high load while being put through a series of updates.
+
+The paper will definitely be stronger when some of the techniques
+proposed for updating long running methods are implemented -- the
+current work just feels a little light and predictable.
+
+

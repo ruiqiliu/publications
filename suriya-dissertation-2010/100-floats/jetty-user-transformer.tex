@@ -1,0 +1,59 @@
+\lstset{frame=single}
+\begin{figure}[p]
+\begin{tabular}{@{}m{0.5\textwidth}@{}m{0.5\textwidth}@{}}
+\BC \begin{minipage}{0.42\textwidth}
+\begin{lstlisting}
+public class HttpContext {
+  private List
+    _systemClasses;
+}
+\end{lstlisting}
+\end{minipage} \EC &
+\BC \begin{minipage}{0.42\textwidth}
+\begin{lstlisting}
+public class HttpContext {
+  private String[]
+    _systemClasses =
+      new String [] {...};
+}
+\end{lstlisting}
+\end{minipage} \EC \\[-3.5ex]
+\BC (a) Version 5.1.5 \EC &
+\BC (b) Version 5.1.6 \EC \\
+\end{tabular}
+
+\begin{tabular}{@{}b{\textwidth}@{}}
+\centering
+\begin{minipage}{0.7\textwidth}
+\begin{lstlisting}
+public static void jvolveObject(
+  HttpContext to, r_5_1_5_HttpContext from) {
+    to._systemClasses = null;
+}
+\end{lstlisting}
+\end{minipage} \\[-0.5ex]
+(c) Default transformer \\[1.5ex]
+\begin{minipage}{0.7\textwidth}
+\begin{lstlisting}
+public static void jvolveObject(
+  HttpContext to, r_5_1_5_HttpContext from) {
+  if (from._systemClasses == null) {
+    to._systemClasses = null;
+  } else {
+    to._systemClasses =
+      new String[from._systemClasses.size()];
+    int i = 0;
+    for (Object o : from._systemClasses) {
+      to._systemClasses[i] = (String) o;
+      i++;
+    }
+  }
+}
+\end{lstlisting}
+\end{minipage} \\[-0.5ex]
+(d) User generated transformer
+\end{tabular}
+\caption{Object transformer from Jetty version 5.1.5 to
+5.1.6\label{fig:sjt}}
+\end{figure}
+\lstset{frame=none}

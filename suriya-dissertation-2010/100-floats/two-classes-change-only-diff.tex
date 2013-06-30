@@ -1,0 +1,32 @@
+\begin{figure}[t]
+\lstset{frame=single}
+\begin{tabular}{@{}m{0.5\textwidth}@{}m{0.5\textwidth}@{}}
+\BC \begin{minipage}{0.3\textwidth}
+\begin{lstlisting}
+public class X {
+  private Y y;
+}
+public class Y {
+  private int i;
+}
+\end{lstlisting}
+\end{minipage} \EC &
+\BC \begin{minipage}{0.32\textwidth}
+\begin{lstlisting}
+public class X {
+  private String s;
+  private Y y;
+}
+public class Y {
+  private int i, j;
+}
+\end{lstlisting}
+\end{minipage} \EC \\[-3ex]
+\BC (a) Old version \EC &
+\BC (b) New version \EC \\[-2ex]
+\end{tabular}
+\hangcaption{Example of a simple update where the field of an updated class
+refers to another updated class\label{fig:two-classes-change-only-diff}}
+\lstset{frame=none}
+\VspaceFixForHangcaption
+\end{figure}

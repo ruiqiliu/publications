@@ -1,0 +1,10 @@
+\beamer@endinputifotherversion {3.20pt}
+\beamer@sectionintoc {1}{Introduction}{2}{0}{1}
+\beamer@sectionintoc {2}{An example of an update}{11}{0}{2}
+\beamer@sectionintoc {3}{Update Timing and Safety}{20}{0}{3}
+\beamer@sectionintoc {4}{Updating State}{27}{0}{4}
+\beamer@subsectionintoc {4}{1}{Object Transformers Model}{28}{0}{4}
+\beamer@subsectionintoc {4}{2}{Object Transformers VM Implementation}{31}{0}{4}
+\beamer@subsectionintoc {4}{3}{Automating state transformer generation}{46}{0}{4}
+\beamer@sectionintoc {5}{Evaluation}{49}{0}{5}
+\beamer@sectionintoc {6}{My research vision}{53}{0}{6}

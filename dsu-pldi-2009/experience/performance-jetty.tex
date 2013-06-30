@@ -1,0 +1,45 @@
+% \input{experience/performance-jetty-table}
+% \input{experience/performance-jetty-graph}
+% \input{experience/performance-microbench-table}
+
+\paragraph{Jetty performance.}
+To see the effect of updating on application performance, we measured Jetty
+under various configurations using httperf, a webserver
+benchmarking tool.\footnote{\url{http://www.hpl.hp.com/research/linux/httperf}}  We used httperf to issue roughly 800 new connection
+requests/second, which we observed to be Jetty's saturation rate.
+Each connection makes 5 serial requests for a 40 Kbyte file. Httperf
+reports average throughput and average per-request latency over a 60 second period. We
+ran this experiment 21 times and report the median and
+quartiles of the throughput and latency reports. With 21 runs, the range between
+the quartiles serves as a 98\% conﬁdence interval~\cite{PrattGibbons81}.
+In order to eliminate network traffic
+effects, we ran the server on two cores of a quad-core machine and the
+client on another core.
+
+Figure~\ref{fig:jetty} shows our results in tabular form and plotted graphically.  The second and third columns
+of the table
+report the median throughput and the range between the two quartiles.
+The third column and fourth column report the median latency and the
+inter-quartile range.  The
+first and seconds rows illustrate the performance of Jetty version 5.1.6
+running on stock \JikesRVM{} and \DSU, respectively. The third row shows
+the performance on \DSU{} of Jetty 5.1.6 dynamically updated from version
+5.1.5 prior to the start of the experiment.
+% \todo{Find a way to introduce the graph} Figure~\ref{fig:jetty} plots the results shown in the table.
+The performance of the two \DSU{} configurations
+is essentially identical: the two configurations' corresponding
+inter-quartile ranges largely overlap.
+The performance of \DSU{} is also quite similar to the performance of
+stock \JikesRVM.  There are many small differences between \DSU{} and the stock
+implementation that change VM code size, code layout, and garbage
+collection behavior.  These differences may impact performance
+directly and they may indirectly affect other elements of the VM,
+such as the timing of garbage collections and JIT
+optimizations (such indirect effects make VMs notoriously difficult to
+benchmark~\cite{dacapo-cacm}).
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../pldi64"
+%%% End: 

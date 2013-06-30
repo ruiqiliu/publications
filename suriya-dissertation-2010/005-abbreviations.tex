@@ -1,0 +1,88 @@
+\newcommand\todo[1]{{\color{red}$<$TODO: #1$>$}}
+% \newcommand\todo[1]{}
+
+% Don't name this file acronyms, since there is a package of the same name
+
+% acronyms help
+% \ac{JVM}   is smart and gives the full name the first time and the acronym
+%            for future invocations
+% \acf{JVM}  Java Virtual Machine (JVM)
+% \acs{JVM}  JVM
+% \acl{JVM}  Java Virtual Machine
+% \acp{JVM}  plural form of \ac
+% \acfp{JVM} Java Virtual Machines (JVMs)
+% \acsp{JVM} JVMs
+% \aclp{JVM} Java Virtual Machines
+
+\acrodef{OSR}{On-Stack Replacement}\newcommand{\OSR}{\ac{OSR}\xspace}
+\acrodef{UPT}{Update Preparation Tool}\newcommand{\UPT}{\ac{UPT}\xspace}
+\acrodef{JVM}{Java Virtual Machine}\newcommand{\JVM}{\ac{JVM}\xspace}
+\acrodef{VMT}{Virtual Meth\-od Table}\newcommand{\VMT}{\ac{VMT}\xspace}
+\acrodef{VM}{Virtual Machine}\newcommand{\VM}{\ac{VM}\xspace}
+\newcommand{\iTIB}{\index{type information block}\xspace}
+\acrodef{TIB}{Type Information Block}\newcommand{\TIB}{\iTIB\ac{TIB}\xspace}
+\acrodef{API}{Application Programming Interface}\newcommand{\API}{\ac{API}\xspace}
+\acrodef{JIT}{Just-in-time}\newcommand{\JIT}{\ac{JIT}\xspace}
+\acrodef{PC}{Program Counter}\newcommand{\PC}{\ac{PC}\xspace}\newcommand{\PCs}{\acp{PC}\xspace}
+\acrodef{DSU}{Dynamic Software Updating}\newcommand{\USD}{\ac{DSU}\xspace}
+\acrodef{GC}{Garbage Collection}\newcommand{\GC}{\ac{GC}\xspace}
+\acrodef{GUI}{Graphical User Interface}\newcommand{\GUI}{\ac{GUI}\xspace}
+\acrodef{FTP}{File Transfer Protocol}\newcommand{\FTP}{\ac{FTP}\xspace}
+\acrodef{SLOC}{source lines of code}\newcommand{\SLOC}{\ac{SLOC}\xspace}
+\acrodef{POP}{Post Office Protocol}\newcommand{\POP}{\ac{POP}\xspace}
+\acrodef{SMTP}{Simple Mail Transfer Protocol}\newcommand{\SMTP}{\ac{SMTP}\xspace}
+\acrodef{HTTP}{Hypertext Transfer Protocol}\newcommand{\HTTP}{\ac{HTTP}\xspace}
+
+\newcommand{\EA}{et al.\@\xspace}
+
+\newcommand{\JO}{{\tt jvolveObject}\xspace}
+\newcommand{\JC}{{\tt jvolveClass}\xspace}
+\newcommand{\JT}{{\tt JvolveTransformers}\xspace}
+
+\newcommand{\VMClass}{{\tt RVMClass}\xspace}
+
+\newcommand{\HttpListener}{{\tt HttpListe\-n\-er}\xspace}
+\newcommand{\getForwardedAddresses}{{\tt getForwardedAddre\-ss\-es}\xspace}
+\newcommand{\getStatus}{{\tt getStat\-us}\xspace}
+\newcommand{\StringArray}{{\tt Str\-ing[]}\xspace}
+\newcommand{\SMTPSenderrun}{{\tt SMTPSender.\-run()}\xspace}
+
+\newcommand{\User}{{\tt User}\xspace}
+\newcommand{\oUser}{{\tt v131\_User}\xspace}
+\newcommand{\oX}{{\tt old\_X}\xspace}
+\newcommand{\oY}{{\tt old\_Y}\xspace}
+\newcommand{\nX}{{\tt new\_X}\xspace}
+\newcommand{\nY}{{\tt new\_Y}\xspace}
+\newcommand{\static}{{\tt static}\xspace}
+\newcommand{\final}{{\tt final}\xspace}
+\newcommand{\public}{{\tt public}\xspace}
+\newcommand{\private}{{\tt private}\xspace}
+\newcommand{\protectd}{{\tt protected}\xspace}
+\newcommand{\NULL}{{\tt null}\xspace}
+\newcommand{\FROM}{{\tt from}\xspace}
+\newcommand{\TO}{{\tt to}\xspace}
+
+\newcommand{\JV}{{\sc Jvo\-l\-ve}\xspace}
+\newcommand{\JTOC}{\texttt{JTOC}}
+\newcommand{\RVM}{JikesRVM\xspace}
+\newcommand{\RVMversion}{\RVM (SVN r15532)\xspace}
+\newcommand{\DSP}{{\em \USD safe point}\xspace}
+\newcommand{\DSPs}{{\em \USD safe points}\xspace}
+
+\newcommand\T{\rule{0pt}{2.25ex}}
+
+\newcommand{\mc}{\multicolumn}
+\newcommand{\CC}[1]{\multicolumn{1}{c}{#1}}
+\newcommand{\mr}{\multirow}
+
+\newcommand{\BC}{\begin{center}}
+\newcommand{\EC}{\end{center}}
+
+\newcommand{\BCode}[2][t]{\begin{figure}[#1]\centering\begin{minipage}{#2\textwidth}}
+\newcommand{\ECode}[1]{\end{minipage}\hangcaption{#1}\end{figure}}
+
+\newcommand{\BS}{\begin{sideways}}
+\newcommand{\ES}{\end{sideways}}
+
+% \hangcaption seems to add extra space in the float.
+\newcommand{\VspaceFixForHangcaption}{\vspace*{-3ex}}

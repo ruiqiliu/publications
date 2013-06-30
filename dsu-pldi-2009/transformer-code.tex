@@ -1,0 +1,32 @@
+\begin{figure}
+\begin{small}
+\begin{verbatim}
+public class v131_User {
+  private final String username, domain, password;
+  private String[] forwardAddresses;
+}
+public class JvolveTransformers {
+ ...
+ public static void jvolveClass(User unused) {}
+ public static void
+  jvolveObject(User to, v131_User from) {
+    to.username = from.username;
+    to.domain = from.domain;
+    to.password = from.password;
+    // default transformer would have:
+    //   to.forwardAddresses = null
+    int len = from.forwardAddresses.length;
+    to.forwardAddresses = new EmailAddress[len];
+    for (int i = 0; i < len; i++) {
+      String[] parts =
+        from.forwardAddresses[i].split("@", 2);
+      to.forwardAddresses[i] =
+        new EmailAddress(parts[0], parts[1]);
+}}}
+\end{verbatim}
+\end{small}
+\caption{Example {\tt User} object transformer}
+\label{fig:example-xform}
+\end{figure}
+
+% vim:nospell

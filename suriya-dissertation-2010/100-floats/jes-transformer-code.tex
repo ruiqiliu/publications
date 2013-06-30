@@ -1,0 +1,34 @@
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.9\textwidth}
+\begin{lstlisting}[frame=single]
+public class v131_User {
+  private final String username, domain, password;
+  private String[] forwardAddresses;
+}
+public class JvolveTransformers {
+ ...
+ public static void jvolveClass(User unused) {}
+ public static void jvolveObject(User to, v131_User from) {
+    to.username = from.username;
+    to.domain = from.domain;
+    to.password = from.password;
+    // default transformer would have:
+    //   to.forwardAddresses = null
+    int len = from.forwardAddresses.length;
+    to.forwardAddresses = new EmailAddress[len];
+    for (int i = 0; i < len; i++) {
+      String[] parts =
+        from.forwardAddresses[i].split("@", 2);
+      to.forwardAddresses[i] =
+        new EmailAddress(parts[0], parts[1]);
+    }
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\hangcaption{\User object transformer for update from JavaEmailServer version
+1.3.1 to version 1.3.2}
+\label{fig:jes-transformer-code}
+\VspaceFixForHangcaption
+\end{figure}

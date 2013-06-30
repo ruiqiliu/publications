@@ -1,0 +1,47 @@
+newgraph X 4.75 Y 3.75
+
+newcurve y_epts
+  0  618.7  614.5  620.8
+ 10  859.0  857.2  864.0
+ 20 1065.9 1064.1 1069.5
+ 30 1269.9 1260.7 1271.1
+ 40 1466.1 1462.7 1470.4
+ 50 1663.6 1659.8 1668.3
+ 60 1850.8 1846.3 1854.9
+ 70 2054.2 2050.9 2060.9
+ 80 2253.1 2249.5 2256.6
+ 90 2448.5 2443.5 2451.7
+100 2627.9 2623.1 2630.2
+marktype circle fill 0.0 linetype dashed label : (1) DSU time (2 + 3)
+
+newcurve y_epts
+  0  615.4  611.2  617.3
+ 10  694.6  692.7  699.6
+ 20  763.0  761.6  766.8
+ 30  833.6  828.2  837.5
+ 40  900.1  897.9  904.9
+ 50  965.9  962.9  970.0
+ 60 1019.0 1016.1 1023.9
+ 70 1076.4 1072.8 1078.2
+ 80 1129.9 1125.1 1133.1
+ 90 1181.2 1177.8 1184.9
+100 1217.5 1215.4 1220.8
+marktype box    linetype solid label : (2) GC time
+
+newcurve y_epts
+  0    0.1    0.1    0.1
+ 10  160.8  160.7  161.1
+ 20  299.2  298.8  299.6
+ 30  429.4  428.9  429.9
+ 40  560.2  559.1  562.1
+ 50  693.8  693.2  695.8
+ 60  827.3  825.9  828.7
+ 70  975.0  974.1  976.8
+ 80 1119.6 1118.7 1120.3
+ 90 1263.7 1261.9 1265.8
+100 1405.4 1404.7 1407.0
+marktype circle fill 1.0 linetype solid label : (3) Running transformers
+
+xaxis size 4   label fontsize 13 font Times-Roman : Change fraction (%)
+yaxis size 3.2 label fontsize 13 font Times-Roman : Time (ms)
+legend defaults x 5 y 2000 hjl vjb font Times-Roman fontsize 13

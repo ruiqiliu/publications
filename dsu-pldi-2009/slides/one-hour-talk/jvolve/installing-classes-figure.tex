@@ -1,0 +1,143 @@
+{
+% \setbeamertemplate{headline}{}
+% \setbeamertemplate{footline}{}
+% \setbeamertemplate{navigation symbols}{}
+\setbeamercovered{invisible}
+\begin{frame}[t,fragile]{Installing new classes}
+\vspace*{-2ex}
+\begin{tikzpicture}[auto]
+
+\tikzstyle{title}=[font=\tiny\tt,text width=9mm,minimum height=4.5mm]
+\tikzstyle{box}=[font=\tiny\tt,draw, thin,text width=9mm,minimum height=4.5mm,anchor=north west]
+% Two rows
+\newcommand{\HeaderRow}[2]{% name, content
+\node [title] (#1 0) { #2 }; \\
+}
+
+\newcommand{\rowsTwo}[3]{% name, row0, row1
+\HeaderRow{#1}{#2}
+\node [box]   (#1 1) { #3 }; \\
+}
+% Three rows
+\newcommand{\rowsThree}[4]{% name, row0, row1, row2
+\rowsTwo{#1}{#2}{#3}
+\node [box]   (#1 2) { #4 }; \\
+}
+% Four rows
+\newcommand{\rowsFour}[5]{% name, row0, row1, row2
+\rowsThree{#1}{#2}{#3}{#4}
+\node [box]   (#1 3) { #5 }; \\
+}
+% Five rows
+\newcommand{\rowsFive}[6]{% name, row0, row1, row2
+\rowsFour{#1}{#2}{#3}{#4}{#5}
+\node [box]   (#1 4) { #6 }; \\
+}
+
+\newcommand{\newRowsTwo}[3]{% name, row0, row1
+\HeaderRow{#1}{#2}
+\node [box,fill=new color]   (#1 1) { #3 }; \\
+}
+% Three rows
+\newcommand{\newRowsThree}[4]{% name, row0, row1, row2
+\newRowsTwo{#1}{#2}{#3}
+\node [box,fill=new color]   (#1 2) { #4 }; \\
+}
+% Four rows
+\newcommand{\newRowsFour}[5]{% name, row0, row1, row2
+\newRowsThree{#1}{#2}{#3}{#4}
+\node [box,fill=new color]   (#1 3) { #5 }; \\
+}
+% Five rows
+\newcommand{\newRowsFive}[6]{% name, row0, row1, row2
+\newRowsFour{#1}{#2}{#3}{#4}{#5}
+\node [box,fill=new color]   (#1 4) { #6 }; \\
+}
+
+\newcommand{\metadataTwo}[4]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\rowsTwo{#1}{#3}{#4}
+};}
+\newcommand{\metadataThree}[5]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\rowsThree{#1}{#3}{#4}{#5}
+};}
+\newcommand{\metadataFour}[6]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\rowsFour{#1}{#3}{#4}{#5}{#6}
+};}
+\newcommand{\metadataFive}[7]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\rowsFive{#1}{#3}{#4}{#5}{#6}{#7}
+};}
+
+\newcommand{\newMetadataTwo}[4]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\newRowsTwo{#1}{#3}{#4}
+};}
+\newcommand{\newMetadataThree}[5]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\newRowsThree{#1}{#3}{#4}{#5}
+};}
+\newcommand{\newMetadataFour}[6]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\newRowsFour{#1}{#3}{#4}{#5}{#6}
+};}
+\newcommand{\newMetadataFive}[7]{% name, position, contents 
+\matrix [row sep=-0.4pt,anchor=north west] (#1) at #2 {
+\newRowsFive{#1}{#3}{#4}{#5}{#6}{#7}
+};}
+
+\colorlet{new color}{green!40}
+\tikzstyle{line}=[draw, thin, -latex',]
+\tikzstyle{every path}=[line]
+
+\begin{scope}
+  \metadataTwo{typeref}{(0,-1)}{Name}{type}
+  \uncover<4->{ \newMetadataTwo{typerefnew}{(0,0)}{Name}{type} }
+  \metadataFour{class}{(2,0)}{Type}{name}{members}{tib}
+  \metadataThree{field}{(4,0)}{Field}{name}{offset}
+  \node at (5.75,-0.75) {...};
+  \metadataFive{method}{(6,0)}{Method}{name}{offset}{bytecode}{asm}
+  \metadataFive{tib}{(4,-1.35)}{TIB}{type}{method0}{method1}{...}
+  \uncover<-2>{ \node[box,text width=14mm] (bc) at (8,-1)   { 0100100101...  }; }
+  \node[box,text width=14mm] (mc) at (8,-2)   { 1010000111... };
+  \uncover<2> { \node[box,text width=14mm,fill=new color] (bcnew) at (8,-0.25) { 1100100101... }; }
+  \uncover<3->{ \node[box,text width=14mm] (bcnew) at (8,-0.25) { 1100100101... }; }
+\end{scope}
+
+\uncover<-3> { \path (typeref 1.east) to [out=0,in=180] (class 1.north west); }
+\uncover<-3> { \path (class 1.west)   to [out=180,in=0] (typeref 1.south east); }
+\uncover<4-> { \path (typerefnew 1.east) to [out=0,in=180] (class 1.north west); }
+\uncover<4-> { \path (class 1.west)   to [out=180,in=0] (typerefnew 1.south east); }
+\path (class 2.east)         to [out=0,in=180]   (field 1.north west);
+\path (class 3.east)         to [out=0,in=135]   (tib 1.north west);
+\path (tib 1.west)           to [out=180,in=315] (class 3.south);
+\path (tib 2.east)           to [out=0,in=225]   (mc.south west);
+\path (method 4.east)        to                  (mc.north west);
+\uncover<1>  { \path (method 3.east)        to   (bc.north west);    }
+\uncover<2-> { \path (method 3.east)        to   (bcnew.north west); }
+
+\uncover<5->{
+\begin{scope}[yshift=-3.75cm]
+  \newMetadataFour{class1}{(2,0)}{Type}{name}{members}{tib}
+  \newMetadataThree{field1}{(4,0)}{Field}{name}{offset}
+  \node at (5.75,-0.75) {...};
+  \newMetadataFive{method1}{(6,0)}{Method}{name}{offset}{bytecode}{asm}
+  \newMetadataFive{tib1}{(4,-1.35)}{TIB}{type}{method0}{method1}{...}
+  \node[box,text width=14mm,fill=new color] (bc1) at (8,-1) { 0100100101... };
+  \node[box,text width=14mm,fill=new color] (mc1) at (8,-2) { 1010000111... };
+\end{scope}
+  \path (class1 2.east)         to [out=0,in=180]   (field1 1.north west);
+  \path (class1 3.east)         to [out=0,in=135]   (tib1 1.north west);
+  \path (tib1 2.east)           to [out=0,in=225]   (mc1.south west);
+  \path (tib1 1.west)           to [out=180,in=315] (class1 3.south);
+  \path (method1 3.east)        to                  (bc1.north west);
+  \path (method1 4.east)        to                  (mc1.north west);
+  \path (class1 1.north west)   to                  (typeref 1.south east);
+  \path (typeref 1.south)       to [out=285,in=180] (class1 1.west);
+}
+
+\end{tikzpicture}
+\end{frame}
+}

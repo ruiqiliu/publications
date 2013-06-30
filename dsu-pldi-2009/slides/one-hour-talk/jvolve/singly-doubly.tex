@@ -1,0 +1,67 @@
+\begin{frame}[fragile]{Jvolve GC}%{A Sub-title is optional}
+\begin{columns}[c]
+\begin{column}{0.67\paperwidth}
+\only<1>{\includegraphics[scale=0.45]{images/singly-doubly/before-gc-copy}}%
+\only<2>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly}}%
+\only<3>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-b-step-0}}
+\only<4>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-b-step-1}}
+\only<5>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-b-step-2}}
+\only<6>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-b-step-3}}
+\only<7>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-head-step-0}}
+\only<8>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-head-step-1}}
+\only<9>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transform-head-step-2}}
+\only<10>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transformed}}
+\only<11>{\includegraphics[scale=0.45]{images/singly-doubly/singly-doubly-transformed-final}}
+\end{column}
+\begin{column}{0.37\paperwidth}%
+% Transform b, step 0
+\only<3>{%
+\begin{footnotesize}%
+\noindent {\tt jvolveObject(Node to,}\\
+{\tt\ \ \ \ old\_Node from) \{}\\
+{\tt\ \ to.data = from.data;}\\
+{\tt\ \ to.next = from.next;}\\
+{\tt\ \ if (to.next != null)}\\
+{\tt\ \ \ \ to.next.prev = to;}\\
+{\tt \}}
+\end{footnotesize}%
+}%
+% Transform b, step 1
+\only<4>{%
+\begin{footnotesize}%
+\noindent {\tt jvolveObject(Node to,}\\
+{\tt\ \ \ \ old\_Node from) \{}\\
+{\tt\ \ \colorbox{yellow}{to.data = from.data;}}\\
+{\tt\ \ to.next = from.next;}\\
+{\tt\ \ if (to.next != null)}\\
+{\tt\ \ \ \ to.next.prev = to;}\\
+{\tt \}}
+\end{footnotesize}%
+}%
+% Transform b, step 2
+\only<5>{%
+\begin{footnotesize}%
+\noindent {\tt jvolveObject(Node to,}\\
+{\tt\ \ \ \ old\_Node from) \{}\\
+{\tt\ \ to.data = from.data;}\\
+{\tt\ \ \colorbox{yellow}{to.next = from.next;}}\\
+{\tt\ \ if (to.next != null)}\\
+{\tt\ \ \ \ to.next.prev = to;}\\
+{\tt \}}
+\end{footnotesize}%
+}%
+% Transform b, step 3
+\only<6>{%
+\begin{footnotesize}%
+\noindent {\tt jvolveObject(Node to,}\\
+{\tt\ \ \ \ old\_Node from) \{}\\
+{\tt\ \ to.data = from.data;}\\
+{\tt\ \ to.next = from.next;}\\
+{\tt\ \ \colorbox{yellow}{if (to.next != null)}}\\
+{\tt\ \ \colorbox{yellow}{\ \ to.next.prev = to;}}\\
+{\tt \}}
+\end{footnotesize}%
+}%
+\end{column}
+\end{columns}
+\end{frame}

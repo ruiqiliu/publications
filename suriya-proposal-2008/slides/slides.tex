@@ -1,0 +1,67 @@
+
+% This is for rubber to remove slides.vrb automatically created by tikz
+% rubber: watch $job.vrb
+% rubber: clean $job.vrb
+
+% \documentclass[xcolor=dvipsnames,12pt]{beamer}
+% \documentclass[draft,handout,xcolor=dvipsnames]{beamer}
+\documentclass[handout,xcolor=dvipsnames]{beamer}
+% \documentclass[draft,xcolor=dvipsnames]{beamer}
+% \documentclass[xcolor=dvipsnames]{beamer}
+
+% Commands
+\newcommand{\DSU}{{\sc Jvolve}}
+\newcommand{\JikesRVM}{Jikes RVM}
+
+\newcommand{\ShowTOC}[1][currentsection,currentsubsection]{%
+\begin{frame}{Outline}%
+  \tableofcontents[#1]%
+  % You might wish to add the option [pausesections]%
+\end{frame}%
+}
+
+% Include packages
+\usepackage{colortbl}
+\usepackage[absolute,overlay]{textpos}
+\usepackage[normalem]{ulem}
+\usepackage[override]{cmtt}
+\usepackage{graphicx}
+\usepackage{ifdraft}
+\usepackage{tikz}
+\usetikzlibrary{arrows,backgrounds}
+
+% Include customized theme
+\input{theme/customized}
+
+\title[Dynamic Software Updates in Java]
+{Dynamic Software Updates in Java:\\ A VM-centric approach}
+
+% \subtitle
+% {Presentation Subtitle} % (optional)
+
+\author[Suriya Subramanian]{%
+Suriya Subramanian\\
+Advisor: Kathryn S. McKinley}
+\institute[The University of Texas at Austin] % (optional, but mostly needed)
+{
+  Department of Computer Sciences\\
+  The University of Texas at Austin
+}
+
+\date[Short Occasion]
+{July 21, 2008\\
+Ph.D. Oral Proposal}
+\subject{Ph.D. Oral Proposal}
+
+\begin{document}
+
+\input{theme/titlepage}
+
+\input{intro}
+\input{jvolve/developers-view}
+\input{jvolve/implementation}
+\input{jvolve/experience}
+\input{conclusion}
+\input{appendix}
+
+\end{document}

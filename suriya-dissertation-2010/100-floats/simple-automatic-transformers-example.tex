@@ -1,0 +1,14 @@
+\BCode[t]{0.38}
+\begin{lstlisting}[frame=single]
+  public void foo() {
+    C x;
+    ...
+    if (...) {
+      ...
+    } else {
+      ...
++     x.f = null;
+    }
+  }
+\end{lstlisting}
+\ECode{Example of a simple patch that fixes a memory leak\label{fig:simple-automatic-transformers}}

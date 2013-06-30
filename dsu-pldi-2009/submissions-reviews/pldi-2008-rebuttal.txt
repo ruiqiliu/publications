@@ -1,0 +1,85 @@
+$Id: pldi-2008-rebuttal.txt 9511 2009-02-03 22:33:37Z suriya $
+
+We thank all reviewers for their valuable feedback and will address all
+comments if accepted. Here, we address the following main concerns:
+
+1. Many reviewers were concerned about the maturity of our implementation
+and novelty.  The current state of the art for Java [20,26], and early
+papers for C [15] used toy programs, and all prior C and Java approaches
+have a priori overheads. While our evaluation is not as comprehensive as
+the most mature implementation for C [23], it is sufficient to show that
+such a system could keep two real programs up for much longer.
+
+2. Some reviewers asked us to clarify the types of changes Jvolve could
+handle and issues specific to OO. Jvolve supports changes to class
+signatures in class hierarchies.  For example, addition/deletion of fields
+and methods to both leaf and parent classes, changes to method/field
+signature, and modifications confined to a method body. Jvolve allows
+changes at all level of the class hierarchy and to interfaces as well. This
+is a notable improvement over some approaches which only allow changes to
+leaf classes of the hierarchy.
+
+3. Some reviewers pointed out anomalies in the execution times of object
+transformer functions for large number of objects. These anomalies are
+because, smaller number of objects fit in cache, and given sufficient
+objects, the microbenchmark starts missing. Performance analysis would be
+easy if each instruction always took a cycle. :-)
+
+===============================================================================
+
+The above is the rebuttal. What is below is just for discussion.
+
+1. Difference between managed and object oriented languages.
+
+2. Is there a semi-formal way to say what changes are supported?
+
+3. Continuous updates.
+   + We did not do that.
+
+4. Reality of runtime workload.
+   + While we have not exhaustively/stochastically tested these
+     applications, we have tested Jetty webserver running at full load, for
+     various version updates.
+
+5. Not convinced that these examples (only 2 applications) represent
+anything new capability.
+   + Don't know what to say.
+
+6. JIT and handling inlining.
+   + How do we propose to handle inlining?
+   + How will this affect runtime performance? Will not
+
+7. Discussion about other collectors and GC pause times.
+
+8. Questions raised about experiments. Issues on correctness of numbers for
+microbenchmarks and variability for Jetty.
+
+9. Review #4 dismisses our work has preliminary.
+
+Specific questions.
+ 1. Did any requests to Jetty time out during any of the software updates?
+    We initiated requests to Jetty at a rate that staturated the webserver.
+    Some requests timed out. This rate was low and consistent for all
+    configurations, including the one where we updated the webserver at
+    full load. (There were timeouts, but these were not because of
+    updating).
+
+ 2. Strategy for inlining.
+
+ 3. You construct "old" class names from a class name and a version number.
+    Where does that version number come from?
+ 
+ 4. Which parts of Jvolve are fully automatic and do not require user
+    interaction? Clearly, object transformation functions must be completed
+    by the user. But what about other changes such as renaming of classes
+    or interfaces, fields and methods? How do you detect and handle the
+    renaming of classes or interfaces, fields and methods? What happens to
+    removed classes and their existing objects?
+
+ 4. What are the challenges of managed languages? What are the challanges
+ of object-oriented languages?
+
+ 5. Long question about microbenchmark numbers.
+
+ 6. Detailed questions from Review #1.
+

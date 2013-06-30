@@ -1,0 +1,49 @@
+\begin{figure}[p]
+\lstset{frame=single}
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\begin{minipage}{0.95\textwidth}
+\begin{lstlisting}
+  public class EditPane {
+    private void handleBufferUpdate(BufferUpdate msg) {
+      if(msg.getWhat() == BufferUpdate.CREATED) { ...
+      } else if(msg.getWhat() == BufferUpdate.CLOSED) { ...
++       Buffer b = msg.getBuffer();
++       if (b.isUntitled()) {
++         // the buffer was a new file so I do
++         // not need to keep its info
++         Map carets = (Map) getClientProperty(CARETS);
++         if (carets != null)
++           carets.remove(b.getPath());
+        }
+      } else if(msg.getWhat() == BufferUpdate.SAVED) { ...
+      } else ...
+      }
+    }
+  }
+\end{lstlisting}
+\end{minipage} \\
+(a) Patch applied by SVN revision 8329. \\
+Lines 5--11 are added in the new version \\[1ex]
+\begin{minipage}{0.95\textwidth}
+\begin{lstlisting}
+public static void jvolveObject(EditPane ep) {
+  Map<String, CaretInfo> carets =
+                   ep.getClientProperty("Buffer->Caret");
+  if (carets != null) {
+    for (String path : carets.getKeys()) {
+      Buffer b = jEdit.getBuffer(path);
+      if (b.isClosed() && b.isUnitled()) {
+        carets.remove(path);
+      }
+    }
+  }
+}
+\end{lstlisting}
+\end{minipage} \\
+(b) State transformer
+\end{tabular}
+\caption{jEdit leak and fix: SVN revision 8329\label{fig:r8329}}
+\end{center}
+\lstset{frame=none}
+\end{figure}

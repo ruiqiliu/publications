@@ -1,0 +1,24 @@
+\begin{figure}[t]
+\begin{tabular}{@{}m{0.5\textwidth}@{}m{0.5\textwidth}@{}}
+\BC \begin{minipage}{0.4\textwidth}
+\begin{lstlisting}
+private int x;
+private static int y;
+public int getX();
+public static int getY();
+\end{lstlisting}
+\end{minipage} \EC &
+\BC \begin{minipage}{0.45\textwidth}
+\begin{lstlisting}
+private double x;
+private static double y;
+public double getX();
+public static double getY();
+\end{lstlisting}
+\end{minipage} \EC \\[-2ex]
+\BC (a) Old version \EC &
+\BC (b) New version \EC \\[-2ex]
+\end{tabular}
+\caption{Examples of an update that changes class signature}
+\label{fig:class-sig-change-example}
+\end{figure}

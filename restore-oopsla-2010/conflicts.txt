@@ -1,0 +1,47 @@
+Kathryn's current conflict list:
+
+All MSR, UT faculty and students
+Mathew Arnold, IBM
+Steve Blackburn, ANU
+Keith Cooper, Rice
+Amer Diwan, Google
+Mike Hicks, UMD
+Martin Hirzel, IBM
+Robert Grimm, NYU
+Sam Guyer, Tufts
+Eliot Moss, UMass
+Darko Stefanovic, UNM
+Zhenlin Wang, MTU
+
+===
+
+Mike's current conflict list:
+
+Nikhil Swamy, Microsoft Research
+Polyvios Pratikakis, FORTH
+Iulian Neamtiu, UC Riverside
+Scott Nettles, UT Austin
+Greg Morrisett, Harvard
+Gavin Bierman, Microsoft Research
+Manuel Costa, Microsoft Research
+Miguel Castro, Microsoft Research
+Jean-Phillipe Martin, Microsoft Research
+Perikles Akritidis, University of Cambridge
+Emery Berger, UMass
+Trent Jaeger, Penn State
+Ninghui Li, Purdue
+Somesh Jha, Wisconsin
+Avik Chaudhuri, Adobe Research
+Mudhakar Srivatsa, IBM Research
+
+===
+
+Stephen's conflict list:
+
+Peter Lee, CMU
+
+===
+
+Suriya's conflict list:
+
+Youfeng Wu, Intel

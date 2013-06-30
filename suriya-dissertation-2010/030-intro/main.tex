@@ -1,0 +1,289 @@
+
+\chapter{Introduction}
+
+Evolving software is a fact of life. Developers constantly fix bugs and add
+new features to software. These software changes
+make their way to deployed systems. However, many systems ranging
+from medical equipment to communication and transportation systems to
+financial systems, must be always available. For online stores, brokerages,
+and exchanges an hour of downtime can mean significant revenue loss running
+into thousands or even millions of dollars~\cite{gartner98downtime, roc1,
+eagle-rock, parker}. Mission critical applications such as satellites
+cannot tolerate downtime~\cite{french-satellite}. When it comes to
+end-user applications and operating systems, downtime is both expensive
+and inconvenient~\cite{zorn05}. In spite of these concerns, the most common
+update method used today is to stop a running system, install an update, and
+restart with the new version. In one study of nearly 6,000 outages of
+high-availability applications, 75\% were for planned hardware and software
+maintenance \cite{lowell:04}. Another study of the IT industry finds 80\%
+of all downtime to have been planned, and 15\% of downtime is attributed to
+software updates \cite{vs-downtime}. Moreover, security issues force system
+administrators to patch their systems ever more frequently \cite{vista}.
+With Internet access being ubiquitous, and application and OS
+vulnerabilities in unpatched systems being exploited more and more,
+delaying updates poses real security risks \cite{altekar05opus, ksplice,
+survival-time}.
+
+As a solution to these problems, researchers have proposed \acf{DSU}.  \USD is a
+general-purpose approach to updating running programs. \USD dynamically patches a program running an old version of an
+application, updating running code and data to a state consistent with a
+newer version.  \USD's appeal is that it can be applied generally without
+the need for redundant hardware or explicit special-purpose system designs~\cite{kspliceslashdot08}. An ideal general-purpose \USD system
+should be \emph{flexible}, \emph{safe}, and \emph{efficient}
+\cite{hicks-thesis, neamtiu-thesis}.
+%
+\begin{description}
+%
+\item[Flexible.] A \USD system should be \emph{flexible} enough to handle the type of
+changes developers typically make between versions. While it is not
+possible to handle every possible software update, \USD desires to support most
+software version changes encountered in practice.
+%
+\item[Safe.] Dynamically updating to the new version should be as {\em safe}
+as starting the new version from scratch. The system should guarantee to
+developers and users that the update process does not introduce type or
+process state errors, and that the updated version executes as intended.
+%
+\item[Efficient.] \USD should provide an \emph{efficient} upgrade process and efficient
+normal execution.  \USD support should add no performance overhead over
+normal application execution, and the update process itself should be
+quick. Preparing the patch and testing the update itself requires
+additional development effort, but this effort should be minimal.
+%
+\end{description}
+
+Researchers have made significant strides toward making \USD practical for
+systems written in C or C++, supporting server feature
+upgrades~\cite{neamtiu06dsu, chen:icse07, upstare}, security
+patches~\cite{altekar05opus}, and operating systems
+upgrades~\cite{K42reconfig, k42usenix, baumann07reboots, baumann04workshop,
+dynamos_eurosys_07, chen06vee, ksplice}.  Unfortunately, work on \USD for
+managed languages such as Java, C\#, Python and Ruby lags behind work for C
+and C++.  However, the use of Java and other dynamic languages is increasingly
+common, powering systems both small and large~\cite{gartner-java,
+ibm-nyse-java, cell-phones, pizlo09, sdtimes}.
+Websites and web-services are increasingly written in dynamic languages such as Python
+and Ruby. Java powers both large complex systems running stock exchanges
+and millions of small cell phones and other handheld devices.  Even
+safety-critical
+applications such as those that control aircraft originally written in
+Ada, are migrating to Java. Dynamic updating
+support for managed languages has lagged behind pervasive use of these
+languages. For example, while the HotSpot JVM~\cite{JVMhotswap} and some
+.NET languages~\cite{VSEnC} support on-the-fly method body updates, this
+support is too inflexible for all but the simplest updates \cite{jvolve}.
+Academic approaches~\cite{ritzau00dynamic, Mala00a, orso:java,
+bierman08upgradej} offer more flexibility, but have never been demonstrated on
+realistic applications, and furthermore, these prior designs impose
+substantial space and time overheads on steady-state execution.
+
+In this dissertation, we present \JV, a \JVM that provides general-purpose
+dynamic updating of Java applications. \JV's combination of flexibility,
+safety, and efficiency is a major advance over prior approaches. Our key
+contribution is to show how to extend and integrate existing \VM services
+to support dynamic updating that is flexible enough to support the largest class of
+updates to date, guarantees type-safety, and imposes no space or time overheads on
+steady-state execution.
+
+\paragraph{Flexibility.}
+A practical \USD system must support changes to software that developers
+typically make between versions. Prior studies on C applications
+\cite{neamtiu05evolution}, the Linux kernel \cite{linux-evolution} and Java
+applications \cite{java-evolution} show that changes can usually be
+categorized into addition of new methods and types, modification of method
+definitions, and changes to the type signatures of methods and data fields.
+%
+\JV supports these and other common updates. Users can add, delete, and change
+existing classes.  Changes may add or remove fields and methods, replace
+existing ones, and change type signatures.  Changes may occur at any level
+of the class hierarchy. Changes can alter data structures, e.g., replace a
+list with a hash map.
+As a testament to its flexibility, our experience shows that \JV supports
+20 of 22
+updates to three open-source programs---Jetty web server, JavaEmailServer,
+and CrossFTP server---based on actual releases occurring over 1 to 2 years.
+
+% To initialize new fields, update existing ones, and alter data structures
+% \JV applies \emph{class} and \emph{object transformer} functions, the
+% former for static fields and the latter for object instance fields. The
+% system automatically generates default transformers, which initialize new
+% and changed fields to default values and retain values of unchanged fields.
+% If needed, programmers can customize the default transformers.
+
+% Object transformers considered by dynamic updating systems in the past have
+% primarily converted state from the old version to the new
+% version. Such per-type transformers uniformly apply the same logic to all
+% objects of a type. In this dissertation, we explore state transformers that
+% customize actions based on the object being
+% considered. We use such transformers to fix faulty application state caused
+% by incorrect execution. A subset of objects in the heap might be
+% corrupted because of a bug. In this model, a transformer
+% examines an object's state and repairs it if necessary.
+% We also explore automatically generating such transformers to ease the
+% burden on the developer.  We
+% perform a dynamic analysis that, informed by the program patch, runs on the
+% old version of the program to
+% infer heap invariants that distinguish between objects that need repair and
+% those that do not, and automatically generates state transformers based on the
+% update patch and the discovered invariants. We are the first to consider
+% systematic, accurate repair of buggy application state.
+
+\paragraph{Overview of \JV's approach.}
+\JV consists of 1) an offline source analysis tool called the \UPT that
+uses
+jClasslib Java Bytecode Viewer library, and 2) a \JVM with
+\USD support built on top of \RVM, a research \VM. \UPT identifies differences
+between source versions and generates an update specification that includes
+\emph{class} and \emph{object transformer} functions that specify logic to
+update application data from the old to the new version.
+The \JV \VM takes in this specification and performs the update.  Upon being
+notified that an update is available, \JV pauses the application, performs
+the update atomically in a single step, and resumes application execution
+of the updated version. Only old code runs before the update and only new code
+runs after the update. Application data stored in globals, locals, and the
+heap always corresponds to the newest version of the application, a property
+called {\em representation consistency}\index{representation consistency}.
+To maintain representation consistency \JV suspends the running program at
+a \DSP and converts all object instances to conform to the newest version
+before it restarts the application.
+
+\paragraph{Update Safety.} \JV relies on Java's semantics to ensure that the
+old and new application versions are independently consistent and {\em
+type-safe}. \JV ensures a type-safe update process by allowing only
+unchanged methods to be active on stack when performing the update
+\cite{mutatis, neamtiu06dsu, k42usenix}. \JV relies on
+the developer and testing process to specify other methods that should not
+be executing during an update in
+order to maintain correct application semantics with the new version
+\cite{gupta-thesis, neamtiu08context}. For example, consider a method {\tt
+foo} that makes two consecutive methods invocations to {\tt bar} and {\tt
+baz}, and requires for correctness that both calls are of the same version.
+If both methods are updated, the developer should not allow an update when
+{\tt foo} is active, to prevent an update in between calls to {\tt bar} and
+{\tt baz}.
+
+To process an update, \JV pauses
+execution at a \DSP.  \USD safe points are a subset of \VM{} {\em safe
+points} where it is safe to switch application threads and perform \GC.
+\USD safe points have the aforementioned restrictions on what
+methods can be active on stack to guarantee a safe update.
+%
+In situations where restricted methods are active on stack, \JV installs
+return barriers~\cite{return-barrier} on these methods that inform the \VM
+that an unsafe method has returned and that it may now be safe to perform an update.
+\JV's use of return barriers increases the
+likelihood of an application reaching a \DSP, but does not guarantee
+reaching one in multithreaded programs~\cite{neamtiu09stump}.
+% More sophisticated thread
+% scheduling support would be need to attain greater
+% flexibility~\cite{neamtiu09stump}.
+\JV utilizes \OSR to recompile restricted methods with unchanged method
+bodies that are active on stack. In this case, \JV promptly performs the
+update. In our experience, if a safe point can ever be reached, \JV's
+support is sufficient to reach it.
+
+\paragraph{Updating code.}
+\JV makes use of \JIT compilation to efficiently update the code.
+\JV invalidates existing compiled code and installs new
+bytecode for all changed method implementations.  When the application
+resumes execution these methods are \JIT-compiled when they are next
+invoked.  The adaptive compilation system naturally optimizes updated
+methods further if they execute frequently.
+
+\paragraph{Updating data.} To update live object instances of changed
+  classes, \JV makes use of \acf{GC}, and is the first dynamic updating system to
+  do so.  \JV initiates a whole-heap \GC, which identifies existing object instances
+  of updated classes. As the last phase of \GC, \JV initializes and
+  transforms all updated objects to their new versions using default or
+  user provided object transformers for each updated type.
+Because \JV identifies all objects it will update before actually
+  invoking object transformers, the system can control the order in which
+  objects are transformed. To our knowledge, \JV is the only system with
+  this functionality. In the current implementation, \JV relies on the
+  developer to specify the required order.
+
+In \JV's natural and intuitive object transformation model, the
+  transformer function receives two objects: an object of the old type
+  corresponding to the state before the update, and an object of the new type
+  corresponding to the state after the update.
+For global variables,
+\JV invokes class transformers where the
+  programmer has access to any object reachable from global variables, i.e.,
+  static fields of classes.  The \UPT generates default object and class
+  transformers that are simple, and the developer can write a more
+  sophisticated function if required.
+
+\paragraph{Specializing and automating transformers.}
+In this
+  dissertation, we also explore state transformers with logic that depends
+  on the state of the object being transformed, rather than only performing a
+  uniform action for all objects. We use such transformers to repair
+  erroneous application state that results from executing a buggy program
+  version. As part of the update, the dynamic updating system runs state transformers
+  on a subset of objects with corrupted state. We use these transformers to
+  fix memory leaks in real applications. In this dissertation we also
+  present a methodology that starts with a bugfix and instruments the
+  application to mark objects that would be corrupted in a run of the old
+  version of the program. We then perform a novel dynamic analysis that
+  infers a predicate that distinguishes between marked and unmarked objects
+  in the application and automatically generates object transformers that
+  repair the state of objects identified by the predicate. We are the first
+  to consider systematic, accurate repair of buggy application state during
+  dynamic updating.
+
+\paragraph{Efficiency.}
+\JV imposes no overhead on steady-state execution. During an update,
+\JV employs
+classloading and garbage collection. After an
+update, the adaptive compilation system will incrementally optimize the
+updated code in its usual fashion.  Eventually, the code is fully optimized
+and running with no additional overhead.  The zero overhead in steady-state
+execution for a VM-based approach is in contrast to \USD techniques for C,
+C++, and previous proposals for managed languages. These prior approaches use a compiler or dynamic rewriter to insert
+levels of indirection~\cite{neamtiu06dsu, orso:java} or
+trampolines~\cite{chen06vee,chen:icse07,altekar05opus,ksplice}, which add
+overhead during normal execution.
+
+We assessed \JV by applying it to updates corresponding to one to two years'
+worth of releases for three open-source multithreaded applications: Jetty
+web server, JavaEmailServer (an SMTP and POP server), and CrossFTP server.
+\JV successfully applies 20 of the 22 updates---the two
+updates it does not support change a method within an infinite loop that is
+always on the stack.  Microbenchmark results show that the pause time due
+to an update depends on the size of the heap and fraction of transformed
+objects.  Experiments with Jetty show that applications updated by \JV
+execute correctly and
+enjoy the same steady-state performance as if started from scratch.
+
+In summary, the main contributions of this dissertation are:
+\begin{enumerate}
+\item New techniques that extend and integrate standard virtual machine services
+for managed languages to support a flexible, safe, and efficient dynamic
+software updating service.
+\item The first implementation to employ garbage collection to update objects in the heap and a
+flexible model that allows object transformers to enforce execution order.
+\item The first systematic methodology for developing state transformers to
+repair application state, employing a novel
+dynamic analysis to automatically generate the transformers.
+\item The design, implementation, and evaluation, using real-world
+applications, of \JV, a Java \VM with
+fully-featured support for dynamic software updating, that is distinguished
+from prior work in its realism, flexibility, technical novelty, and high
+performance.  
+\end{enumerate}
+This work demonstrates a significant step towards supporting flexible,
+efficient, and safe updates in managed code virtual machines.  We believe
+that our design, implementation, and results show that this technology,
+together with a rigorous testing regime, is ready to be adopted and be a
+part of future virtual machines.
+% To take
+% dynamic updating support to the real world, researchers should build
+% dynamic updating systems that work in various environments --- from desktop
+% applications, to operating systems, to web applications; address the
+% challenges of safety guarantees and build update safety analysis into
+% Integrated Development Environments; develop efficient dynamic updating
+% testing mechanisms that can be included in the software release process;
+% and integrate dynamic updating into the edit-compile-debug cycle.
+
+% Visa transaction processing system is routinely updated as many as 20,000
+% times per year, yet tolerates less than 0.5% down-time \cite{visa}

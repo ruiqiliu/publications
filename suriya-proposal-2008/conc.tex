@@ -1,0 +1,20 @@
+\section{Conclusions}
+\label{sec:conc}
+
+This proposal has presented \DSU{}, a Java virtual machine with support for
+dynamic software updating.  \DSU{} is the most full-featured,
+best-performing implementation of DSU for Java published to date.  To
+show that it can support changes that occur in practice, we
+successfully applied updates for one to two years
+% that correspond to most of a year-and-a-half's
+worth of releases for three 
+programs, Jetty webserver, JavaEmailServer, and CrossFTP server.  \DSU{}
+imposes no overhead during a program's normal execution---the only
+overhead occurs at the time of the update.  \DSU{}'s DSU support
+builds naturally on top of existing VM services, including dynamic class
+loading, \acs{JIT} compilation, thread synchronization, and garbage
+collection. For the remaining work, we will extend \acs{OSR}, thread
+synchronization on multiprocessors, and concurrent collection.
+Our results demonstrate that dynamic software updating
+support can be naturally incorporated into modern VMs, and that doing so has
+the potential to significantly improve software availability.

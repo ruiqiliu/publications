@@ -1,0 +1,137 @@
+% * Update timing [Not yet written]
+%    programmer specified update points
+%    immediate updates
+%    synchronization
+%    quiescence points
+%    multithreaded updates
+%    loop extraction
+
+\section{Update Timing}
+The previous section dealt with safety properties at each program point for
+a specific update.  In this section, we discuss update timing, or how a
+dynamic updating system ensures that an application reaches a program point
+that is safe for the update.
+
+\paragraph{Update points in a program}
+\USD systems provide API calls that check for and perform an update, and
+typically allow either the programmer or the compiler to instrument program
+update points. Note that these points are potential update points, and it is
+not necessarily safe to perform an update at these points.  \JV uses method
+entry points, method exit points, and loop backedges as potential update points.
+These points are the same as {\em safe points} in a Virtual Machine. At
+these safe points, the VM can safely switch threads and perform garbage
+collection. Upstare, a \USD system
+for C, has the same update points as \JV. In \JV, the compiler already
+instruments these safe points for normal program execution, whereas in
+Upstare, the \USD system has to instrument the program to make it
+updateable.
+
+The developers of Ginseng observed that programs that benefit most from
+dynamic updating are typically structured as long-running event processing
+loops. Each loop iteration is usually independent of each other and
+processes a particular transaction. The start of each loop iteration serves
+as a {\em quiescent point} where there are no partially-completed
+transactions, and all global state is consistent. The common use case
+scenario in Ginseng is for the developer to mark update points at the start
+of outer loop iterations. Ginseng performs a static analysis to ensure that
+it is safe to update at a marked program point, and updates the application
+during runtime.
+
+\paragraph{Return barriers}
+In \JV, a user can trigger an update at any time during program execution.
+While \JV will suspend the application at the earliest VM safe point it
+encounters, this point is not necessarily safe for the update. For instance, a
+modified method might be active on stack, violating activeness safety
+discussed in Section~\ref{sec:safety}. In such situations, \JV
+installs return barriers that trigger an update after all unsafe methods
+have returned. Return barriers are most useful for long-running or
+frequently-invoked unsafe methods, which are likely to be on stack almost
+all the time. Return barriers are not sufficient if an unsafe method
+contains an infinite loop, and would never return. There are at least two
+good solutions which deal with infinite loops ---
+stack reconstruction, used first in Upstare, discussed in
+Section~\ref{subsec:updates-active-methods}, and
+loop extraction, used
+first in Ginseng.
+
+\paragraph{Loop extraction}
+In loop extraction, the programmer can mark potentially unsafe long running
+loops, and the compiler will extract the loop out into its own function,
+that is called on each loop iteration. If an update changes the loop body,
+the extracted function will be unsafe for the update, but the update can
+happen after it returns and later loop iterations call the new version's
+function. Because of the code change, state used by the loop across
+iterations might have to be updated as well. Ginseng automatically
+generates state transformers for this loop state.
+
+\subsection{Updates to active methods}
+\label{subsec:updates-active-methods}
+A dynamic updating system can improve flexibility by performing updates to
+methods that are active on stack. Supporting updates to active methods in
+their full generality makes it impossible to guarantee even non-semantic
+safety properties such as type-safety or correct execution that respects
+the language specification. However, actual changes to real applications
+drive DSU systems to support some changes to active methods. Systems lie on
+various points in the spectrum from no support at all to more general
+support for arbitrary code changes.
+
+Systems that enforce activeness safety, do not support updates to active
+methods. As mentioned in Section~\ref{sec:safety}, these systems are
+type-safe but very restrictive. They do support a simple
+update that changes a version number string printed by the main method of
+the application, since the main method is always active. Systems that
+enforce con-freeness safety, for instance Ginseng~\cite{neamtiu06dsu}, support
+such updates by allowing existing methods to run the old version, while
+executing newer versions for future invocations.
+
+When considering changes to methods, it is important to mention the level
+of abstraction at which we compare method versions. In systems that compile
+source code to machine code, either statically in the case of C or
+dynamically in the case of Java, the source code may be the same across
+versions, while the compiled machine codes is different, as explained in
+more detail in
+Section~\ref{sec:dsu-view-of-changes}. When DSU systems refer to changes,
+they usually do so at the compiled code level. \JV enforces activeness
+safety at the bytecode level, i.e., only methods with unchanged bytecodes
+can be active at update time. At the machine code level, \JV performs
+\acl{OSR}.
+\JV recompiles the method to generate machine code that conforms to the new
+version of the application and switches execution of an active method to
+this new code.
+
+\paragraph{Stack extraction} In order to support arbitrary changes to
+active methods, a DSU system must extract an active method's stack state,
+transform it to satisfy the new version of the method, and transfer
+execution to the right instruction in the new method's body.
+Upstare is the only dynamic updating system we are aware of, that supports
+updates to active methods~\cite{upstare}. Programmers write a stack transformer function that takes takes
+the old version's stack and returns a new one. Upstare's \emph{stack
+extraction} support takes the old version's stack, applies the programmer
+specified transformer and resumes execution after the update.  This model
+relies heavily on developer expertise and testing.
+
+% \paragraph{Stack reconstruction}
+% Upstare is the only \USD system we are aware of, that supports changes to
+% active methods on stack. When a long running method is changed between
+% versions, Upstare maps program points between the old and the new method
+% bodies, and requires the programmer to specify a stack transformer
+% function. Such a function that takes the old function's stack state and
+% returns the new functions' stack. As part of the update, Upstare extracts
+% stack state, invokes the stack transformer to reconstruct the new version's
+% stack, and resumes execution at the right point in the new method body.
+
+\subsection{Multithreaded applications}
+The above discussion on update points focussed mainly on single-threa\-d\-ed
+applications. Other than stack reconstruction, which can update unsafe
+methods in more than one thread, all other mechanisms fail for
+multithreaded programs. Unsurprisingly, the challenge of synchronizing
+multiple threads to all simultaneously be at a safe update point is hard. A
+\USD system has to suspend a thread at a safe point, while waiting for
+other threads to also reach respective safe points. This waiting can
+adversely affects application throughput, and in the worst case may
+deadlock the application. Neamtiu \EA address this problem in their work on
+Stump~\cite{neamtiu09stump}. Stump allows the developer to specify a few
+program points (in each thread) to be update safe. The system then uses
+static analysis and runtime support to expand this list to other program
+points with safe behavior. The runtime system synchronizes across threads,
+resuming them if they have waited for too long.

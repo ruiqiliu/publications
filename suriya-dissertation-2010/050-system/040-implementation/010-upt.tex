@@ -1,0 +1,26 @@
+\subsection{Preparing the update}
+\label{sec:prep}
+
+To determine the changed classes and methods for a given release, we wrote
+\acf{UPT}. \UPT is built using jclasslib, a Java bytecode library
+\cite{jclasslib}. \UPT examines differences between the old and new classes
+provided by the user, and groups them into the following categories
+described in Section~\ref{sec:supported-changes}.
+
+\begin{description}
+\item[Class updates:] These updates change the class signature by
+  adding, removing, or changing the types of fields and methods.
+\item[Method body updates:] These updates change only the internal
+implementation of a method. 
+\item[Indirect method updates:] These are methods whose bytecode is
+unchanged, but the VM recompiles them because they refer to fields and
+methods of updated classes.   The compiled code uses hard-coded field
+offsets, and the update may change these offsets.
+\end{description}
+
+\ac{UPT} generates default object and class transformer functions for all
+class updates, which the programmer may optionally modify. After compiling
+the transformers with our custom JastAdd compiler (described in
+Section~\ref{subsec:transformers}), the user initiates the update by
+signaling the \JV \VM and providing the new version of the application,
+the update specification file, and the transformers class file.

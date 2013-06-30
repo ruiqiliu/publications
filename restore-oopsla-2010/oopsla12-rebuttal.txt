@@ -1,0 +1,57 @@
+We thank the reviewers for their suggestions and will incorporate them
+in the final paper.  Below we address the most substantive questions.
+
+* "Update points" and assumptions on input snapshots
+
+Dynamic updates take place only at "update points," (sf. Section 2.1), which
+programmers place in the program's event-processing loops.  In our
+experience with dozens of programs and years of updates (using Jvolve
+and other DSU systems), the placement of the update point (e.g., at
+the start of the loop) is quite stable, even when code in the same
+loop or method changes.  Update points are easy to place, and make
+programs easier to reason about.  See our prior study [7] for details;
+we will provide discussion in the revision.
+
+For TOS on a changed class C to make sense, we must consider snapshots
+at update points, since inferred transformation functions will
+ultimately run at such points.  The program state in each pair of
+compared snapshots must be equivalent with respect to only C objects
+(not all objects). We execute the old and new version with the same
+test inputs and snapshot at the same points.  During snapshotting we
+"control" test runs in the sense that we exercise a variety of
+potentially differing behavior concerning class C in the two versions
+(e.g., we reproduce a stateful bug the update is fixing). We will
+elaborate the meaning of "a variety" more formally in the revision,
+but we find that standard test suites provide sufficient variation.
+Note that program states between snapshots, and the portion of states
+involving classes other than C, need *not* be equivalent in the old
+and new executions; indeed our test programs often exhibit
+nondeterminism, e.g., in the form of concurrency and timing
+(cf. Section 2.3).
+
+* Matching and synthesis
+
+While most of our examples used strings for key fields, any primitive
+will do.  Note that requiring objects match 1-to-1 makes it highly
+unlikely we will infer key fields incorrectly.
+
+Our algorithm does not explicitly consider all functions, but rather
+rules out functions as it goes, based on matched pairs.  The
+algorithm prefers simpler functions, e.g., those not involving
+branches, by construction--it does not explore all functions.  
+
+We will discuss both points in more detail in the revision.
+
+* Evaluation
+
+We believe TOS is useful for updates we have observed in practice.
+Our evaluation considered "interesting" updates from several programs.
+In [14] we dynamically updated CrossFTP and JES 12 times total, and
+most of these updates involved simple transformer functions that TOS
+can easily infer, so we did not explicitly consider them (cf. para 2
+of 5.2).  We will add them, expanding our evaluation.  We will point
+out that even when TOS fails, it provides useful information for
+writing an update by hand, e.g., in the Azureus example.  We could not
+generate an update for the other example because we could not
+reproduce the fixed bug (cf. end of Section 5).  We will more
+explicitly conclude/summarize in the revision.

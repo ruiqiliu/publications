@@ -1,0 +1,57 @@
+We thank all reviewers for their careful reading of our paper; we will
+incorporate their valuable feedback in the final version.
+
+Reviewer 1 suggests larger, high-availability systems with redundant
+hardware could piggyback software updates on "failover and restart."
+We believe both this approach and in-place DSU are useful technologies, as
+evidenced by a recent Slashdot discussion:
+
+http://tech.slashdot.org/article.pl?sid=08/04/24/1334234&from=rss
+
+Reviewers wondered if DSU puts an undue burden on developers.  We do
+not believe so.  While in general things could be quite dicey, in our
+experience (in this work and in prior work), few classes require
+manually-written object transformers, and for these transformers are
+generally easy to write--less than a day for our applications.  DSU
+testing, and other methods of validation, are interesting topics of
+future research.  While new tests are surely needed, many existing
+system tests can be reused.  In particular, we can run a test starting
+with a program's old version, and then update the program in flight.
+We would ideally systematically consider all legal update points
+during a test run.
+
+Several reviewers were unsure about the protocol we use to reach a
+safe point.  We simply piggyback on GC safe points for the
+stop-the-world collector.  The VM sets a flag which causes all threads
+to stop at a GC safe point, and then tests if DSU is safe.  If not, it
+retries after a short delay.  For all successful updates, at most one
+retry was needed to reach a DSU safe point in multiple experiments.
+
+Reviewers were concerned about the time needed to initiate and
+complete an update, particularly in a multiprocessor system.  Roughly,
+on a uniprocessor system: the time to suspend threads and check that
+the application is in a safe-point is around 1ms; the classloading
+time is usually less than 20ms; the time to resume execution is less
+usually less than 20ms. (Classloading could occur in parallel with
+normal execution.)  We will add more explanation and measurements on
+these issues and others requested by reviewers, such as rate of GCs
+performed before and after updates, including when using multiple
+cores.  We leave to nontrivial future work the use of a concurrent
+collector and/or OSR to make it easier to reach safe points and to
+reduce disruption due to an update.
+
+The performance of Jetty 5.1.5 on Jikes is as expected; it was removed
+to avoid clutter in the graph.
+
+We could compile object transformers to catch any exception and
+trigger a rollback.  One possible approach: traverse the update log
+and copy the contents of all old versions of changed objects in
+to-space to the new implementations of those same objects, also in
+to-space.  All pointer fields so copied will be valid, because they
+already point to the new versions of objects.  Then restore the class
+metadata to the old class implementations, and discard the new
+classes, and resume.  We plan to implement and report on this idea for
+the final version.
+
+We will make our implementation available on the Jikes RVM Research
+archive at time of publication.

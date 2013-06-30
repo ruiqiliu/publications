@@ -1,0 +1,30 @@
+\newcommand{\JvolveTimeLine}[5]{
+\begin{center}
+\begin{tikzpicture}[auto]
+  \tikzstyle{block}=[
+    font=\tiny,
+    rectangle,
+    draw=structure.fg,
+    thick,
+    text width=1.2cm,
+    text badly centered,
+    rounded corners,
+    minimum height=2em,
+  ]
+  \tikzstyle{current}=[fill=structure.fg!20, ]
+  \tikzstyle{line}=[draw, thick, -latex',]
+  \tikzstyle{every path}=[line]
+  \matrix [column sep=5mm,row sep=7mm,ampersand replacement=\&] {
+    \node [block,#1] (0) {\hyperlink{offline}{Offline tool}};          \&
+    \node [block,#2] (1) {\hyperlink{suspend}{Suspend application}};   \&
+    \node [block,#3] (2) {\hyperlink{classload}{Load new classes}};    \&
+    \node [block,#4] (3) {\hyperlink{transform}{Transform objects}};   \&
+    \node [block,#5] (4) {Resume application};                         \\
+  };
+  \path (0) -- (1);
+  \path (1) -- (2);
+  \path (2) -- (3);
+  \path (3) -- (4);
+\end{tikzpicture}
+\end{center}
+}

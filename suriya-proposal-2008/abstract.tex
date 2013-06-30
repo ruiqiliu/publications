@@ -1,0 +1,39 @@
+% $Id: abstract.tex 8063 2008-05-09 01:15:48Z mwh657 $
+
+\begin{abstract}
+  \noindent
+  Software evolves to fix bugs and add features, but stopping and
+  restarting existing programs to take advantage of these changes can
+  be inconvenient and costly.  Dynamic software updating (DSU)
+  addresses these problems by updating programs while they run.
+  The challenge is to develop 
+  DSU infrastructure that is \emph{flexible}, \emph{safe}, and
+  \emph{efficient}---DSU should enable updates that are likely to
+  occur in practice, and updated programs should be as reliable and as
+  efficient as those started from scratch.
+  
+  This proposal presents the design and implementation of a JVM we call
+  \DSU{} that is enhanced
+  with DSU support.  The key insight is that
+  flexible, safe, and efficient DSU can be supported by naturally
+  extending existing VM services.  By
+  piggybacking on classloading and garbage collection, \DSU{} can
+  flexibly support additions and replacements of fields and methods anywhere
+  within the class hierarchy, and in a manner that may alter class
+  signatures.  By utilizing bytecode verification and
+  thread synchronization support, \DSU{} can ensure that an applied
+  update will never violate type-safety. By building on top of \acf{OSR}
+  support, \DSU{} can support updates to active methods on stack.
+  Finally, by employing \acs{JIT}
+  compilation, there is no DSU-related 
+  overhead before or after an update.
+  Our work demonstrates that the VM is well-suited to support practical DSU
+  services and DSU support should be a standard feature of VMs in the
+  future.
+%   Using \DSU{}, we successfully applied dynamic continuous updates
+%   corresponding to 20 
+%   of the 22 releases that occurred over nearly two years' time, one
+%   update per release, for three open-source programs, Jetty web
+%   server,  JavaEmailServer, and CrossFTP server.  Our results indicate
+%   that the VM is well-suited to support practical DSU services.
+\end{abstract} 

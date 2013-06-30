@@ -1,0 +1,37 @@
+\BCode[p]{0.75}
+\begin{lstlisting}[frame=single, escapeinside={(*}{*)}]
+function GC(roots):
+   Q := empty
+   for r in roots:
+       r.color = GREY
+       Q.add(r)
+   while Q not empty:
+       object = Q.pop()
+       scanObject(object)
+
+// precondition: object is GREY
+function scanObject(object):(*\label{line:scan}*)
+    for field in object:
+        object.field = moveObject(object.field)
+    object.color = BLACK
+
+// precondition: object is either a forwarding
+// pointer or a WHITE object. Either way,
+// object resides in from space.
+function moveObject(object):
+    if object is real:
+        copy = copyObject(object)
+        copy.color = GREY
+        Q.add(copy)
+        object.FP = copy
+        return copy
+    if object is a forwarding pointer:
+        return object.FP
+
+// precondition: object is WHITE
+function copyObject(object):
+    copy = malloc() # in to space
+    memcopy(copy, object)
+    return copy
+\end{lstlisting}
+\ECode{Semi-space copying collector pseudo-code\label{fig:gc-code}}

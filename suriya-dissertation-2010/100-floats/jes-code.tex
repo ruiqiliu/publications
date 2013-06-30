@@ -1,0 +1,42 @@
+\BCode[p]{0.75}
+\begin{lstlisting}[frame=single]
+// Listen on socket for POP client connections
+// Handle a client
+public class Pop3Processor implements Runnable {
+  public void run() {
+    while (true) {
+      Socket client = serverSocket.accept();
+      handleCommands();
+    }
+  }
+}
+
+// SMTPProcessor is similar to Pop3Processor
+
+// Poll the filesystem and deliver messages
+public class SMTPSender implements Runnable {
+  public void run() {
+    while (true) {
+      if (messageToBeDelivered)
+        deliverMessages();
+      sleep();
+    }
+  }
+}
+
+public class Mail {
+  public static void main(String args[]) {
+    // Create 5 POP threads
+    for (int i = 0; i < 5; i++)
+      new Thread(new Pop3Processor()).start();
+
+    // Create 5 SMTP threads
+    for (int i = 0; i < 5; i++)
+      new Thread(new SMTPProcessor()).start();
+
+    // Create one thread that delivers mail
+    new Thread(new SMTPSender()).start();
+  }
+}
+\end{lstlisting}
+\ECode{JavaEmailServer code: High level organization\label{fig:jes-code}}

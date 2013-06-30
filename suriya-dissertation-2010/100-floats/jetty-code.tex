@@ -1,0 +1,40 @@
+\BCode[p]{0.72}
+\begin{lstlisting}[frame=single]
+// There are different listeners for various
+// virtual hosts Each listener has multiple
+// threads
+public class HttpListener {
+  public void run() {
+    while (true) {
+      if (job == null)
+        wait();
+      if (job != null)
+        handle(job);
+    }
+  }
+}
+
+// Maps a collection of HttpListener objects
+// which generates requests and HttpContext
+// objects which maintain collection of
+// HttpHandlers
+public class HttpServer {
+  public void start() {
+    for (HttpContext c : contexts) {
+      c.start();
+    }
+    for (HttpListener l : listeners) {
+      l.start();
+    }
+  }
+
+  public static void main(String args[]) {
+    HttpServer server = new HttpServer();
+    HttpContext context = server.getContext();
+    context.addHandler(...);
+    server.addListener(...);
+    server.start();
+  }
+}
+\end{lstlisting}
+\ECode{Jetty webserver code: High level organization\label{fig:jetty-code}}

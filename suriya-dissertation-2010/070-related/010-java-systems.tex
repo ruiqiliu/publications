@@ -1,0 +1,175 @@
+\section{Dynamic Software Updating for managed languages}
+
+Researchers have adopted several approaches to bring \USD support to managed
+languages. These include special-purpose compilation, class loaders,
+or \VM-support. The main drawback of approaches that do not change the \VM
+are inflexibility and high overhead.
+
+\subsection{Edit and continue development}
+
+Debuggers and IDEs have long provided \emph{edit and continue} (E\&C)
+functionality that permits limited modifications to program state to avoid
+stopping and restarting during debugging. For example, Sun's HotSwap
+VM~\cite{JVMhotswap, Dmit01a}, .NET Visual Studio for C\# and
+C++~\cite{VSEnC}, and library-based support~\cite{eaddy05enc} for .NET
+applications all provide E\&C.  These systems restrict updates to code
+changes within method bodies.  While this restriction reduces safety
+concerns and obviates the need for class and object transformers, the
+resulting systems are inflexible. A request for enhanced dynamic updating
+has the fourth highest number number of votes among enhancement requests
+recorded in the Hotspot VM bug database~\cite{voted-bug,bug-rank-list}.
+These systems cannot perform more than half of the
+updates discussed in Chapter~\ref{chap:experience}.
+
+% To avoid changing the \VM to support \USD, researchers have developed
+% special-purpose classloaders and/or compiler support~\cite{javarebel,
+% BarrE03, Milazzo05updates}. The main drawbacks of these approaches are
+% inflexibility and high overhead.
+
+\subsection{Solutions without VM-support}
+
+JRebel~\cite{javarebel} is a productivity tool targeting Java EE
+(Enterprise Edition) developers. JRebel watches changes to the source tree
+of a web application under development and applies these changes to a
+running VM. Developers do not have to restart their application after every
+change, thereby speeding up development. JRebel is implemented on top of
+the Sun Hotspot VM's instrumentation API. When loading a class, JRebel
+rewrites the bytecodes of all methods, intercepting all method calls and
+field accesses. JRebel implements method and field accesses by performing a
+dictionary lookup, and incurring a high performance overhead, like in an
+interpreted language such as Python or Ruby.  When a new version of a class
+is available, JRebel updates the dictionary to point to the new method
+versions. While JRebel supports addition and deletion of fields, it does
+not update the state of existing objects, rendering updates type-unsafe. It
+also has no notion of update timing for safety. Because of the performance
+overhead and the lack of type safety, JRebel is suited mainly to ease
+debugging during development.
+
+Barr and Eisenbach~\cite{BarrE03} support updates to Java libraries in a
+client server model. The system supports a subset of updates to Java
+programs that do not cause linker errors.  Milazzo
+\EA~\cite{Milazzo05updates} support dynamic updating in a distributed
+computing environment. Their work proposes a specialized software
+architecture to monitor updates, and distribute them across the
+application.  Both systems use custom classloaders for binary-compatible
+and component-level changes respectively, but cannot support signature
+changes such as class field additions.
+
+%% Eisenbach and Barr: safe upgrading without restarting.  They support
+%% upgrades that satisfy binary compatibility.  Uses a custom classloader and
+%% JMX to replace the code of existing objects.  No way to modify the state of
+%% the objects.
+
+%% Milazzo use a modified class loader to load individual replacements to
+%% classes in a special-purpose architecture.  The class loader may modify the
+%% bytecode of the loaded class to deal with type version namespace issues.
+%% Basically this is more limited in scope than our approach.
+
+Orso et al.~\cite{orso:java} use source-to-source translation for DSU by
+introducing a proxy object that indirectly accesses an object that may
+change. For each class C that might change in the future they produce a
+proxy for that class.  All calls from clients of C are redirected to call
+the wrapper instead.  When C is updated by some new class C', a new C'
+object is created and initialized using the old state of C and the wrapper
+is redirected to point to C'. This approach requires updated classes to
+export the same public interface, forbidding new public methods and fields.
+
+Non VM-based approaches are in general limiting because they are not
+\emph{transparent}---they make visible changes to the class hierarchy, and
+insert or rename classes. This approach makes it essentially impossible to
+be robust in the face of code using reflection or native methods.
+Moreover, the indirection imposes time and space overheads on steady-state
+execution.  Our VM approach naturally supports reflection and native
+methods (these are updated as well), is more expressive, e.g., it
+supports signature changes, and imposes no overhead on steady-state
+execution.
+
+\subsection{VM support for DSU in managed languages} 
+
+The PROSE system performs short-term, run-time patches to code for logging,
+introspection, and performance adaptation, rather performing general
+updates~\cite{nicoara:eurosys08}.  An Eclipse plug-in performs run-time
+bytecode instrumentation and a modified JIT performs method code
+replacement, using an API in the style of aspect-oriented programming.
+PROSE has the same update model as the E\&C systems: it supports updates to
+method bodies but not class or method signature changes that require
+changes to object state.  This flexibility is similar to the E\&C
+implementations discussed above; indeed, PROSE builds on the HotSwap method
+replacement support in its Sun JDK implementation~\cite{JVMhotswap}.
+
+JDrums~\cite{ritzau00dynamic} and the Dynamic Virtual Machine
+(DVM)~\cite{Mala00a} both implement DSU for Java within the VM, providing a
+programming interface similar to \JV, but are lacking in two ways.  First,
+neither JDrums nor DVM have ever been demonstrated to support updates from
+real-world applications.  Second, their implementations impose overheads
+during steady-state execution.  They both update \emph{lazily} and use an
+extra level of indirection (the \emph{handle space}).  Indirection
+conveniently supports object updates, but adds extra overhead.  For
+example, JDrums traps all object pointer dereferences to apply VM object
+transformer function(s) when the object's class changes.  Lazy updating has
+the advantage that it amortizes  pauses due to an update over subsequent
+execution.  The main drawback is that its overhead persists during normal
+execution, even though updates are relatively rare.  DVM works only with
+the interpreter.  Relative to this interpreter, which is already slow, the
+extra traps result in roughly 10\% overhead.
+
+Compared to these two, \JV performs updates eagerly by employing a full
+heap collection at update-time.  This stop-the-world approach imposes a
+longer pause at update time, but eliminates overhead during steady-state
+execution.  Likewise, by invalidating updated methods, \JV's performance is
+slowed just after the update as these methods are being recompiled.
+However, compared to running with an interpreter, steady-state execution is
+much improved, since methods will be much better optimized.
+
+\subsection{Dynamic ML}
+
+Gilmore et al.~\cite{GilmoreKW97} propose DSU support for modules in ML
+programs using a similar, but more restrictive programming interface
+compared with \JV.  They formalize an abstract machine for implementing
+updates using a copying garbage collector.
+Duggan~\cite{DBLP:journals/acta/Duggan05} also proposes dynamic updates to
+ML programs, focusing on lazy updates to data type definitions.  Neither
+approach was ever implemented.
+
+\subsection{Language support for \USD}
+
+UpgradeJ~\cite{bierman08upgradej} is an extension to the Java language
+design supporting class upgrades, in two flavors: \emph{revision upgrades},
+which may modify method bodies, and \emph{evolution upgrades}, which may
+add new methods and fields.  Programmers control the effects of upgrades
+using \emph{version annotations}, introduced by Bierman et
+al.~\cite{BiermanHSS03}.  For example, the programmer may
+write \texttt{o = new Button[1=]()} to force \texttt{o} to always use
+version~1 methods, while writing \texttt{p = new Button[1+]()} or \texttt{p
+= new Button[1++]()} allows \texttt{p} to be revised or evolved,
+respectively.  UpgradeJ's update model is easier to implement than \JV's
+because it need not change existing object instances.  Of course, the
+downside is a loss of flexibility.  Many of the updates to our benchmark
+applications change field contents and layout.  UpgradeJ does not support
+these updates.  On the other hand, evolution upgrades add power over simple
+method body updates, and consequently enable more real-world updates to be
+supported~\cite{tempero08upgradej}.  There currently is no implementation of
+UpgradeJ.
+
+%% JDRUMS: implements the conversion lazily.  They have a similar interface
+%% (object and class transformers). The drawback here is that there is overhead
+%% in the general case of execution---we do not know when the update is
+%% complete.  Implemented in Sun's JDK 1.2.  Adds a level of indirection to the
+%% new object.  Thus overhead builds up over time.  It also appears they have a
+%% more limited interface to what can be referenced in a conversion function.
+%% For example, there is no way to refer to fields other than those of the
+%% object's class (i.e., no super-class fields) and there is no way to call new
+%% methods, like constructors.  Not clear if there are restrictions on how
+%% methods can be changed.
+
+%% DVM: use an incremental mark-sweep collector, where mark phase marks objects
+%% to be updated and the sweep phase incrementally updates them (prior to being
+%% accessed by the mutator).  Like JDRUMS, all accesses to marked objects are
+%% trapped.  Imposes a stock 10\% overhead, even only using bytecode.
+
+%% Both of these: no significant experience with real applications, according
+%% to how they change in practice.  They also can't handle native methods
+%% because they can't trap access to modified objects.  Doing the full GC
+%% solves this problem.
+
+% More recently, Nicoara et al. developed PROSE, a system for run-time

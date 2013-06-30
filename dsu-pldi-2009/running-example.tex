@@ -1,0 +1,55 @@
+\begin{figure*}[t]
+\begin{tabular}{c|c}
+\begin{minipage}{3.12in}
+\begin{small}
+\begin{verbatim}
+public class User {
+  private final String username, domain, password;
+  private String[] forwardAddresses;
+  public User(...) {...}
+  public String[] getForwardedAddresses() {...}
+  public void setForwardedAddresses(String[] f) {...}
+}
+public class ConfigurationManager {
+  private User loadUser(...) {
+     ...
+     User user = new User(...);
+     String[] f = ...;
+     user.setForwardedAddresses(f);
+     return user;
+  }
+}
+\end{verbatim}
+\end{small}
+\end{minipage} &
+\begin{minipage}{3.5in}
+\begin{small}
+\begin{verbatim}
+public class User {
+  private final String username, domain, password;
+  private EmailAddress[] forwardAddresses;
+  public User(...) {...}
+  public EmailAddress[] getForwardedAddresses() {...}
+  public void setForwardedAddresses(EmailAddress[] f) {...}
+}
+public class ConfigurationManager {
+  private User loadUser(...) {
+     ...
+     User user = new User(...);
+     EmailAddress[] f = ...;
+     user.setForwardedAddresses(f);
+     return user;
+  }
+}
+\end{verbatim}
+\end{small}
+\end{minipage} \\
+(a) Version 1.3.1 &
+(b) Version 1.3.2 \\
+\end{tabular}
+\caption{Example changes to JavaEmailServer \texttt{User} and
+  \texttt{ConfigurationManager} classes}
+\label{fig:email-example}
+\end{figure*}
+
+% vim:nospell

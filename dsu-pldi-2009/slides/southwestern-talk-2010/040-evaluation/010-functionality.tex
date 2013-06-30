@@ -1,0 +1,51 @@
+\begin{frame}{Application Experience}%{A Sub-title is optional}
+\begin{itemize}
+\item Jetty webserver
+  \begin{itemize}
+  \item 11 versions, 5.1.0 through 5.1.10, 1.5 years
+  \item 45 KLOC
+  \end{itemize}
+\item JavaEmailServer
+  \begin{itemize}
+  \item 10 versions, 1.2.1 through 1.4, 2 years
+  \item 4 KLOC
+  \end{itemize}
+\item CrossFTP server
+  \begin{itemize}
+  \item 4 versions, 1.05 through 1.08, more than a year
+  \item 18 KLOC
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{What works}%{A Sub-title is optional}
+\begin{center}
+{\Large Support 20 of 22 updates}
+\end{center}
+\vspace{2ex}
+\begin{itemize}
+\item 13 updates change class signature by adding new fields
+\item Several updates require On-stack replacement support
+\item Two versions update an infinite loop, postponing the update
+indefinitely
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Unsupported updates}%{A Sub-title is optional}
+\begin{itemize}
+\item JavaEmailServer 1.2.4 to 1.3
+  \begin{itemize}
+  \item Update reworks the configuration framework of the server
+  \item Many classes are modified to refer to the configuration system
+  \item Including infinite loops in SMTP and POP threads
+  \end{itemize}
+\item Jetty 5.1.2 to 5.1.3
+  \begin{itemize}
+  \item The application would never reach a safe point
+  \item Modified method {\tt ThreadedServer.acceptSocket()} that waits for
+        connections is nearly always on stack
+  \item Return barrier not sufficient since the main method in other
+        threads {\tt PoolThread.run()} is itself modified
+  \end{itemize}
+\end{itemize}
+\end{frame}

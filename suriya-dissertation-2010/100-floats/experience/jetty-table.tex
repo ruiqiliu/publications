@@ -1,0 +1,22 @@
+\begin{figure}[t]
+\centering
+\begin{small}
+\begin{tabular}{lcccc} \toprule
+\multirow{2}{*}{Config.} & \mc{2}{c}{Throughput (MB/s)}  & \mc{2}{c}{Latency (ms)} \\ \cmidrule{2-5}
+           & Median   & Quartiles                    & Median & Quartiles     \\ \midrule
+%            & \mc{2}{c}{Throughput (MB/s)}  & \mc{2}{c}{Latency (ms)} \\ \cmidrule{2-5}
+% Config.    & Median   & Quartiles                    & Median & Quartiles     \\ \midrule
+\RVM       & 122.437  & 121.44--123.32               & 0.442  & 0.394--0.496  \\
+\JV        & 121.308  & 121.12--121.41               & 0.349  & 0.341--0.351  \\
+\JV upd.   & 121.242  & 121.09--121.29               & 0.345  & 0.341--0.349  \\ \bottomrule
+\end{tabular}
+\end{small}
+\\[2ex]
+\includegraphics[scale=0.63]{100-graphs/jetty-throughput-latency}
+% \caption{Throughput and latency measurements of Jetty webserver v5.1.6\label{fig:jetty}}
+\hangcaption{Throughput and latency measurements for Jetty webserver
+version 5.1.6 showing median and semi-interquartile range\label{fig:jetty}}
+\VspaceFixForHangcaption
+\end{figure}
+
+% vim:tw=0

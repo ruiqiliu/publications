@@ -1,0 +1,320 @@
+\input{jvolve/dsu-steps}
+
+\subsection{Implementation}
+\ShowTOC
+
+\begin{frame}{Update model}%{A Sub-title is optional}
+\begin{itemize}
+\item Update happens in one fell swoop
+\item Simple to reason about
+\item Code
+  \begin{itemize}
+  \item Old code before the update
+  \item New code after the update
+  \end{itemize}
+\item Data
+  \begin{itemize}
+  \item Representation consistency (all values of a type correspond to the
+        latest version)
+  \item Support a transformation function to convert objects to conform to
+        their new definition
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Update process}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{}{}
+\begin{itemize}
+\item Offline Update Preparation Tool (UPT)
+\item \DSU{} VM
+  \begin{itemize}
+  \item Reach a safe point in the VM (thread synchronization)
+  \item Install new classes (classloader)
+  \item Transform objects to new definition (garbage collector)
+  \item Resume execution
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile,label=offline]{Update Preparation Tool}%{A Sub-title is optional}
+% \vspace{-2ex}
+\JvolveTimeLine{current}{}{}{}{}
+% \vspace{-2ex}
+\begin{itemize}
+\item Uses jclasslib\footnote{\url{http://jclasslib.sourceforge.net}}, a
+bytecode library
+\item Compares bytecodes of the two versions
+% \item Categorizes changes into
+%   \begin{description}
+%   \item[Updated classes] Classes that add, remove, change signature of fields
+%                        or methods
+%   \item[Updated methods] Changes within a method body. Only the method has
+%                         to be loaded/updated
+%   \item[Indirect updates] No change to method, but refers to changed
+%                           classes
+%   \end{description}
+\item Generates old version stubs and default object transformers
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Compiling transformation functions}%{A Sub-title is optional}
+\begin{itemize}
+\item All transformers specified in a separate source file
+\item Class transformers  \\ \hspace{6ex} {\footnotesize {\tt jvolveClass(ClassName unused)}}
+\item Object transformers \\ \hspace{6ex} {\footnotesize {\tt jvolveObject(old\_ClassName from, ClassName to)}}
+\item Compiled specially by a JastAddJ extension to the Java language
+\item Ignores access protection and allows assigning to {\tt final} fields
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile,label=suspend]{Safe point for the update}%{A Sub-title is optional}
+\JvolveTimeLine{}{current}{}{}{}
+\begin{itemize}
+\item Update must be atomic
+\item Updates happen at ``safe points'' (VM yield points with restriction
+      on what methods can be on stack)
+\item Extend the thread scheduler to suspend all application threads
+\item Examine all stacks, ensure no restricted methods on stack and perform
+      the update
+\end{itemize}
+\end{frame}
+
+{
+\setbeamercovered{invisible}
+\begin{frame}[t,fragile]{Restricted methods}%{A Sub-title is optional}
+\begin{itemize}
+\item (1) Methods changed by the update
+\item (2) Methods whose bytecode is unchanged, but compiled representation is
+      changed by the update
+  \begin{itemize}
+  \item Offsets of fields and methods hard-coded in machine code
+  \item Inlined callees may have changed
+  \end{itemize}
+\item (3) Methods identified by the user as unsafe based on semantic
+information about the application
+\end{itemize}
+\uncover<2>{
+Handling restricted methods
+\begin{itemize}
+\item \emph{On-stack replace} baseline-compiled category (2) methods
+\item Do not allow (1) and (3) to be active on stack, install a return
+      barrier for such methods
+\end{itemize}
+}
+\end{frame}
+}
+
+\begin{frame}[c,fragile]{Handling restricted methods}%{A Sub-title is optional}
+\hspace*{-5mm}
+\centering{\scalebox{0.67}{\includegraphics{images/flowchart}}}
+\end{frame}
+
+\begin{frame}[t,fragile]{On stack replacement in \DSU{}}%{A Sub-title is optional}
+\begin{itemize}
+\item Used in \JikesRVM{} to optimize long running methods
+\item \DSU{} utilizes OSR for DSU
+\item Currently only support baseline-compiled methods
+\item Can OSR any method on stack
+\uncover<2>{
+\item Extract the state of the stack
+\item Construct a new method with a specialized prologue (at the bytecode
+level) that reconstructs the stack
+\item Last instruction of prologue jumps to bytecode where execution should
+resume from
+\item Overwrite the return address to point to the special method
+}
+\end{itemize}
+\end{frame}
+
+
+{
+\setbeamercovered{invisible}
+\begin{frame}[t,fragile]{OSR Example}%{A Sub-title is optional}
+\begin{footnotesize}
+\begin{columns}[t]
+
+\begin{column}{0.4\paperwidth}
+\begin{semiverbatim}
+public class A \{
+  public int foo(int i, B b) \{
+    i = i + 1;
+    i = b.bar(i);
+    i = i + 1;
+    return i;
+  \}
+\}
+\end{semiverbatim}
+
+\uncover<2-> {
+State: \\
+Thread: \#5 \\
+FP: 0x4ad33e40 \\
+PC: 9 \\
+Locals: i = 5, b = 0x52ae34a0 \\
+Stack vars: S0, S1, ... \\
+}
+\end{column}
+
+\begin{column}{0.4\paperwidth}
+\begin{semiverbatim}
+ 0 iload\_1
+ 1 iconst\_1
+ 2 iadd
+ 3 istore\_1
+ 4 aload\_2
+ 5 iload\_1
+ 6 invokevirtual <B.bar>
+ 9 istore\_1
+10 iload\_1
+11 iconst\_1
+12 iadd
+13 istore\_1
+14 iload\_1
+15 ireturn
+\end{semiverbatim}
+\end{column}
+\end{columns}
+\end{footnotesize}
+\end{frame}
+}
+
+{
+\setbeamercovered{invisible}
+\begin{frame}[t,fragile,shrink=20]{OSR Example}%{A Sub-title is optional}
+\begin{footnotesize}
+\begin{columns}[b]
+
+\begin{column}{0.4\paperwidth}
+\begin{semiverbatim}
+ 0 iload\_1
+ 1 iconst\_1
+ 2 iadd
+ 3 istore\_1
+ 4 aload\_2
+ 5 iload\_1
+ 6 invokevirtual <B.bar>
+ 9 istore\_1
+10 iload\_1
+11 iconst\_1
+12 iadd
+13 istore\_1
+14 iload\_1
+15 ireturn
+\end{semiverbatim}
+\end{column}
+
+\begin{column}{0.4\paperwidth}
+\begin{semiverbatim}
+   ldc 5
+   istore\_0 
+   ldc 0x52ae34a0
+   astore\_1
+   goto 9
+ 0 iload\_1
+ 1 iconst\_1
+ 2 iadd
+ 3 istore\_1
+ 4 aload\_2
+ 5 iload\_1
+ 6 invokevirtual <B.bar>
+ 9 istore\_1
+10 iload\_1
+11 iconst\_1
+12 iadd
+13 istore\_1
+14 iload\_1
+15 ireturn
+\end{semiverbatim}
+\end{column}
+
+\end{columns}
+\end{footnotesize}
+\end{frame}
+}
+
+\begin{frame}[t,fragile,label=classload]{Installing new classes}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{current}{}{}
+\begin{itemize}
+\item The VM maintains Class, Method and Field data structures
+\item For Method updates: Only load the new method's bytecodes
+\item For Class updates: Rename the old class and load the entire class
+file (equivalent to have loaded two different class)
+\end{itemize}
+\end{frame}
+
+\ifdraft{}{
+\include{jvolve/installing-classes-figure}
+}
+
+\begin{frame}[t,fragile,label=transform]{Transforming objects}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+\begin{itemize}
+\item Built on top of a semi-space copying collector
+\item As part of collector's visit allocate additional space for updated
+      objects
+\item After GC, run class and object transformers
+\end{itemize}
+\end{frame}
+
+\ifdraft{}{
+\include{jvolve/semi-space-animation/macro-definitions}
+% \include{jvolve/semi-space-animation/gc}
+}
+
+\begin{frame}[t,fragile]{\DSU{} Garbage collector}%{A Sub-title is optional}
+\begin{itemize}
+\item Identical to Semispace for ``regular'' objects
+\item For objects to be transformed
+  \begin{itemize}
+  \item Copy the object to ToSpace (like Semispace)
+  \item Also, allocate an empty object in ToSpace for the new version
+  \end{itemize}
+\item Forwarding pointers point to the ``new version'' object
+\item No field can point to an ``old version'' object
+\end{itemize}
+\end{frame}
+
+\ifdraft{}{
+\include{jvolve/semi-space-animation/dsu-gc}
+\include{jvolve/semi-space-animation/dsu-after-gc}
+\include{jvolve/semi-space-animation/revisiting-transformation-functions}
+}
+
+\begin{frame}[t,fragile]{Revisiting transformation functions}%{A Sub-title is optional}
+Solutions to the ordering problem \\
+\begin{itemize}
+\item Programmer can invoke a VM function that will transform objects on
+demand. Moves burden of safety to the programmer
+\uncover<2>{
+\item Insert read barrier code to perform this check when compiling the
+transformation function
+\item Perform some static analysis to determine an order to queue
+objects
+}
+\end{itemize}
+\end{frame}
+
+% \begin{frame}[fragile]{Updating from a singly to doubly linked list}%{A Sub-title is optional}
+% \begin{footnotesize}
+% \begin{verbatim}
+% public static void jvolveObject(LinkedList.Node to,
+%                                 r0_LinkedList.Node from) {
+%   to.next = from.next;
+%   to.data = from.data;
+%   if (to.next != null) to.next.prev = to;
+% }
+% 
+% public static void jvolveObject(LinkedList to, r0_LinkedList from) {
+%   Jvolve.transformReferences(from);
+%   to.head = from.head;
+%   LinkedList.Node n0 = null;
+%   LinkedList.Node n1 = to.head;
+%   while (n1 != null) {
+%     n0 = n1;
+%     n1 = n1.next;
+%   }
+%   to.tail = n0;
+% }
+% \end{verbatim}
+% \end{footnotesize}
+% \end{frame}

@@ -1,0 +1,85 @@
+\documentclass[9pt]{sigplanconf}
+
+\newcommand{\DSU}{{\sc Jvolve}}
+\newcommand{\transformObject}{\texttt{jvolveObject}}
+\newcommand{\transformClass}{\texttt{jvolveClass}}
+\newcommand{\VMClass}{\texttt{RVMClass}}
+\newcommand{\TIB}{\texttt{TIB}}
+\newcommand{\JTOC}{\texttt{JTOC}}
+\newcommand{\JikesRVM}{Jikes RVM}
+\newcommand{\JRVMVersion}{Jikes RVM (SVN r15532)}
+
+% This is for adjusting spacing in tables
+% Taken from
+% https://www.msu.edu/~harris41/latex_tablespacing.html
+\newcommand\T{\rule{0pt}{2.0ex}}
+\newcommand\B{\rule[-1.2ex]{0pt}{0pt}}
+
+\usepackage{times}
+\usepackage{rotating}
+\usepackage{subfigure}
+\usepackage{acronym}
+\usepackage{multirow}
+\usepackage{graphics}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{url}
+\usepackage[usenames]{color}
+\usepackage[override]{cmtt}
+\usepackage{hyperref}
+
+% \newcommand\maybecolor[1]{\color{#1}}
+% \newcommand\mwh[1]{{\maybecolor{green}\textbf{Mike says:} #1}}
+% \newcommand\ksm[1]{{\maybecolor{blue}\textbf{Kathryn says:} #1}}
+% \newcommand\suriya[1]{{\maybecolor{blue}\textbf{Suriya says:} #1}}
+% \newcommand\todo[1]{{\maybecolor{red} #1}}
+% \newcommand\proofread[1]{{\maybecolor{red} #1}}
+% \newcommand\mwh[1]{}
+% \newcommand\ksm[1]{}
+% \newcommand\suriya[1]{}
+% \newcommand\todo[1]{}
+
+\begin{document}
+
+% \permission{\copyright ACM, (2009). This is the author's version of the
+% work. It is posted here by permission of ACM for your personal use. Not
+% for redistribution. The definitive version was published in PUBLICATION,
+% {VOL\#, ISS\#, (DATE)} \url{http://doi.acm.org/10.1145/nnnnnn.nnnnnn} }
+
+\permission{\copyright ACM, (2009). This is the author's version of the
+work. It is posted here by permission of ACM for your personal use. Not for
+redistribution. The definitive version will be published in the proceedings
+of PLDI 2009. The DOI identifier is currently unavailable.}
+
+\conferenceinfo{PLDI'09,} {June 15--20, 2009, Dublin, Ireland.}
+\CopyrightYear{2009}
+\copyrightdata{978-1-60558-392-1/09/06}
+
+\title{Dynamic Software Updates: A VM-centric Approach}
+\authorinfo{Suriya Subramanian}{The University of Texas at Austin}{suriya@cs.utexas.edu}
+\authorinfo{Michael Hicks}{University of Maryland, College Park}{mwh@cs.umd.edu}
+\authorinfo{Kathryn S. McKinley}{The University of Texas at Austin}{mckinley@cs.utexas.edu}
+\maketitle
+
+\input{abstract}
+
+\category{D.3.4}{Programming Languages}{Processors}[Run-time environments]
+\terms Languages, Experimentation, Reliability
+\keywords dynamic software updating, virtual machine technology, garbage collection 
+
+\input{intro}
+\input{model}
+\input{implementation}
+\input{experience/experience}
+\input{related}
+\input{conc}
+\input{acknowledgements}
+
+\input{acronyms}
+
+\bibliographystyle{plain}
+\bibliography{paper}
+
+\end{document}
+
+% vim:nospell

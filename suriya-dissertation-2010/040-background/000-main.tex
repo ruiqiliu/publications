@@ -1,0 +1,56 @@
+\chapter{Background\label{chap:dsu}}
+
+% This chapter will cover the following
+% \begin{lstlisting}[numbers=none]
+% * DSU Semantics [Written]
+% * Safety [Written]
+% * Update timing [Not yet written]
+%    programmer specified update points
+%    immediate updates
+%    synchronization
+%    queiscence points
+%    multithreaded updates
+%    loop extraction
+% * Updating code [Written]
+%    Function indirection
+%    trampolines
+%    on-stack replacement
+%    stack transformers
+% * Updating data [Half Written, to be polished]
+%    state transformers
+%    when to apply state transformers
+%    how to apply transformers
+%    supporting data structure changes
+%    type wrapping
+%    type representation/padding
+%    indirection
+% \end{lstlisting}
+
+This chapter presents an overview of the dynamic updating problem.
+It discusses the semantics of
+updates, explains safety guarantees that \USD systems provide, and presents
+mechanisms that systems employ to support \USD. This chapter focuses on DSU
+system requirements and mechanisms, whereas Chapter~\ref{chap:related}
+covers how prior systems chose among them.
+
+The goal of \USD is to avoid application downtime in the face of software
+updates. Researchers have addressed the problem of dynamic updating in
+various contexts such as standalone and server applications, distributed
+computing, distributed object stores, and databases for various types of
+code updates, and types of code and data updates. This dissertation
+considers updating a single application process, changing code and data to
+be as expected by the new version.
+% \USD systems achieve this goal by dynamically updating a running
+% application, changing code and data to be as expected by the new version. 
+
+\input{040-background/007-updating-code}
+\input{040-background/008-updating-data}
+  \input{040-background/010-semantics} % This is a sub-section
+\input{040-background/020-safety}
+\input{040-background/025-timing}
+
+\section{Conclusion}
+In this chapter, we presented an overview of the dynamic software updating
+problem.  We discussed mechanisms for updating code and data that meet
+desirable safety guarantees while processing the update in a timely
+fashion.

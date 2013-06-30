@@ -1,0 +1,112 @@
+
+\subsection{Experience}
+\ShowTOC
+
+\newcommand{\HighlightRow}{\rowcolor{structure.fg!30}}
+
+\begin{frame}{Applications}%{A Sub-title is optional}
+\begin{itemize}
+\item Jetty webserver
+  \begin{itemize}
+  \item 11 versions, 5.1.0 through 5.1.10, 1.5 years
+  \item 45 KLOC
+  \end{itemize}
+\item JavaEmailServer
+  \begin{itemize}
+  \item 10 versions, 1.2.1 through 1.4, 2 years
+  \item 4 KLOC
+  \end{itemize}
+\item CrossFTP server
+  \begin{itemize}
+  \item 4 versions, 1.05 through 1.08, more than a year
+  \item 18 KLOC
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Unsupported updates}%{A Sub-title is optional}
+\begin{itemize}
+\item Jetty 5.1.2 to 5.1.3
+  \begin{itemize}
+  \item The application would never reach a safe point
+  \item Modified method {\tt ThreadedServer.acceptSocket()} that waits for
+        connections is nearly always on stack
+  \item Return barrier not sufficient since the main method in other
+        threads {\tt PoolThread.run()} is itself modified
+  \end{itemize}
+\item JavaEmailServer 1.2.4 to 1.3
+  \begin{itemize}
+  \item Update reworks the configuration framework of the server
+  \item Many classes are modified to refer to the configuration system
+  \item Including infinite loops in SMTP and POP threads
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Overhead of DSU}%{A Sub-title is optional}
+\begin{itemize}
+\item No discernible overhead for normal execution (before and after the
+update)
+\item Only effect on execution time is the update pause time
+  \begin{itemize}
+  \item Comparable to GC pause time
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Jetty webserver performance}%{A Sub-title is optional}
+\begin{itemize}
+\item Used \texttt{httperf} to issue requests
+\item Create 800 new connections/second (saturation rate)
+\item 5 serial requests to 40KB file per connection
+\item Compared versions 5.1.5 and 5.1.6
+\item Experiments on Intel Core 2 Quad, Linux 2.6.22, JikesRVM SVN r15532
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Jetty webserver: Throughput measurements}%{A Sub-title is optional}
+\begin{center}
+\centering\scalebox{0.8}{\includegraphics{graphs/jetty-throughput-latency}}
+\end{center}
+\end{frame}
+
+\begin{frame}{DSU pause times}%{A Sub-title is optional}
+\begin{itemize}
+\item \DSU{} performs a GC to transform objects
+\item Pause time determined by
+  \begin{itemize}
+  \item Heap size
+  \item \# of objects transformed
+  \end{itemize}
+\item Simple microbenchmark varying the \# of objects transformed
+\end{itemize}
+\end{frame}
+
+\begin{frame}[shrink=5]{DSU pause times (microbenchmark)}%{A Sub-title is optional}
+\begin{center}
+\hspace*{19mm}\scalebox{1.1}{\includegraphics{graphs/microbench}}
+\end{center}
+\end{frame}
+
+% \begin{frame}{Jetty webserver: Summary of changes}%{A Sub-title is optional}
+% \begin{footnotesize}
+% \begin{center}
+% \begin{tabular}{|l||c||c|c|c|r|c|c|} \hline
+% Ver.    & \#      & \multicolumn{6}{c|}{\# changed} \\
+%         & classes & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields} \\
+%         & added   &         & add & del & chg              & add & del \\ \hline \hline
+% 5.1.1   & 0       & 14      & 4   & 1   & 38/0             & 0   & 0   \\
+% 5.1.2   & 1       & 5       & 0   & 0   & 12/1             & 0   & 0   \\ \HighlightRow
+% 5.1.3   & 3       & 15      & 19  & 2   & 59/0             & 10  & 1   \\ \HighlightRow
+% 5.1.4   & 0       & 6       & 0   & 4   & 9/6              & 0   & 2   \\ \HighlightRow
+% 5.1.5   & 0       & 54      & 21  & 4   & 112/8            & 5   & 0   \\ \HighlightRow
+% 5.1.6   & 0       & 4       & 0   & 0   & 20/0             & 5   & 6   \\ \HighlightRow
+% 5.1.7   & 0       & 7       & 8   & 0   & 11/2             & 9   & 3   \\
+% 5.1.8   & 0       & 1       & 0   & 0   & 1/0              & 0   & 0   \\
+% 5.1.9   & 0       & 1       & 0   & 0   & 1/0              & 0   & 0   \\
+% 5.1.10  & 0       & 4       & 0   & 0   & 4/0              & 0   & 0   \\ \hline
+% \end{tabular}
+% \end{center}
+% \end{footnotesize}
+% \end{frame}
+

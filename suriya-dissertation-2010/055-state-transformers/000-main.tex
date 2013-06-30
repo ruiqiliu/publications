@@ -1,0 +1,48 @@
+\chapter{State Transformers: Models and Automation}
+\label{chap:transformers}
+
+This chapter discusses \JV's state transformation model in more detail. We
+present \JV's per-type object transformation model; our use of state
+transformers to repair application state for specific bugfixes; and a
+methodology
+for automating state transformer generation to ease programmer burden.
+
+\input{055-state-transformers/010-transformer-model}
+\input{055-state-transformers/020-repairing-application-state}
+\input{055-state-transformers/030-automating-transformers}
+
+\section{Conclusion}
+In this chapter, we presented \JV's new world state transformation model
+in comparison to an alternative old world model. We show that the models
+are similar and more flexible than lazy models. While the new world model
+makes implementation simpler and efficient, the old world model leads to
+more elegant transformation functions.
+
+We extend our model
+to more sophisticated transformers with logic dependent on the state of
+each object. We use such transformers to repair application state that the
+old program incorrectly created. To simplify creation of such transformers,
+we introduce a dynamic analysis technique to discover predicates that
+describe and distinguish heap objects that need repair. We use the
+discovered invariants to automatically generate state transformers, thereby
+reducing some of the effort required of the programmer. We also use these
+discovered invariants to help the programmer gain confidence in the
+correctness of their own transformer functions.
+
+% \section{Don't know a good place to put this}
+% \todo{This is about OSR. Where should this be moved?} Finally, our \OSR
+% support is currently limited to on-stack methods whose bytecode has not
+% changed.  We plan to further extend OSR to support \emph{changed} methods
+% on the stack, similar to what is provided by UpStare, a DSU system for
+% C~\cite{upstare}.  For changed methods the user wishes to update while they
+% run, she must additionally provide a mapping between the yield points in
+% the old method to similar points in the new method.  For example, a common
+% change is to modify the contents of an event handling loop.  The user would
+% map the yield point at the end of the old loop to the yield point at the
+% end of the new loop. The user would also have to provide the analogue of an
+% object transformer for initializing the contents of the new method's stack
+% frame, given the old stack frame contents.  As with object transformers,
+% this update model poses a question: should the stack frame transformer be
+% allowed to dereference objects in the old stack frame if they too have
+% changed?  We leave exploration of updating active methods to interesting
+% future work.

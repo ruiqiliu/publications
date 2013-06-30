@@ -1,0 +1,30 @@
+\BCode[t]{0.67}
+\begin{lstlisting}[frame=single]
+function getfield(object, field):
+    value = object.field
+    new_value = ensure_transformed(value)
+    if (value != new_value):
+        setfield(object, field, new_value)
+    return new_value
+
+function getstatic(class, field):
+    // similar to getfield
+    // uses setstatic
+
+function aaload(array, index):
+    // similar to getfield
+    // uses aastore
+
+function ensure_transformed(o):
+    if o.isForwardingPointer():
+        return o.ForwardedValue
+    else if o.isUpToDate():
+        return o
+    else:
+        new_o = new Object()
+        jvolveObject(new_o, o)
+        o = (forwarding pointer to new_o)
+        return new_o
+\end{lstlisting}
+\ECode{Lazy object transformation model
+implementation\label{fig:read-barrier}}

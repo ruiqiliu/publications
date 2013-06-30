@@ -1,0 +1,355 @@
+\documentclass{article}
+\input{smagill-base}
+\usepackage{listings}
+\lstset{language=C,numbers=left,numberstyle=\tiny,numbersep=5pt,basicstyle=\small\sffamily,columns=flexible,mathescape=true,lineskip=1pt,frame=single,escapeinside={/**}{*/},showstringspaces=false}
+
+\semanticdomain{PCs,Fields,Methods,Stores,Stacks,DataStates,Vars,Commands,Labels,Func[\ensuremath{\mathcal{F}}],Arrays,Heaps,error[\ensuremath{\mathbf{error}}]}
+\newcommand{\progcount}{\mathit{progcount}}
+\newcommand{\lang}[1]{\mathsf{#1}}
+\newcommand{\atloc}[1]{\mathit{atloc}(#1)}
+\newcommand{\ltlform}{\varphi}
+\newcommand{\len}{\mathit{len}}
+\newcommand{\delete}[1]{}
+
+% PTLTL connectives
+\newcommand{\ltlF}{\mathbf{F}}
+\newcommand{\ltlY}{\mathbf{Y}}
+\newcommand{\ltlZ}{\mathbf{Z}}
+\newcommand{\ltlO}{\mathbf{O}}
+\newcommand{\ltlH}{\mathbf{H}}
+\newcommand{\ltlS}{\mathrel{\mathbf{S}}}
+\newcommand{\ltlT}{\mathrel{\mathbf{T}}}
+\newcommand{\ltlvee}{\mathbin{\vcenter{\offinterlineskip\hbox{\hskip 0.2em$\cdot$}\vskip-0.45em\hbox{$\vee$}}}}
+\newcommand{\ltlwedge}{\mathbin{\vcenter{\offinterlineskip\vskip 0.1em\hbox{\hskip 0.2em$\cdot$}\vskip-0.55em\hbox{$\wedge$}}}}
+\newcommand{\ltlneg}{\mathord{\hbox{\scriptsize$\sim$}}}
+\newcommand{\ltlimp}{\mathbin{\vcenter{\offinterlineskip\vskip 0.1em\hbox{\hskip 0.2em$\cdot$}\vskip-0.55em\hbox{$\supset$}}}}
+\newcommand{\p}[1]{\textsf{#1}}
+\begin{document}
+
+\begin{abstract}
+A short note on a language for specifying temporal properties of object systems and a light-weight monitoring implementation capable of dynamically identifying objects that satisfy these properties.  %Also includes notes how to use this to help write dynamic software updates.
+\end{abstract}
+
+\section{Program Traces}
+
+The approach in this note is based on identifying objects that satisfy given temporal properties.  As such, we start with a description of the traces over which temporal properties will be evaluated.  For now we assume that each Java command has one of the forms below.  Conversion of a program into this simplified form or extraction of this form from the bytecode still has to be worked out.
+
+\begin{center}
+\begin{tabular}{lrcl}
+\textit{Variables} & $x,y$ & $\in$ & $\<Vars>$ \\
+\textit{Fields} & $f$ & $\in$ & \<Fields> \\
+\textit{Methods} & $m$ & $\in$ & \<Methods> \\
+\textit{Expressions} & $e$ & $\bnfas$ & $x \mid x.m(\vec{y}) \mid x.f$ \\
+\textit{Commands} & $a$ & $\bnfas$ & $x := e \mid x.f := e \mid x.m(\vec{y})$ \\
+\end{tabular}
+\end{center}
+
+Note that commands and expressions only allow invokation of a single method on a variable.  Compound commands and expressions can be reduced to this form by insertion of temporary variables.
+
+A \emph{program trace} consists of a sequence of state, command pairs.  The state portion describes the Java heap just prior to execution of the command.  Inclusion of both state and command components lets us include predicates over both states and actions in our specification language.  Heap states are not described in detail here, but these would map global and local variables to values, which include the set of memory addresses.  The heap state would also contain a mapping from addresses to objects.  Finally, we assume that the heap state includes the current value of the program counter.  We write $\progcount(\sigma)$ for the value of this counter in state $\sigma$.
+
+We use the meta-variable $\sigma$ to represent a heap state and the meta-variable $a$ for a command (which is also called an \emph{action}, as our actions correspond directly to Java commands).  A trace $T$ is thus a sequence of the form
+\[T = (\sigma_1,a_1) (\sigma_2,a_2) \ldots (\sigma_n,a_n) \]
+
+We assume the existence of a semantic function
+\[\sembrack{\cdot} : \textit{Expressions} \rightarrow \textit{Heap State} \rightarrow \textit{Values}\]
+that allows us to evaluate an expression in a given heap state.  We write $\sembrack{e} \sigma$ for the application of this function to expression $e$ and heap state $\sigma$.
+
+\section{Specification Language}
+
+We start with a past-time version of LTL.  Figure \ref{fig:ptltl-syntax} gives the syntax of Past-Time LTL (PTLTL).  Figure \ref{fig:ptltl-semantics} gives the semantics, which are defined in terms of satisfaction of \emph{finite} traces of the form sketched in the previous section.  Note that this is in contrast to the standard semantics for LTL, which is interpreted over infinite traces.  The reason for this is that, given a specified point in time, while the future behaviors of the system are potentially infinite, the past behavior is finite.  Since our language only includes past-time operators, a semantics based on finite traces suffices.
+
+The state predicates of PTLTL consist of \emph{actions} and \emph{state predicates}.  Actions describe Java language events of interest including field assignments and method invocations.  These predicates are true when the program executes a matching command.  State predicates describe properties of the program state and are true in any state satisfying the predicate.
+
+\vspace*{1em}
+\noindent
+\fbox{
+\begin{varwidth}{\textwidth-1em}
+\textbf{Side Note:}
+
+ In the grammar in Figure \ref{fig:ptltl-syntax}, state predicates can include formulas such as $x.m(\vec{y}) = \true$, which is true if the method call $x.m(\vec{y})$ evaluates to true in the current state.  This would be very expensive to implement in the absence of dependency information for the method $m$, so we probably want to leave it out of the implementation.  To see why this is expensive, suppose we want to check that ``it has always been the case that $x.m(y) = \true$.''  Intuitively, to check this we would have to call $x.m(y)$ at every step of the program to ensure that this method continues to return $\true$.  Absent any information about which methods may influence the truth of $x.m(y)$ we have to assume that any method call could potentially change the behavior of $x.m(y)$.
+\end{varwidth}}
+\vspace*{1em}
+
+State predicates also include the ability to specify a particular code location.  So while $\lang{global\_var.f := null}$ is true whenever $\lang{global\_var.f}$ is assigned the value $\lang{null}$, the predicate $\lang{global\_var.f := null} \wedge \atloc{\lang{foo.java:131}}$ is only true when the assignment at line $131$ in $\lang{foo.java}$ results in the assignment $\lang{global\_var.f := null}$.  The method for mapping between these source locations and program counter values as stored in our traces is left unspecified for now.
+
+\begin{figure}[tb]
+\textsc{Syntax of PTLTL}
+\center{
+\begin{tabular}{lrcl}
+\textit{Variables} & $x,y$ & $\in$ & $\<Vars>$ \\
+\textit{Labels} & $l$ & $\in$ & \<Labels> \\
+\textit{Fields} & $f$ & $\in$ & \<Fields> \\
+\textit{Methods} & $m$ & $\in$ & \<Methods> \\
+\textit{Expressions} & $e$ & $\bnfas$ & $x \mid x.m(\vec{y}) \mid x.f$ \\
+\textit{State Predicates} & $s$ & $\bnfas$ & $\atloc{l} \mid e_1 = e_2 \mid e_1 \neq e_2 \mid e_1 < e_2 \mid \ldots$ \\
+& & & $s_1 \wedge s_2 \mid s_1 \vee s_2 \mid s_1 \imp s_2 \mid \neg s$ \\
+\textit{Actions} & $a$ & $\bnfas$ & $x := e \mid x_1.f := x_2 \mid x.m(\vec{y})$ \\
+\textit{Atomic Predicate} & $m$ & $a \wedge s \mid \atloc{l} \wedge s$ \\
+\textit{Temporal Predicates} & $\ltlform$ & $\bnfas$ & $m \mid \ltlY \ltlform \mid \ltlZ \ltlform \mid \ltlO \ltlform \mid \ltlH \ltlform \mid \ltlform_1 \ltlS \ltlform_2 \mid \ltlform_1 \ltlT \ltlform_2$ \\
+& & & $\ltlform_1 \ltlwedge \ltlform_2 \mid \ltlform_1 \ltlvee \ltlform_2 \mid \ltlneg \ltlform$ \\
+\textit{PTLTL Selector} & $P$ & $\bnfas$ & $x_1 : \tau_1, \ldots, x_n : \tau_n.\ \ltlform$ \\
+\end{tabular}
+}
+\caption{\label{fig:ptltl-syntax}Syntax for PTLTL.}
+\end{figure}
+
+As with the expressions and commands occurring in traces, PTLTL expressions and actions include only basic forms and not compound expressions.  Compound expressions can be converted to this form by insertion of temporary variables, and we should probably define such a conversion in order to provide a more easy-to-use specification language.
+
+Figure \ref{fig:ptltl-semantics} gives the semantics of PTLTL formulas.  We use the notation $T(i)$ to denote the $i^{\text{th}}$ element of trace $T$, where the first element is given by $T(1)$.  We will take care to use this operation only in cases where it is defined.  We write $\pi_1(T(i))$ for the first component of the pair $T(i)$ (which is a heap state) and $\pi_2(T(i))$ for the second component (an action).  We assume the existence of a semantic function $\sembrack{\cdot} : \textit{State Predicate} \rightarrow \textit{Heap State} \rightarrow \{\true,\false\}$ such that $\sembrack{s} \sigma$ gives the truth value of predicate $s$ in state $\sigma$.
+
+We write $o \in \sigma$ to denote that the object $o$ appears in the heap state $\sigma$.  We write $o : \tau$ to indicate that object $o$ has type $\tau$.  We write $\sigma[x \mapsto o]$ to denote the heap state $\sigma$ extended such that variable $x$ maps to object $o$.  As with the other details of states, we leave the precise statement of these notions for later.
+
+The truth of a formula $\ltlform$ is evaluated with respect to a trace $T$ and a time point $i$.  We write $(T,i) \models \ltlform$ if trace $T$ satisfies $\ltlform$ at time point $i$, where $i=1$ gives the initial time point.  In a notable departure from standard practice, we say that a trace $T$ satisfies a formula $\ltlform$ if and only if it satisfies it at its final time point (more standard is to evaluate formulas at the initial time point).  That is, if $\len(T)$ is the length of $T$, then we write $T \models \ltlform$ as an abbreviation for $(T,\len(T)) \models \ltlform$.  We adopt this convention as it fits well with our view of a formula as ``looking back'' over a trace in order to identify objects of interest.
+
+We can define implication at the level of temporal predicates as $\ltlform_1 \ltlimp \ltlform_2$ if and only if $\ltlneg\ltlform_1 \vee \ltlform_2$.  We can also move negations toward or away from state predicates and actions using the following laws.
+\begin{eqnarray*}
+\ltlneg(\ltlY \ltlform) &<=>& \ltlZ (\neg\ltlform)\\
+\ltlneg(\ltlZ \ltlform) &<=>& \ltlY (\neg\ltlform)\\
+\ltlneg(\ltlO \ltlform) &<=>& \ltlH (\neg\ltlform)\\
+\ltlneg(\ltlH \ltlform) &<=>& \ltlO (\neg\ltlform)\\
+\ltlneg(\ltlform_1 \ltlS \ltlform_2) &<=>& ((\neg\ltlform_1) \ltlT (\neg\ltlform_2))\\
+\ltlneg(\ltlform_1 \ltlT \ltlform_2) &<=>& ((\neg\ltlform_1) \ltlS (\neg\ltlform_2))
+\end{eqnarray*}
+
+\begin{figure}[tb]
+\textsc{Semantics of PTLTL}
+\[
+\begin{array}{rcl}
+(T,i) \models s & \iff & \sembrack{s} \pi_1(T(i)) = \true\\
+(T,i) \models a & \iff & \pi_2(T(i)) = a \\
+(T,i) \models \ltlY \ltlform & \iff & i > 1 \text{ and } (T,i-1) \models \ltlform\\
+(T,i) \models \ltlZ \ltlform & \iff & i = 1 \text{ or } (T,i-1) \models \ltlform\\
+(T,i) \models \ltlO \ltlform & \iff & \E[j \leq i] (T,j) \models \ltlform\\
+(T,i) \models \ltlH \ltlform & \iff & \A[j \leq i] (T,j) \models \ltlform\\
+(T,i) \models \ltlform_1 \ltlS \ltlform_2 & \iff & \E[j \leq i] ((T,j) \models \ltlform_2 \text{ and } \A[k : j < k \leq i] (T,k) \models \ltlform_1) \\
+(T,i) \models \ltlform_1 \ltlT \ltlform_2 & \iff & \A[j \leq i] ((T,j) \models \ltlform_2 \text{ or } \E[k : j < k \leq i] (T,k) \models \ltlform_1)\\
+(T,i) \models \ltlform_1 \ltlwedge \ltlform_2 & \iff & (T,i) \models \ltlform_1 \text{ and } (T,i) \models \ltlform_2\\
+(T,i) \models \ltlform_1 \ltlvee \ltlform_2 & \iff & (T,i) \models \ltlform_1 \text{ or } (T,i) \models \ltlform_2\\
+(T,i) \models \ltlneg \ltlform & \iff & (T,i) \not\models \ltlform \\
+\\
+(T,i) \models x_1 : \tau_1, \ldots, x_n : \tau_n.\ \ltlform & \iff & \text{there exist objects } o_1 : \tau_1, \ldots, o_n : \tau_n \text{ such that} \\
+& & (T',i) \models \ltlform \text{ where } T'(j) = T(j) \text{ for all } j \neq i \text{ and }\\
+& & T'(i) = (\pi_1(T(i))[x_i \mapsto o_i], \pi_2(T(i)))
+\end{array}
+\]
+\caption{\label{fig:ptltl-semantics}Semantics of PTLTL.}
+\end{figure}
+
+A PTLTL selector formula $x_1 : \tau_1, \ldots, x_n : \tau_n.\ \ltlform$ holds if and only if we can find bindings of the appropriate types for the variables $x_1,\ldots,x_n$ that make the PTLTL formula $\ltlform$ true.  Automatic identification at run-time of bindings that satisfy the formula $\ltlform$ is the focus of this work.
+
+\section{Approach and Examples}
+
+We have given a language for describing first-order temporal predicates where the domain of individuals consists of Java objects.  The temporal aspect of these predicates is given using past-time operators.  This enables formulas like the following, which describes objects $x$ that have been passed to the $\lang{StaticObj.process}$ method and which have been added to the hash table $\lang{ht}$ but have not since been removed.
+\[\lang{x} : \lang{Object}.\ \bigl(\ltlO (\lang{StaticObj.process(x)})\bigr) \ltlwedge
+\bigl(\ltlneg (\lang{ht.remove(x)}) \ltlS (\lang{ht.add(x)})\bigr)\]
+
+Identification of such objects may be useful for checking program properties, for correcting state, or for debugging purposes.  Suppose that when control reaches source line $l$, there should not be any objects satisfying this predicate.  Whatever the mechanism, a desired property of the program is that objects that have been processed are not present in the hash table at location $l$ (either they are never added or they were added but since removed).  The programmer may want to write an assert statement checking this property.
+\[\lang{assertNone}(\lang{x} : \lang{Object}.\ \bigl(\ltlO (\lang{StaticObj.process(x)})\bigr) \ltlwedge
+\bigl(\ltlneg (\lang{ht.remove(x)}) \ltlS (\lang{ht.add(x)})\bigr))\]
+
+If the mechanism enforcing this property is broken, such that sometimes objects satisfying this formula exist, the programmer may want to print information about them to try to identify the problem.
+\begin{align*}
+&\lang{foreach\Bigl( x : Object} .\  \bigl(\ltlO (\lang{StaticObj.process(x)})\bigr) \ltlwedge
+\bigl(\ltlneg (\lang{ht.remove(x)}) \ltlS (\lang{ht.add(x)})\bigr) \Bigr)\\
+& \ind \lang{print\_obj(x);}
+\end{align*}
+Or the programmer may want to fix the state by removing all such objects from the hash table.
+\begin{align*}
+&\lang{foreach\Bigl( x : Object} .\  \bigl(\ltlO (\lang{StaticObj.process(x)})\bigr) \ltlwedge
+\bigl(\ltlneg (\lang{ht.remove(x)}) \ltlS (\lang{ht.add(x)})\bigr) \Bigr)\\
+& \ind \lang{ht.remove(x);}
+\end{align*}
+
+All of these example uses can be supported if we can take a PTLTL formula $\ltlform$ and automatically generate a marking scheme capable of identifying objects satisfying formula $\ltlform$.  Ideally, we would like to convert $\ltlform$ to a simple state machine that can be evaluated in parallel with the program.  This process can be based on the work described in \cite{bounded-verif-ltl}, which essentially provides such a translation for proposition PTLTL.  The proposed work differs from \cite{bounded-verif-ltl} and from other work on constructing run-time monitors for LTL properties in that we are concerned with identification of objects satisfying a formula (that is, our formulas contain free variables for which we want to find satisfying bindings), whereas prior work has focused on propositional LTL, where the formulas involved contain no free variables (that is, they reference only global and local program variables, which can be viewed as ``bound'' in the program source).
+
+The proposed work differs from existing work on scriptable debugging in that we are interested in automatically generating a marking strategy from a declarative specification of temporal behavior, whereas existing work focuses on making it easier for the programmer to express a marking strategy.  The scriptable debugging work also tends to provide a domain-specific language for specifying actions to perform on objects identified by the marking, whereas we focus solely on the marking aspect of the problem and let the source language handle subsequent processing of the identified objects (e.g. by the incorporation of a new looping construct as in the example above).
+
+\section{Notes}
+
+The work in \cite{bounded-verif-ltl} seems not as straightforward to apply as I thought since we define satisfaction of a formula in terms of evaluation starting at the end of a trace, rather than at the beginning.  The ``separated normal form'' defined there is also, upon closer examination, not quite what we want.  Perhaps more related is the work in \cite{runtime-verif-LTL} which constructs a monitor automaton from an LTL formula, although this shares the same issue with the differing view-point from which we evaluate a formula.
+
+There seem to be the following outstanding issues, some of which may be worth looking into and some of which we may want to punt on.
+
+\paragraph{Past vs. Future}  We could require the programmer to write a future-time LTL formula instead of a past-time one.  This would make the approach match current work more closely and allow us to more easily leverage these results.  If we have a control location $l_f$ corresponding to the final point in the trace, we can trivially convert the ``past-looking'' formula $\phi$ into the ``future-looking'' formula $\ltlF(\atloc{l_f} \wedge \phi)$.  Another approach would be to re-do the translation we use, e.g. that from \cite{runtime-verif-LTL}, in terms of the ``past-looking'' semantics.  This would only be worthwhile if using the trivial translation ends up exacting some sizeable performance cost.
+
+\paragraph{Digression Through B\"uchi Automata}  The algorithm given in \cite{runtime-verif-LTL} is based on converting the LTL formula into a B\"uchi automaton, converting this into an NFA, and then determinizing this NFA.  This results in a DFA that has size doubly-exponential in the size of the input formula.  In the ``Buchi automaton to NFA'' step, the algorithm identifies connected components and simplifies them to single states.  At the end, when the DFA is obtained, it is minimized using standard techniques.  This detour through B\"uchi automata is straightforward, in the sense that it re-uses well-established results, however I wonder if a more optimal approach is possible.  B\"uchi automata encode languages of infinite strings, but we are only interested in finite strings.  Perhaps one of the exponential blowups in the formula-to-automaton step can be eliminated if we take this into account.
+
+\paragraph{Two-valued vs Three-valued Semantics}
+
+The work in \cite{runtime-verif-LTL} gives a three-valued semantics for LTL (true, false, and ``not yet determined'').  Since we are only interested in the set of (tuples of) objects that make a formula true, we only need a two-valued semantics (like that presented in this note previously).  However, adopting a three-valued semantics may make monitoring more efficient.  Object tuples that have been shown incapable of satisfying the formula can be discarded and no longer tracked.  Object tuples that have been shown to already satisfy the formula can be held off to the side and not considered when processing new events and updating truth values.
+
+\subsection{Reusing Existing Work}
+There are existing open-source tools for generating and working with the automata produced by the approach in \cite{runtime-verif-LTL}, so it is desirable to stick as closely to this approach as possible.  We will still have to do additional work, as we are tracking satisfying objects rather than just determining propositional satisfaction.  But perhaps we can write our code ``on top of'' the automaton produced by these tools (only the method for determining truth of state formulas should be different---existing tools evaluate some expression here whereas we will be tagging an object).
+
+\section{From PTLTL to Monitors}
+
+Figure \ref{fig:inductive-semantics} gives an inductive semantics for PTLTL formulas.  The truth of a formula $\ltlform$ at time $i+1$ is defined in terms of the truth of that formula at time $i$ and the truth of sub-formulas at time $i+1$.  Thus, the induction is over a lexicographic order of the time $i$ followed by the size of the subterm.
+ Such a semantics can be viewed as a specification for a monitor by viewing each base case as an initializer and each inductive rule as an update function for a list of Boolean-valued variables $v_1,\ldots,v_n$ where each $v_i$ gives the current truth value of a sub-formula of the PTLTL formula under consideration.  Provided the variables are updated in topological order with respect to the sub-term relation, this gives an accurate and deterministic method of computing the truth of a PTLTL formula at the current time.
+
+\begin{figure}
+\[
+\begin{array}{rcl}
+t_0(\ltlY \ltlform) & = & \false\\
+t_{i+1}(\ltlY \ltlform) & = & t_i(\ltlform)\\
+\\[-0.8em]
+t_0(\ltlZ \ltlform) & = & \true\\
+t_{i+1}(\ltlZ \ltlform) & = & t_i(\ltlform)\\
+\\[-0.8em]
+t_0(\ltlO \ltlform) & = & \false\\
+t_{i+1}(\ltlO \ltlform) & = & t_{i+1}(\ltlform) \vee t_i(\ltlO \ltlform)\\
+\\[-0.8em]
+t_0(\ltlH \ltlform) & = & \true\\
+t_{i+1}(\ltlH \ltlform) & = & t_{i+1}(\ltlform) \wedge t_i(\ltlH \ltlform)\\
+\\[-0.8em]
+t_0(\ltlform_1 \ltlS \ltlform_2) & = & \false\\
+t_{i+1}(\ltlform_1 \ltlS \ltlform_2) & = & t_{i+1}(\ltlform_2) \vee \bigl(t_i(\ltlform_1 \ltlS \ltlform_2) \wedge t_{i+1}(\ltlform_1)\bigr)\\
+\\[-0.8em]
+t_0(\ltlform_1 \ltlT \ltlform_2) & = & \true\\
+t_{i+1}(\ltlform_1 \ltlT \ltlform_2) & = & t_{i+1}(\ltlform_1) \vee \bigl(t_i(\ltlform_1 \ltlT \ltlform_2) \wedge t_{i+1}(\ltlform_2)\bigr)\\
+\end{array}
+\]
+\caption{\label{fig:inductive-semantics}Inductive definition of truth at time $i$ (written $t_i$) for PTLTL formulas.}
+\end{figure}
+
+Since the semantics viewed as a state transformer is deterministic and modifies the state of $n$ Boolean variables, where $n$ is the size of the abstract syntax tree for the formula, this transformer can be encoded as a finite state machine with $2^n$ states.  However, it is probably more efficient to perform the transformation by operating directly on the $n$ Boolean variables.
+
+\subsection{Proposed Implementation}
+
+Given a PTLTL formula $\ltlform$, let $v_\ltlform$ be the Boolean variable representing truth of the formula $\ltlform$ at the current time.  That is, $v_\ltlform$ is true at time $i$ if and only if $(T,i) \models \ltlform$, where $T$ is the execution history from the start to $i$.  
+We use primed versions of these variables to represent the value of the variables at the next time step.  Figure \ref{fig:alg} gives code that produces an update function for the $v_\ltlform$.
+
+\begin{figure}
+\begin{lstlisting}
+genUpdateCode($\ltlform$) {
+  F = topologicalSort(subTerms($\ltlform$));
+  return genUpdateCode'(F);
+}
+
+genUpdateCode'(F) {
+/* Precondition: F is a list of sub-formulas of $\ltlform$ sorted topologically. */
+  String res = new String();
+  foreach $\ltlform \in F$ {
+    res += toString($v_\ltlform$) + " := " + toCode($\ltlform$) + ";''
+  }
+  return res;
+}
+
+String toCode($\ltlform$) {
+  match $\ltlform$ with
+    $\ltlform_1 \ltlS \ltlform_2$ $->$
+      return $v_\ltlform'$ + " = " + $v_{\ltlform_1}'$ + " || (" + $v_\ltlform$ + " && " + $v_{\ltlform_2}'$ + ");"
+    $\ltlH \ltlform_1$ $->$
+      return $v_\ltlform'$ + " = " + $v_{\ltlform_1}'$ + " && " + $v_\ltlform$ + ";"
+    $\vdots$
+}
+\end{lstlisting}
+\caption{\label{fig:alg}Algorithm for generating update code for variables tracking a PTLTL formula $\ltlform$.}
+\end{figure}
+
+Let $n$ be the size of the number of nodes in the abstract syntax tree for the formula being tracked.  We can use one bit to encode each Boolean variable, resulting in added overhead of $n$ bits per tracked formula.  The size of the update code is $O(n)$.
+
+\vspace*{1em}
+\noindent
+\fbox{
+\begin{minipage}{\textwidth-1em}
+\textbf{Conjecture:}\\
+\\
+I think that if the truth values of the atomic predicates are fixed, the truth value of a PTLTL formula stabilizes after some bound that depends on the number of $\ltlY$ and $\ltlZ$ operators appearing in the formula.  If this is true, then we only have to evaluate the update code for timesteps within some window of a change to one of the atomic predicates.  Our language of atomic predicates is designed such that there are unlikely to be many points in the code at which they change, making the set of points where we have to update markings small.\\
+\\
+To see why atomic predicates are unlikely to be satisfied often, note that atomic predicates have either the form $a \wedge s$ or $\atloc{l} \wedge s$.  In the first case, the predicate can only be true if the current event (method call or assignment) matches action $a$.  This means that the predicate's truth value can only change at time points where the given method is called.  Certainly a method could be called in many places in the code, but in practice I would expect the set of call sites for most methods to be small relative to the size of the code.  For assignments, there could potentially be many matches if we ask the method to mark all $x$ and $y$ such that $x := y$ is executed.  However, we are unlikely to require such under-constrained atomic predicates.  In particular, our pattern $x.f := null$ is not likely to match too many source lines.\\
+\\
+For the second form, $\atloc{l} \wedge s$, we constrain our attention to a single source line, again ensuring that the predicate can only become true at a small number of points (only one).
+\end{minipage}}
+\vspace*{1em}
+
+
+\subsection{Instantiating Bound Variables}
+
+We now describe our method for tracking possible instantiations for bound variables.  Selectors have the following form.
+\[C_1 v_1, \ldots, C_n v_n.\ \ltlform\]
+To track instantiations for $v_1, \ldots, v_n$, we add some extra global state as well as extra state local to each object of these types.
+
+As we discussed in the previous section, if $\ltlform$ has size $n$, then $n$ boolean variables are sufficient to track the truth of $\ltlform$.  Together with pointers to objects of type $C_1,\ldots,C_n$, this gives us everything we need to update the truth of a formula given a new action $a$.  We store all this extra state in a class $\p{PTLTL}$ which has the form below.
+\pagebreak[4]
+\begin{lstlisting}
+class PTLTL {
+  $\p{C}_1$ $\p{v}_n$;
+   $\vdots$
+  $\p{C}_n$ $\p{v}_n$;
+  boolean[] truth_vals;
+  update(Action a);
+}
+\end{lstlisting}
+
+$\p{truth\_vals}$ gives the truth values for the subformulas of $\ltlform$.  
+The $v_1$ and $v_2$ fields are $null$ if the variable $v_i$ is not yet instantiated and otherwise point to the object that $v_i$ has been instantiated to.
+The \p{update} function takes new values for the 
+The \p{update()} function takes an action and updates the truth values stored in \p{truth\_vals} to account for the action.
+We could just generate an instance of this class for each $(v_1,\ldots,v_n)$ tuple encountered in the program, store a linked list of these instances, and iterate through them performing the update whenever an action matching one of the atomic predicates occurs.  However, it is better if we can limit the overhead required to find and update the appropriate \p{PTLTL} instances when an action occurs.
+
+\paragraph{Static State}
+\newcommand{\Linv}{L^{-1}}
+\newcommand{\llist}{\p{ll}}
+Given a selector $C_1 v_1, \ldots, C_n, v_n.\ \ltlform$ with $n$ bound objects, we create $2^n$ linked lists and store these in a globally-accessible array $\llist$.  Each list corresponds to a subset $S$ of $\{v_1,\ldots,v_n\}$ and stores PTLTL instances $p$ where for a given $v_i$, we have $v_i \in S <=> p.v_i \neq null$.  These lists partition PTLTL instances based on which variables have been instantiated.   We will write $L(A)$ for the linked list corresponding to subset $A$ (that is, the list of \p{PTLTL} instances where exactly those variables in $A$ are instantiated).  We write $\Linv(n)$ for the inverse function, which maps a natural number $n$ to the subset of variables that are instantiated in list $n$.  Initially, all lists are empty except for $\llist[\Linv(\emptyset)]$, which contains a single \p{PTLTL} instance with all object nodes set to $\p{null}$.
+
+\paragraph{Dynamic State}
+As we identify possible instantiations for variables $v_1,\ldots,v_n$, we also keep track of this via dynamic state attached to each object serving as an instantiation.  We add to each class $C_i$ a field $\p{v}_i$, which points to a set of PTLTL objects.
+If we discover that $o$ is a possible instantiation for $v_i$, resulting is PTLTL object $p$, we add $p$ to the set at $o.\p{v}_i$.
+
+\paragraph{Instantiating Variables}
+\newcommand{\ins}{\iota}
+Let $V = \{v_1,\ldots,v_n\}$ be the set of variables that are bound in the formula $\ltlform$ and let $O$ be the set of Java objects.
+We first define the notion of an \textit{instantiation}.
+\begin{defn}
+A \defemph{partial instantiation} is a mapping $\ins : V --` O$ such that $\A[v_i] (\ins(v_i) = o_i) \imp (o_i : C_i)$.  An \defemph{instantiation} is a partial instantiation $\ins$ such that $\dom(\ins) = V$.
+\end{defn}
+
+We say that two partial instantiations $\ins_1$ and $\ins_2$ are \textit{compatible} if and only if they agree on elements in their shared domain.
+
+\begin{defn}
+Partial instantiations $\ins_1$ and $\ins_2$ are \defemph{compatible} if and only if $\A[v] v \in \dom{\ins_1} \cap \dom{ins_2} \imp \ins_1(v) = \ins_2(v)$.
+\end{defn}
+
+Each PTLTL instance $p$ encodes a partial instantiation $\ins$ where $\ins(v_i)$ is undefined if $\p{p.v}_i = null$ and $\ins(v_i) = o_i$ if $\p{p.v}_i = o_i$ and $o_i \neq null$.  The function $\Linv(n)$ then gives the domain of the partial instantiations contained in list $n$.
+
+\newcommand{\match}{\sim}
+\newcommand{\matout}{\backslash\backslash}
+We say that a command $a(\vec{o})$ matches an action $a(\vec{v})$ if there exists a partial instantiation $\ins$ such that $a(\ins(\vec{v})) = a(\vec{o})$.  We write $a(\vec{v}) \match a(\vec{o}) \matout \ins$ to indicate that $a(\vec{o})$ matches $a(\vec{v})$ with $\ins$ witnessing the match.
+
+When we encounter an action $a(o_1,\ldots,o_k)$ involving objects $o_1,\ldots,o_k$, we do the following.
+
+\begin{lstlisting}
+For each atomic predicate $a(\vec{v}) \wedge s$ such that $a(\vec{v}) \match a(\vec{o}) \matout \ins$ do
+  For each element $p$ of $o.v_i$ such that $p$ is compatible with $\ins$
+    update(p,$\ins$)
+   
+\end{lstlisting}
+\delete{
+$a \wedge s \mid \atloc{l} \wedge s$
+Let $A = \{o_1,\ldots,o_k\}$
+For each $o_i$
+  if $o_i.v_i$
+For each $n$,
+  let $A_{\text{new}} = \Linv(n) \cap A$
+  let $A_{\text{old}} = \neg(\Linv(n)) \cap A$
+    if $A_{\text{new}} = \emptyset$
+      /* All variables involved are instantiated in this list */
+      update_all(\p{ll}[n],a);
+    else
+      let }
+
+Problems:  we aren't updating except at $a \wedge s$ type events.  Also, where to add new possible instantiations?  Allocation sites or instances of events?
+
+To class $C_1$, we add a field $\p{head}$ that points to the head of a linked list which stores 
+
+To be filled in next$\ldots$
+
+% TODO:
+%   revise discussion of efficient / non-efficient state predicates to instead talk about atomic predicates, which should always be efficient (since they are constrained by an action.
+%   discuss in implementation section how we can push negations around so that actions are never negated, ensuring that not many events will match and allowing fast testing of whether the variables need to be updated.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,21 @@
+
+Formatting:
+1. Fix fig:setting-tail-field
+
+
+1. Look at the structure of the Jetty and write about it.
+2. Special object transformers.
+4. Differences between C and Java when it comes to DSU.
+5. Detailed explanation of all our microbenchmark regression tests.
+6. Full pass through implementation chapter.
+7. Explain OSR and return barriers in more detail if possible.
+8. Better captions like in Mike Bond's thesis.
+
+9. Three pictures for object transformer execution. Before, during and
+after.
+10. Figure for "Ensuring Program Specific Semantics"
+11. Add refs to line numbers for JES example.
+
+% Add POLUS.
+% built on top of PROSE.
+% GEM. about Hicks talk.

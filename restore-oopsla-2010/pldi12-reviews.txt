@@ -1,0 +1,800 @@
+================
+ POST-REBUTTAL REVIEWS
+================
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+Meaning of Classification:
+A: I will champion this paper at the PC meeting (Advocate/Accept).
+B: I can accept this paper, but I will not champion it (accept,
+  but could reject).
+C: This paper should be rejected, though I will not fight strongly
+  against it (reject, but could accept)
+D: Serious problems. I will argue to reject this paper (Detractor).
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=
+
+First reviewer's review:
+
+Classification <<<
+
+B: I can accept this paper, but I will not champion it (accept,
+but could reject).
+
+Summary of the submission <<<
+
+The paper presents an approach to automatically synthesize object
+transformations for the purpose of converting live objects in a system from an
+old version to the new one upon a dynamic software update. Prior work on
+dynamic software update has used simple defaults for these transformations
+(e.g., assigning a new field the value null). Here they use an approach based
+on program synthesis to obtain richer transformations. The idea is to take heap
+snapshots periodically, to compare snapshots of the old and new versions in
+order to heuristically match up old and new objects in a one-to-one
+correspondence, and then search for a transformation in a stylized form that
+converts from old objects to new ones. The paper describes the approach in
+detail and then presents an experimental evaluation using version updates from
+several real systems.
+
+Evaluation <<<
+
+This is a novel application of program synthesis techniques to address an
+interesting, important, and non-trivial problem. The paper is well written and
+does a good job of illustrating how the various algorithms work. The
+experimental results indicate that the approach can be useful for real systems.
+All in all, a solid paper.
+
+One weakness of the approach is that each part is subject to heuristics that
+are relatively fragile, so if the stars don't align properly the approach can
+easily fail. For example, snapshots have to capture interesting heap states,
+and both the matching and synthesis phases are quite limited in what they can
+do. While in general the choice to favor simplicity over complexity makes
+sense, at least as a first step, there's a somewhat ad hoc feeling about some
+of the things that are currently supported (e.g., the built-in substr function
+and associated fixed set of delimiters).
+
+To the authors' credit, they illustrate some of these limitations in their
+experimental section, which also shows several examples of successful
+synthesis. I would have liked to understand more about the benchmarks chosen.
+For example, how did you decide which versions of a program to use in the
+experiment? And when you did use a version, are your results about the entire
+upgrade or just a particular class of interest? Without such information, it's
+hard to get a sense of how well the current set of heuristics actually works on
+real systems.
+
+Specific comments:
+
+2.3: "good inputs are needed" How do you make sure to obtain good inputs (and
+how do you define "good")?
+
+3: "The input to match is a pair of lists of object sets..." Are these sets of
+objects of the same type? It seems you assume this, although you say earlier in
+this section that you can handle the case when they are not the same. I didn't
+see where that happens.
+
+4.1, last sentence: I don't see why you can't use the value of o.f1 when
+updating field n.f2.f3 -- it seems to be allowed by your grammar.
+
+5.1: I don't understand how your snapshot mechanism works. You take snapshots
+at update points. So that gives you a snapshot of the old version running on
+some input. Now how do you get a corresponding snapshot of the new version
+running on that input?
+
+5.2: For Azureus, what is the _bContinue variable, and how do you have access
+to it to use in the inferred conditional?
+
+6: "We can synthesize functions that subsume those synthesized by these
+systems." That directly contradicts what you said in 4.3, that you could
+incorporate the techniques of those systems to get more expressiveness if
+necessary.
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
+
+Second reviewer's review:
+
+Classification <<<
+
+B: I can accept this paper, but I will not champion it (accept,
+but could reject).
+
+Summary of the submission <<<
+
+This paper presents a technique, called Targeted Object Synthesis
+(TSO), for synthesizing object transformer methods. These methods are
+used by dynamic updating systems to convert objects in a running
+program to new objects that are compatible with a given code patch.
+TSO works in two phases, matching and synthesis. In the matching
+phase, both the original and the patched program are executed on the
+same set of inputs to obtain snapshots of their heaps at
+programmer-specified update points. The objects of the transformed
+class are then matched at each snapshot, by pairing each object in the
+original snapshot with its corresponding object in the patched
+snapshot. These pairs are used in the synthesis phase as input/output
+examples; the synthesizer produces a transformer method that maps each
+original object in a pair to its corresponding patched object. Both
+the original and the patched program are required to be deterministic
+with respect to the class whose objects are being transformed; that
+is, the ith snapshot obtained by executing the program on the same
+input always contains the same set of objects of the given class. The
+technique is evaluated by synthesizing transformers for several
+patches that were applied to four open-source programs.
+
+Evaluation <<<
+
+This is a well written and clearly presented paper, describing a new
+approach to synthesizing object transformers. My main concern
+regarding TSO is its lack of any soundness and/or completeness
+guarantees. The paper discusses several limitations that affect
+completeness, including the sensitivity of the technique to the
+quality of the inputs used for matching as well as the need for
+deterministic behavior with respect to the transformed class. Given
+these limitations, together with the fact that a synthesized
+transformer is not guaranteed to be correct in some sense, it is
+unclear to me how much TSO would ease the burden of writing
+transformer methods in practice. Even if it produces a transformer,
+the programmer cannot trust it. He must separately establish that it
+performs the right conversion, which seems nearly as hard as writing
+the transformer method to begin with, at least for the transformers
+presented in the evaluation section. 
+
+Because of the heuristic nature of the approach, I would have liked to
+see the technique evaluated on a larger set of examples. It would
+also be helpful to know how many test inputs were needed to synthesize
+the given transformers, where the tests came from, and how hard it was
+to construct the necessary inputs. As it is, I find it hard to get a
+sense of how much effort it would take to use the technique (as
+measured, e.g., by the size and quality of the test suite) and how
+often it would fail in real life, either by producing no transformer
+or by producing an incorrect transformer.
+
+Section 2
+
+- "The acquire" --> "To acquire"
+
+Section 3
+
+- "can always creates" --> "create"
+
+Section 4
+
+- "new-verion" --> "version"
+- "an transformation function" --> "a"
+
+Section 5
+
+- "and saving them to disk" --> "saves"
+- "applicate" --> "application"
+- "Since the the" --> typo
+
+Section 6
+
+- "concatonation" --> "concatenation"
+
+Section 7
+
+- "existing objects an code" --> "and code"
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
+
+Third reviewer's review:
+
+Classification <<<
+
+C: This paper should be rejected, though I will not fight strongly
+against it (reject, but could accept).
+
+Summary of the submission <<<
+
+The paper presents a technique for synthesis of objects
+transformations in dynamic software updates.
+
+The input to the technique is:
+(i)  old version of a program P and a new version P'
+(ii) test inputs for exercising the programs
+(iii) a class C that has been modified between versions and for which a
+  state transformation should be synthesized.
+
+The output of the technique is a transformation function,
+describing how to turn an object of the old class C into an object
+of the new class C. This may require elaborate transformations of
+values from the old object.
+
+The technique works in two phases:
+
+(1) Matching
+- run P and P' and take heap snapshot S (in P) and S' (in P') at update points
+- establish correspondence between objects of class C in S and S'
+the goal is to create pairs of corresponding old and new objects (o,o')
+
+To establish correspondence between objects, the technique attempts
+to identify key-fields. A sequence of fields is considered a key if
+its value uniquely identifies an old object in S, and uniquely
+identifies a corresponding new object in S'. Often a single field
+is a sufficient key, but the technique needs to determine which
+field to pick.
+
+(2) Synthesis
+- use pairs (o,o') from matching as examples for the transformation function
+- for every pair (o,o')
+ - for every field in o', compute a transformation function that computes its
+value using constants,
+  conditionals, simple functions, and values from fields of o
+- intersect functions computed for all examples
+
+The techniques uses [5] to synthesize string transformations.
+
+The technique has been implemented and applied to a number of real
+world examples. Experiments show that in some cases the technique
+can effectively synthesize transformers.
+
+Evaluation <<<
+
+Pros:
+
++ The problem is important and very challenging. Manual solutions
+are error-prone and hard to construct. Any automation, even in
+limited cases, is valuable.
+
+Cons:
+
+- Ability to synthesize transformers depends on coverage of the
+dynamic technique.
+
+- The assumptions on the patch are not clear, and its not clear
+whether these assumptions make sense in practice.
+
+- Experimental evaluation is a little weak
+
+Additional Comments:
+
+- This is a nice attempt to tackle a very hard problem. Despite its
+shortcomings, it is impressive that this technique managed to
+produce some results in practice.
+
+- The main weakness of the approach is that it relies on dynamic
+executions to exercise the modified code. Not only that, to obtain
+a sufficient number of examples for synthesis, the heap (probably)
+has to contain a sufficient number of modified objects. In general,
+this is hard to do, especially for server applications and large
+applications of the kind in which dynamic updates make most sense.
+
+- Another issue is the correctness guarantee of the technique. In
+[5] the user is involved in the spreadsheet transformation and can
+abort/refine in case it does not match his expectations. In
+contrast, for DSU, manual reasoning about the correct
+transformation is what we're trying to avoid.
+
+- Could you phrase the problem of finding key-fields
+(distinguishing attributes) as a standard classification problem
+and use a standard algorithm for solving it?
+
+- What are the assumptions on the static code patch?
+
+- is it reasonable to assume that only a single class changes in an
+update or that there are no relationships between updated classes?
+Generalizing this assumption has significant impact on the
+complexity of matching (and synthesis) and in full generality may
+deteriorate to checking subgraph isomorphism.
+
+- is it reasonable to assume that every object in the old heap has
+a counterpart in the new heap?
+
+- another application of your technique may be simply
+reverse-engineering and understanding of black box updates.
+
+- Unfortunately, the current experimental evaluation did not
+convince me that this technique provides an effective attack on
+this hard problem.
+
+- In your experimental evaluation, for each experiment: how many
+snapshots were compared? how many objects were matched by the
+matching phase?
+
+- Right now your experiments demonstrate mostly constant
+transformers. Is it fair to say that these are the ones that would
+also be easy for a human to come up with?
+
+- A stronger experimental evaluation could make the paper much
+stronger. In particular, further experiments to show that dynamic
+execution can be in fact driven to cover the updated parts of the
+code. Unfortunately, this is a hard problem and using symbolic
+techniques (or static techniques) is likely not going to help in
+the domain of matching heap objects.
+
+- Minor: I am *really* not an expert on dynamic updates but my
+impression was that common practice, which is probably a
+compromise, is to put up a new VM with the new version, re-route
+new users to the new VM and wait for users on the old machine to
+gradually retire.
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
+
+Fourth reviewer's review:
+
+Classification <<<
+
+B: I can accept this paper, but I will not champion it (accept,
+but could reject).
+
+Summary of the submission <<<
+
+The paper describes a technique for automatically generating transformer
+functions for updating the state of live objects after a dynamic software
+update. The idea is to take heap snapshots during the execution of the old and
+the new version of the program and to match objects of a modified type in the
+old version to their corresponding objects in the new version. If a bijective
+mapping can be found, a transformer function is derived from the mappings. The
+transformer consists of a list of field assignments that initialize the fields
+of the new objects with field values of the old objects and with constants
+taking different cases into account. The technique was evaluated with
+real-world updates in four open-source programs.
+
+Evaluation <<<
+
+The paper is well written and interesting from a scientific point of view,
+although I question the practical relevance of the approach. Instead of
+generating transformers automatically using heuristics (that might produce the
+wrong results) it would also be possible to provide a hand-written transformer
+for objects of modified classes. Unfortunately, the paper does not discuss this
+possibility with its advantages and disadvantages. For example, there is an
+implementation of dynamic software update for the HotSpot VM (Wuerthinger et
+al.: Safe and Atomic Run-time Code Evolution and its Application to Dynamic
+AOP, OOPSLA'11) in which hand-written transformers are used. This approach is
+also not mentioned under related work.
+
+It would be good to include a section on restrictions, i.e. cases that cannot
+be handled by your approach. For example, I assume that it is not possible to
+automatically initialize a field in a new object, whose value cannot be derived
+from the fields of the old object. Is that true? Another restriction is that
+transformers can only be inferred from examples of those object pairs that
+actually occur in the taken snapshots. As you say in the paper, the snapshots
+might not contain all possible states of an object type, so the examples might
+be incomplete. Maybe there are also other restrictions.
+
+While the text of the paper is clear and easy to read, the algorithms are
+sometimes hard to understand. They contain a number of obvious little errors,
+which is annoying, because one does not know if the difficulty of understanding
+the algorithms comes from the fact that there are more little errors, which are
+less obviously discovered.
+
+You don't give any run-time measurements for the experiments described in
+Section 5. I assume that the implementation is rather slow, because it has to
+consider all fields (or actually all field combinations) of all heap objects in
+all snapshots for both the old and the new version of the updated program. I
+strongly suggest that the evaluation should contain run-time measurements.
+
+Here are some more comments that are related to individual pages of the paper:
+
+p.3: For matching you require that two runs of a program produce the same
+objects of a modified class C on the heap. This seems to imply that objects of
+class C cannot be allocated in different threads that might be active at the
+time of an update. Otherwise, the number of C objects at the time of the update
+depends on the scheduling. How do you find out if this restriction holds?
+
+p.5: I assume that the objects sets (i.e. the snapshots) contain just objects
+of the modified classes and not all objects on the heap. You don't say that
+explicitly.
+
+p.5, line 14: Shouldn't that be "get_keyfields" instead of
+"split_on_keyfields"?
+
+Fig.6, line 3: Where does Sigma'.old(i) come from? It is only set in line 4.
+
+Fig.6, function get_keyfields: I had expected that you simply check if a
+specific field (or field combination) is unique in Sigma.old(i) and if for
+every key value in Sigma.old(i) there is a single object with this key value in
+Sigma.new(i). The implementation that you give seems to be more complicated.
+Why? Also, your algorithm does not seem to stop if a single field is identified
+to be sufficient as a key.
+
+Section 3.2, last paragraph: The set C mentioned here does not occur in the
+algorithm synthesis_match.
+
+Fig.7: The f in o.f is a field name, while in n.f it is a list of labels.
+
+Fig.7: Here you write substr(o.f, i, j) while the text describes this function
+as substr(o.f, i).
+
+Section 4.1: What if the new object has a field that references an object of a
+class C. The transformer would have to create such an object and initialize it.
+Object creation is not listed among the initializers in Fig.7. Is it possible?
+
+Fig.8, lines 17 and 18: What is U^.i? You probably mean U^.
+
+p.8: The first paragraph ends with an incomplete sentence.
+
+p.8, par.2: What do you mean by "constant appearing in an object"? An object
+has fields that contain values, but I don't think that you speak of these
+values as constants. So what are the constants?
+
+p.8, par.2: According to Definition 1, the first argument of rank() must be a
+condition, but here you are passing it a list of object sets.
+
+Section 4.5: In the code for the generated function the first initializer
+should probably read n.f := 0 and the second one n.f := o.f.
+
+Section 5.1: You collect snapshots using the HotSpot VM, but on page 2 you
+write that you implemented TOS for Jvolve, which is based on the Jikes RVM? How
+does this fit together?
+
+Fig.11: What is the purpose of this figure? It shows one version of the program
+(the new one? Or did you forget the "+" and "-" characters?) but it does not
+show any fields. So the explanations in the text, which mention the fields
+_bContinue, _server, _server_old, and adapter, cannot be properly understood.
+One does not see the objects and fields from which this transformer code was
+derived.
+
+Assume, an object of a modified class C references a D object with a field f,
+which has the value A in the old version and B in the new version. Does your
+matching find that out? This can proliferate, i.e. C references D, which
+references E, which has a field f that differs, etc.
+
+	 
+typos:
+- p.2: "virutal" => "virtual"
+- p.3: "The acquire a meaningful matching" => "To acquire a ..."
+- p.3: "No pair of C objects" => "No pairs of C objects"
+- p.5: "Once we score all the fields" => "Once we have scored ..."
+- p.5: "Line 4 get_fields" => "Line 4 of match"
+- p.6: "can always creates" => "can always create"
+- p.6: "Once Sigma becomes empty" => "Once Sigma' becomes empty"
+- p.7: "Given a set of objects" => "Given two sets of objects"
+- p.9: "an then garbage collector" => "and then the garbage collector"
+
+Reaction to the authors' response
+
+The authors' response did not really provide me with new insights. I still
+think that the paper could be published because its idea is interesting from a
+scientific point of view, but on the other hand I somewhat question the
+usefulness of the heuristics in practice. The paper is ok but I think that its
+quality (especially the clarity of its algorithms and the evaluation section)
+is below that of a top paper.
+
+*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*=--=*
+
+================
+ PRE-REBUTTAL REVIEWS
+================
+
+        >>> Classification <<<
+
+B: I can accept this paper, but I will not champion it (accept, but could reject).
+
+          >>> Summary of the submission <<<
+
+The paper presents an approach to automatically synthesize object
+transformations for the purpose of converting live objects in a system from an
+old version to the new one upon a dynamic software update. Prior work on
+dynamic software update has used simple defaults for these transformations
+(e.g., assigning a new field the value null). Here they use an approach based
+on program synthesis to obtain richer transformations. The idea is to take heap
+snapshots periodically, to compare snapshots of the old and new versions in
+order to heuristically match up old and new objects in a one-to-one
+correspondence, and then search for a transformation in a stylized form that
+converts from old objects to new ones. The paper describes the approach in
+detail and then presents an experimental evaluation using version updates from
+several real systems.
+
+
+
+          >>> Evaluation <<<
+
+This is a novel application of program synthesis techniques to address an
+interesting, important, and non-trivial problem. The paper is well written and
+does a good job of illustrating how the various algorithms work. The
+experimental results indicate that the approach can be useful for real systems.
+All in all, a solid paper.
+
+One weakness of the approach is that each part is subject to heuristics that
+are relatively fragile, so if the stars don't align properly the approach can
+easily fail. For example, snapshots have to capture interesting heap states,
+and both the matching and synthesis phases are quite limited in what they can
+do. While in general the choice to favor simplicity over complexity makes
+sense, at least as a first step, there's a somewhat ad hoc feeling about some
+of the things that are currently supported (e.g., the built-in substr function
+and associated fixed set of delimiters).
+
+To the authors' credit, they illustrate some of these limitations in their
+experimental section, which also shows several examples of successful
+synthesis. I would have liked to understand more about the benchmarks chosen.
+For example, how did you decide which versions of a program to use in the
+experiment? And when you did use a version, are your results about the entire
+upgrade or just a particular class of interest? Without such information, it's
+hard to get a sense of how well the current set of heuristics actually works on
+real systems.
+
+Specific comments:
+
+2.3: "good inputs are needed" How do you make sure to obtain good inputs (and
+how do you define "good")?
+
+3: "The input to match is a pair of lists of object sets..." Are these sets of
+objects of the same type? It seems you assume this, although you say earlier in
+this section that you can handle the case when they are not the same. I didn't
+see where that happens.
+
+4.1, last sentence: I don't see why you can't use the value of o.f1 when
+updating field n.f2.f3 -- it seems to be allowed by your grammar.
+
+5.1: I don't understand how your snapshot mechanism works. You take snapshots
+at update points. So that gives you a snapshot of the old version running on
+some input. Now how do you get a corresponding snapshot of the new version
+running on that input?
+
+5.2: For Azureus, what is the _bContinue variable, and how do you have access
+to it to use in the inferred conditional?
+
+6: "We can synthesize functions that subsume those synthesized by these
+systems." That directly contradicts what you said in 4.3, that you could
+incorporate the techniques of those systems to get more expressiveness if
+necessary.
+
+
+
+Second
+reviewer's
+review	
+          >>> Classification <<<
+
+C: This paper should be rejected, though I will not fight strongly against it (reject, but could accept).
+
+          >>> Summary of the submission <<<
+
+The paper presents a technique for synthesis of objects
+transformations in dynamic software updates.
+
+The input to the technique is:
+(i)  old version of a program P and a new version P'
+(ii) test inputs for exercising the programs
+(iii) a class C that has been modified between versions and for which a
+   state transformation should be synthesized.
+
+The output of the technique is a transformation function,
+describing how to turn an object of the old class C into an object
+of the new class C. This may require elaborate transformations of
+values from the old object.
+
+The technique works in two phases:
+
+(1) Matching
+- run P and P' and take heap snapshot S (in P) and S' (in P') at update points
+- establish correspondence between objects of class C in S and S'
+ the goal is to create pairs of corresponding old and new objects (o,o')
+
+To establish correspondence between objects, the technique attempts
+to identify key-fields. A sequence of fields is considered a key if
+its value uniquely identifies an old object in S, and uniquely
+identifies a corresponding new object in S'. Often a single field
+is a sufficient key, but the technique needs to determine which
+field to pick.
+
+(2) Synthesis
+- use pairs (o,o') from matching as examples for the transformation function
+- for every pair (o,o')
+  - for every field in o', compute a transformation function that computes its
+value using constants,
+   conditionals, simple functions, and values from fields of o
+- intersect functions computed for all examples
+
+The techniques uses [5] to synthesize string transformations.
+
+The technique has been implemented and applied to a number of real
+world examples. Experiments show that in some cases the technique
+can effectively synthesize transformers.
+
+
+
+          >>> Evaluation <<<
+
+Pros:
+
++ The problem is important and very challenging. Manual solutions
+are error-prone and hard to construct. Any automation, even in
+limited cases, is valuable.
+
+Cons:
+
+- Ability to synthesize transformers depends on coverage of the
+dynamic technique.
+
+- The assumptions on the patch are not clear, and its not clear
+whether these assumptions make sense in practice.
+
+- Experimental evaluation is a little weak
+
+Additional Comments:
+
+- This is a nice attempt to tackle a very hard problem. Despite its
+shortcomings, it is impressive that this technique managed to
+produce some results in practice.
+
+- The main weakness of the approach is that it relies on dynamic
+executions to exercise the modified code. Not only that, to obtain
+a sufficient number of examples for synthesis, the heap (probably)
+has to contain a sufficient number of modified objects. In general,
+this is hard to do, especially for server applications and large
+applications of the kind in which dynamic updates make most sense.
+
+- Another issue is the correctness guarantee of the technique. In
+[5] the user is involved in the spreadsheet transformation and can
+abort/refine in case it does not match his expectations. In
+contrast, for DSU, manual reasoning about the correct
+transformation is what we're trying to avoid.
+
+- Could you phrase the problem of finding key-fields
+(distinguishing attributes) as a standard classification problem
+and use a standard algorithm for solving it?
+
+- What are the assumptions on the static code patch?
+
+- is it reasonable to assume that only a single class changes in an
+update or that there are no relationships between updated classes?
+Generalizing this assumption has significant impact on the
+complexity of matching (and synthesis) and in full generality may
+deteriorate to checking subgraph isomorphism.
+
+- is it reasonable to assume that every object in the old heap has
+a counterpart in the new heap?
+
+- another application of your technique may be simply
+reverse-engineering and understanding of black box updates.
+
+- Unfortunately, the current experimental evaluation did not
+convince me that this technique provides an effective attack on
+this hard problem.
+
+- In your experimental evaluation, for each experiment: how many
+snapshots were compared? how many objects were matched by the
+matching phase?
+
+- Right now your experiments demonstrate mostly constant
+transformers. Is it fair to say that these are the ones that would
+also be easy for a human to come up with?
+
+- A stronger experimental evaluation could make the paper much
+stronger. In particular, further experiments to show that dynamic
+execution can be in fact driven to cover the updated parts of the
+code. Unfortunately, this is a hard problem and using symbolic
+techniques (or static techniques) is likely not going to help in
+the domain of matching heap objects.
+
+- Minor: I am *really* not an expert on dynamic updates but my
+impression was that common practice, which is probably a
+compromise, is to put up a new VM with the new version, re-route
+new users to the new VM and wait for users on the old machine to
+gradually retire.
+
+
+
+
+Third
+reviewer's
+review	
+          >>> Classification <<<
+
+B: I can accept this paper, but I will not champion it (accept, but could reject).
+
+          >>> Summary of the submission <<<
+
+The paper describes a technique for automatically generating transformer
+functions for updating the state of live objects after a dynamic software
+update. The idea is to take heap snapshots during the execution of the old and
+the new version of the program and to match objects of a modified type in the
+old version to their corresponding objects in the new version. If a bijective
+mapping can be found, a transformer function is derived from the mappings. The
+transformer consists of a list of field assignments that initialize the fields
+of the new objects with field values of the old objects and with constants
+taking different cases into account. The technique was evaluated with
+real-world updates in four open-source programs.
+
+
+          >>> Evaluation <<<
+
+The paper is well written and interesting from a scientific point of view,
+although I question the practical relevance of the approach. Instead of
+generating transformers automatically using heuristics (that might produce the
+wrong results) it would also be possible to provide a hand-written transformer
+for objects of modified classes. Unfortunately, the paper does not discuss this
+possibility with its advantages and disadvantages. For example, there is an
+implementation of dynamic software update for the HotSpot VM (Wuerthinger et
+al.: Safe and Atomic Run-time Code Evolution and its Application to Dynamic
+AOP, OOPSLA'11) in which hand-written transformers are used. This approach is
+also not mentioned under related work.
+
+It would be good to include a section on restrictions, i.e. cases that cannot
+be handled by your approach. For example, I assume that it is not possible to
+automatically initialize a field in a new object, whose value cannot be derived
+from the fields of the old object. Is that true? Another restriction is that
+transformers can only be inferred from examples of those object pairs that
+actually occur in the taken snapshots. As you say in the paper, the snapshots
+might not contain all possible states of an object type, so the examples might
+be incomplete. Maybe there are also other restrictions.
+
+While the text of the paper is clear and easy to read, the algorithms are
+sometimes hard to understand. They contain a number of obvious little errors,
+which is annoying, because one does not know if the difficulty of understanding
+the algorithms comes from the fact that there are more little errors, which are
+less obviously discovered.
+
+You don't give any run-time measurements for the experiments described in
+Section 5. I assume that the implementation is rather slow, because it has to
+consider all fields (or actually all field combinations) of all heap objects in
+all snapshots for both the old and the new version of the updated program. I
+strongly suggest that the evaluation should contain run-time measurements.
+
+Here are some more comments that are related to individual pages of the paper:
+
+p.3: For matching you require that two runs of a program produce the same
+objects of a modified class C on the heap. This seems to imply that objects of
+class C cannot be allocated in different threads that might be active at the
+time of an update. Otherwise, the number of C objects at the time of the update
+depends on the scheduling. How do you find out if this restriction holds?
+
+p.5: I assume that the objects sets (i.e. the snapshots) contain just objects
+of the modified classes and not all objects on the heap. You don't say that
+explicitly.
+
+p.5, line 14: Shouldn't that be "get_keyfields" instead of
+"split_on_keyfields"?
+
+Fig.6, line 3: Where does Sigma'.old(i) come from? It is only set in line 4.
+
+Fig.6, function get_keyfields: I had expected that you simply check if a
+specific field (or field combination) is unique in Sigma.old(i) and if for
+every key value in Sigma.old(i) there is a single object with this key value in
+Sigma.new(i). The implementation that you give seems to be more complicated.
+Why? Also, your algorithm does not seem to stop if a single field is identified
+to be sufficient as a key.
+
+Section 3.2, last paragraph: The set C mentioned here does not occur in the
+algorithm synthesis_match.
+
+Fig.7: The f in o.f is a field name, while in n.f it is a list of labels.
+
+Fig.7: Here you write substr(o.f, i, j) while the text describes this function
+as substr(o.f, i).
+
+Section 4.1: What if the new object has a field that references an object of a
+class C. The transformer would have to create such an object and initialize it.
+Object creation is not listed among the initializers in Fig.7. Is it possible?
+
+Fig.8, lines 17 and 18: What is U^.i? You probably mean U^.
+
+p.8: The first paragraph ends with an incomplete sentence.
+
+p.8, par.2: What do you mean by "constant appearing in an object"? An object
+has fields that contain values, but I don't think that you speak of these
+values as constants. So what are the constants?
+
+p.8, par.2: According to Definition 1, the first argument of rank() must be a
+condition, but here you are passing it a list of object sets.
+
+Section 4.5: In the code for the generated function the first initializer
+should probably read n.f := 0 and the second one n.f := o.f.
+
+Section 5.1: You collect snapshots using the HotSpot VM, but on page 2 you
+write that you implemented TOS for Jvolve, which is based on the Jikes RVM? How
+does this fit together?
+
+Fig.11: What is the purpose of this figure? It shows one version of the program
+(the new one? Or did you forget the "+" and "-" characters?) but it does not
+show any fields. So the explanations in the text, which mention the fields
+_bContinue, _server, _server_old, and adapter, cannot be properly understood.
+One does not see the objects and fields from which this transformer code was
+derived.
+
+Assume, an object of a modified class C references a D object with a field f,
+which has the value A in the old version and B in the new version. Does your
+matching find that out? This can proliferate, i.e. C references D, which
+references E, which has a field f that differs, etc.
+
+         
+typos:
+- p.2: "virutal" => "virtual"
+- p.3: "The acquire a meaningful matching" => "To acquire a ..."
+- p.3: "No pair of C objects" => "No pairs of C objects"
+- p.5: "Once we score all the fields" => "Once we have scored ..."
+- p.5: "Line 4 get_fields" => "Line 4 of match"
+- p.6: "can always creates" => "can always create"
+- p.6: "Once Sigma becomes empty" => "Once Sigma' becomes empty"
+- p.7: "Given a set of objects" => "Given two sets of objects"
+- p.9: "an then garbage collector" => "and then the garbage collector"
+

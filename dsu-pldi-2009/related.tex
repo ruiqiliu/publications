@@ -1,0 +1,247 @@
+\section{Related Work}
+\label{sec:related}
+We compare our VM-centric approach to DSU with related work on
+implementing DSU for managed languages, C, and C++.
+
+\paragraph{Edit and continue.}
+
+Debuggers and IDEs have long provided \emph{edit and continue} (E\&C)
+functionality that permits limited modifications to program state to
+avoid stopping and restarting during debugging. For example, Sun's
+HotSwap VM~\cite{JVMhotswap,Dmit01a}, .NET Visual Studio for C\# and
+C++~\cite{VSEnC}, and library-based support~\cite{eaddy05enc} for .NET
+applications all provide E\&C.  These systems restrict updates to
+code changes within method bodies.  While this restriction reduces safety
+concerns and obviates the need for class and object transformers, the resulting
+systems are inflexible. They cannot perform more than half of the updates discussed in
+Section~\ref{sec:experience}.
+
+\paragraph{DSU for managed languages without VM support. } To avoid
+changing the VM to support DSU, researchers have developed special-purpose
+classloaders and/or compiler support.  The main drawbacks of these
+approaches are inflexibility and high overhead.
+For example, Eisenbach and Barr~\cite{BarrE03} and Milazzo et
+al.~\cite{Milazzo05updates} use custom classloaders for
+binary-compatible and component-level changes respectively, but
+cannot perform class field additions.
+% The former targets libraries and the latter is part of the design of a
+% special-purpose software architecture.
+
+%% Eisenbach and Barr: safe upgrading without restarting.  They support
+%% upgrades that satisfy binary compatibility.  Uses a custom classloader and
+%% JMX to replace the code of existing objects.  No way to modify the state of
+%% the objects.
+
+%% Milazzo use a modified class loader to load individual replacements to
+%% classes in a special-purpose architecture.  The class loader may modify the
+%% bytecode of the loaded class to deal with type version namespace issues.
+%% Basically this is more limited in scope than our approach.
+
+Orso et al.~\cite{orso:java} use source-to-source translation for DSU
+by introducing a proxy object that indirectly accesses
+an object that may change.  
+%% For each class C that might change in the future they produce a proxy for
+%% that class.  All calls from clients of C are redirected to call the wrapper
+%% instead.  When C is updated by some new class C', a new C' object is created
+%% and initialized using the old state of C and the wrapper is redirected to
+%% point to C'.
+This approach requires updated classes to export the same public
+interface, forbidding new public methods and
+fields.
+Non VM-based approaches are in general limiting because they are
+not \emph{transparent}---they make visible changes to the class hierarchy,
+and insert or rename classes.  This approach makes it essentially
+impossible to be robust in the face of code using reflection or native
+methods.  Moreover, the indirection imposes time and space overheads
+on steady-state execution.  Our VM approach
+naturally supports reflection and native methods (these are updated
+as well), and is more expressive, e.g., it supports signature changes.
+
+\paragraph{VM support for DSU in managed languages.} 
+The PROSE system performs short-term, run-time patches to code for
+logging, introspection, and performance adaptation, rather performing
+general updates~\cite{nicoara:eurosys08}.  An Eclipse plug-in performs
+run-time bytecode instrumentation and a modified JIT performs method
+code replacement, using an API in the style of aspect-oriented
+programming.  % in support of run-time software
+PROSE has the same update model as the E\&C systems: it supports updates to method bodies but not
+class or method signature changes that require changes to object state. 
+% This flexibility is
+% similar to the EnC implementations discussed above; 
+% indeed, PROSE builds on the HotSwap method replacement support in its
+% Sun JDK implementation~\cite{JVMhotswap}.
+
+JDrums~\cite{ritzau00dynamic} and Dynamic Virtual Machine
+(DVM)~\cite{Mala00a} both implement DSU for Java within the VM,
+providing a programming interface similar to \DSU, but are lacking in
+two ways.  First, neither JDrums nor DVM have ever been demonstrated
+to support updates from real-world applications.  Second,
+their implementations impose overheads during steady-state execution.
+They both update \emph{lazily} and use
+an extra level of indirection (the \emph{handle
+  space}).  Indirection conveniently supports
+object updates, but adds extra overhead.  For example, JDrums traps
+all object pointer dereferences to apply VM object transformer
+function(s) when the object's class changes.  Lazy updating has the
+advantage that it amortizes  pauses due to an update over
+subsequent execution.  The main drawback is that its overhead persists
+during normal execution, even though updates are relatively rare.  DVM
+works only with the interpreter.  Relative to this interpreter, which
+is already slow, the extra traps result in roughly 10\% overhead.
+
+Compared to these two, \DSU{} performs updates eagerly by employing a
+full heap collection at update-time.  This stop-the-world approach imposes a longer pause at
+update time, but eliminates overhead during steady-state execution.
+Likewise, by invalidating updated methods, \DSU's performance is
+slowed just after the update as these methods are being recompiled.
+However, compared to running with an interpreter, steady-state
+execution is much improved, since methods will be much better
+optimized.
+
+%% JDRUMS: implements the conversion lazily.  They have a similar interface
+%% (object and class transformers). The drawback here is that there is overhead
+%% in the general case of execution---we do not know when the update is
+%% complete.  Implemented in Sun's JDK 1.2.  Adds a level of indirection to the
+%% new object.  Thus overhead builds up over time.  It also appears they have a
+%% more limited interface to what can be referenced in a conversion function.
+%% For example, there is no way to refer to fields other than those of the
+%% object's class (i.e., no super-class fields) and there is no way to call new
+%% methods, like constructors.  Not clear if there are restrictions on how
+%% methods can be changed.
+
+%% DVM: use an incremental mark-sweep collector, where mark phase marks objects
+%% to be updated and the sweep phase incrementally updates them (prior to being
+%% accessed by the mutator).  Like JDRUMS, all accesses to marked objects are
+%% trapped.  Imposes a stock 10\% overhead, even only using bytecode.
+
+%% Both of these: no significant experience with real applications, according
+%% to how they change in practice.  They also can't handle native methods
+%% because they can't trap access to modified objects.  Doing the full GC
+%% solves this problem.
+
+% More recently, Nicoara et al. developed PROSE, a system for run-time
+
+Boyapati et al.~\cite{boyapati03lazy} support dynamic updates to
+classes kept in a \emph{persistent object store} (POS).  While the
+setting is different, their basic update model, and in particular
+their notion of object transformer function, is similar to ours.  In
+their system, programmers manually write an object transformer
+that they view as a method on the old version of the updated class, i.e., the transformer method is type-safe with respect to the old class.
+In \DSU, object transformers may access the \emph{new} versions of
+objects pointed to from the old class.  Instead, Boyapati et al.'s
+transformers may access the \emph{old} versions.  To implement this
+model, they rely on
+\emph{encapsulation} based on \emph{ownership types}: if an object $a$ of class $A$ has an ``owned''
+field pointing to an object $b$ of class $B$, then only $a$ can point
+to (and access) $b$.  Encapsulation thus ensures the system will always transform $a$ before $b$, which makes the transformation
+algorithm more efficient.  They rely on the programmer to 
+enforce encapsulation, and describe how the compiler could automate language support for encapsulation in a non-standard type system.  
+\DSU{} takes the opposite tack of forcing old object fields to point
+to up-to-date objects, and thus requires no special language support.
+Moreover, \DSU's model follows that of earlier
+work~\cite{k42usenix,neamtiu06dsu,neamtiu09stump,upstare} which has
+proven its effectiveness on a half-dozen realistic applications
+across several years' worth of releases.  However, further
+research to understand the costs and benefits of the two updating
+models would be useful.
+
+Boyapati et al. also differs from \DSU{} in that, like JDRUMS and DVM,
+updates are applied incrementally as objects are accessed following
+an update rather than all at once using a stop-the-world GC\@.  This
+incremental cost is more natural in a POS since indirection is
+already required to access external objects.  The POS model also
+permits programmers to specify ACID transaction boundaries, which can
+help ensure that updates are applied consistently and safely.  In contrast, our work focuses on 
+supporting dynamic upgrades in a high-performance VM for Java, and thus many of
+the issues we consider---reaching a safe point via return barriers and
+OSR, and coexisting with the JIT compiler---are the unique
+contributions of our work.
+
+% \paragraph*{Approaches using a standard VM.}
+% \suriya{another
+% awkward title. Should ask Kathryn what it actually is}
+% 
+
+\paragraph{Dynamic Software Updating for C/C++}
+
+There are several substantial systems for dynamically updating C and
+C++ programs that target server
+applications~\cite{HjalmtyssonG98,altekar05opus,neamtiu06dsu,chen:icse07,upstare,neamtiu09stump}
+and operating systems
+components~\cite{K42reconfig,k42usenix,chen06vee,lee06linuxmod,dynamos_eurosys_07}.
+% These systems are more mature than most of the systems described above, in
+% some cases with substantial updating experience.  The flexibility
+Although some of these systems are mature, the flexibility
+afforded by \DSU{} is comparable or superior.  \DSU's timing
+restrictions and Java's type safety also provide comparable or
+superior safety; the fact that C and C++ programs often circumvent the
+languages' weak type systems greatly complicates efforts 
+to ensure that updates behave correctly.  Some prior
+systems~\cite{neamtiu09stump,upstare,chen:icse07} have focused 
+on means to reach DSU safe points quickly, and we plan similar
+efforts as future work.  In particular, we plan to extend our support
+for OSR to apply to running methods whose bytecode has changed,
+allowing the user to map an active method's PC and
+stack frame and those of its new version, similar to support provided by
+UpStare~\cite{upstare}.
+
+The lack of a VM is a disadvantage for C and C++ DSU.  For
+example, because a VM-based JIT can compile and recompile replacement
+classes, it imposes no steady-state execution overhead.  By contrast,
+C and C++ implementations must use either statically-inserted
+indirections~\cite{HjalmtyssonG98,neamtiu06dsu,K42reconfig,k42usenix,upstare}
+or dynamically-inserted trampolines to redirect function
+calls~\cite{altekar05opus,chen06vee,chen:icse07,ksplice}.  Both cases
+impose persistent overhead on normal execution and inhibit
+optimization.  Likewise, because these systems lack a garbage
+collector, they either do not update object instances at
+all~\cite{ksplice}, update them lazily~\cite{neamtiu06dsu,chen:icse07}
+or perform extra allocation and bookkeeping to locate the
+objects at update-time~\cite{k42usenix}.  Finally, because these
+systems lack support for on-stack replacement, they must pre-compile
+potentially long-running methods specially, so that they can be
+updated while they run.   These techniques impose time and space overheads on
+steady-state execution, and in some cases limit update flexibility.
+
+\paragraph*{Other proposals}
+
+Gilmore et al.~\cite{GilmoreKW97} propose DSU support for modules in
+ML programs using a similar, but more restrictive programming interface
+compared with \DSU{}.  They formalize an abstract machine for
+implementing updates using a copying garbage collector.
+Duggan~\cite{DBLP:journals/acta/Duggan05} also proposes dynamic
+updates to ML programs, focusing on lazy updates to data type
+definitions.  Neither approach was ever implemented.
+
+UpgradeJ~\cite{bierman08upgradej} is an extension to
+the Java language design supporting class upgrades, in two flavors:
+\emph{revision upgrades}, which may modify method bodies, and
+\emph{evolution upgrades}, which may add new methods and fields.
+Programmers control the effects of upgrades using \emph{version
+annotations}, introduced by Bierman et al.~\cite{BiermanHSS03} in
+earlier work.  For 
+example, the programmer may write \texttt{o = new 
+Button[1=]()} to force \texttt{o} to always use version~1 methods,
+while writing \texttt{p = new Button[1+]()} or \texttt{p = new
+  Button[1++]()} allows \texttt{p} to be revised or evolved,
+respectively.  UpgradeJ's update model is easier to implement than
+\DSU's because it need not change existing object instances.  Of
+course, the downside is a loss of flexibility.  Many of the updates to
+our benchmark applications change field contents and layout.  UpgradeJ does not support these updates.  On the other hand,
+evolution upgrades add power over simple method
+body updates, and consequently enable more real-world updates to be
+supported~\cite{tempero08upgradej}.  There is no implementation of
+UpgradeJ.
+
+
+
+
+
+
+%% basic swapping for single modules.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pldi64"
+%%% End: 

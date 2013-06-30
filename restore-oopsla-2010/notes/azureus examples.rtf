@@ -1,0 +1,417 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fnil\fcharset0 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red250\green255\blue171;\red168\green0\blue0;\red254\green234\blue234;
+\red26\green120\blue0;\red216\green255\blue209;\red0\green0\blue255;\red0\green181\blue65;}
+\margl1440\margr1440\vieww14240\viewh17040\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs28 \cf0 \ul \ulc0 Changes that do affect global state (prob. not handle)\
+\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \ulnone support for adding a virtual device access to the user-plugin dir\
+
+\b0 51c1982522583fd8d702b052be1f79fe83e6c7e1\
+look at UUIDGenerator.generateUUIDString() for the transformation function\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs28 \cf0 \ul \
+Changes that do affect constant global state\
+\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \ulnone added some properties\
+
+\b0 eb650232f063e071b928e1c9910e19d417e3cbbf
+\b \
+
+\b0 String constants
+\f0\b\fs28 \ul \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\cf0 \
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \ulnone Prep 4315.\
+
+\b0 902152a4e44f7e9ba641a847fcca491022e4a12c
+\b \
+
+\b0 String constants
+\f0\b\fs28 \ul \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\cf0 \
+Changes that do affect global state (can handle)\
+\
+Changes that do not affect global state\
+\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0 \ulnone fix slow magnet download with large torrents
+\b0 \
+6dfab0eaa640c1ef898c05f7c78ef7d949ef6bdb\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs28 \cf0 \ul \
+Potential memory leaks we can handle in Azureus
+\b0\fs24 \ulnone \
+\
+\pard\pardeftab720\ql\qnatural
+
+\f1\b \cf0 fix leak
+\b0 \
+e19bb6a376d9901e91ce043d5b4052a853873575\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Not a real leak.  Just an unnecessary local variable.\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b Fix memory leak. (tag: nonleak1)
+\b0 \
+8633059e2bf9b6164b676fc214a98e84b1dc1e63\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Notes:\
+Error occurs in a very old version that is difficult to compile (depends on ancient versions of libraries and does not use a build system).  I will attempt to recreate the error on the newest version.\
+\
+Update:\
+This is not really a leak.  A buffer is escaping being collected by the GC that the developers would prefer to re-use.  The call to returnToPool() preserves the liveness of this buffer.\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b mem leaks (leak-1)
+\b0 \
+cc61212e65f7a3e7252c4fce36c064a8b4d90965\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Notes:\
+This fix nulls out a field in the main server class for torrent connections.  When the server is stopped, the server instance is actually kept around for when the torrent resumes.  Nulling out this field allows part of the server object to be garbage collected.  The identifying condition should be:\
+  PEPeerServerImpl.bContinue == false\
+\
+There are two leaks in this update that have this same form. (update: I not longer believe this is the case--there is just one leak).\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b parameter listeners never removed!
+\b0 \
+980024434f3551df9dbfc75457589dc493a66e89\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Notes:\
+Due to the following typo,\
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+
+\f2 \cf3 \cb4 -        parameterListeners.remove(listener);\
+\cf5 \cb6 +        parameterListener.remove(listener);\
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+
+\f1 \cf0 \cb1 The "listener" object is interpreted as a key and removed from the Hashtable parameterListeners instead of removed from one of the mappings of the Hashtable.  This would have been caught by the type checker if Java generics had been used, but the codebase at this point is targeted to Java 1.3 and generics were not part of the standard then.\
+\
+The old line should have no effect, as the Hashtable is indexed by strings, so "listener", which is a ParameterListener, should never match a key.  The problem then reduces to characterizing the "listener" objects that should have been removed and removing them from the appropriate list.\
+\
+The temporal logic formula would be:\
+  String parameter, ParameterListener listener, Vector parameterListenerVec.\
+    (line 309 /\\ parameterListener.remove(listener) /\\ parameterListener = parameterListeners.get(parameter))\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b another memory leak... (leak-3)
+\b0 \
+82ba9018db12772653655a65f8df563c917779ec\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Notes:\
+This leak is fixed by the following change.\
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+
+\f2 \cf3 \cb4 -    if (readBuffer != null && !readingLength)\
+\cf5 \cb6 +    if (readBuffer != null)\
+\cf0 \cb1        ByteBufferPool.getInstance().freeBuffer(readBuffer);
+\f1 \
+There is a variable "closing" that gets set to true when a socket close is requested.  This variable remains true even after the close has completed.  So the characteristic formula should be:\
+  closing == true && readingLength == true\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b Some memory leak corrections.
+\b0 \
+10a46b92b76147e478f5c19ff9193c4b3e1b50e7\
+
+\b azureus2/org/gudy/azureus2/core/DiskManager.java\
+azureus2/org/gudy/azureus2/core/PeerManager.java
+\b0 \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs28 \cf0 \ul Possibly can handle
+\b0\fs24 \ulnone \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b \cf0 Fixed some more Color resource leaks
+\b0 \
+51edfc5926217a71faab9d4adbfd955491e9025d\
+\
+
+\b GDI leaks ... can't believe we kept all those leaks so long\
+
+\b0 df947e4cf31c7432db986c090dbb8bc421482ecd\
+
+\b azureus2/org/gudy/azureus2/ui/swt/components/graphics/ScaledGraphic.java\
+azureus2/org/gudy/azureus2/ui/swt/donations/DonationWindow2.java\
+azureus2/org/gudy/azureus2/ui/swt/help/AboutWindow.java (addDisposeListener example)\
+azureus2/org/gudy/azureus2/ui/swt/mainwindow/SplashWindow.java\
+(possibly more.  stopped here.)
+\b0 \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs28 \cf0 \ul Interesting leaks that maybe we could handle with more work
+\b0\fs24 \ulnone \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b \cf0 Fixed a severe SWT handle leak in the large library view caused by the Icon column
+\b0 \
+2f6b25c1baa4736770004a4c54737a3e826ba229\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs28 \cf0 \ul Investigate Further\
+\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0 \ulnone Fix minor resource leak where the Region of the shell was not disposed of properly
+\b0 \
+0124df0a6006774a277adc0e4c719f6dfade05e7\
+\
+
+\b Fix memory leak.
+\b0 \
+acbd06940f6f284d01a740742de5ff584fd9b287\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs28 \cf0 \ul Can't fix no matter what
+\b0\fs24 \ulnone \
+(why are these not handled by the garbage collector?)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b \cf0 reduce memory leak
+\b0 \
+\pard\pardeftab720\ql\qnatural
+
+\f1 \cf0 c0425299ab0b73570f4bb9f251ab0fa8b3aa5bff\
+\
+
+\b fix resource leak\
+
+\b0 47ac7c6c667fdb4ae8ae42e7618e395a97157a17\
+\
+
+\b fix minor SWT leak\
+
+\b0 15c0bbe8482cb7ab609fea5808cb40690b0f210c\
+\
+
+\b fix font leak thanks to yahave\
+
+\b0 0143b9eff126a88ebae025fe796f29aafa155a0e\
+\
+
+\b Remove most of the resource leaks.\
+
+\b0 6b43412978b2b199b0902c2da595291be6847d4f\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs28 \cf0 \ul Looks more like an resource optimization than a leak fix
+\b0\fs24 \ulnone \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b \cf0 fix for GUI handle leak in the torrent info view ( OKed by Tux )\
+
+\b0 cb60485d5987fe24c204310203f9953d6915ba21\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs36 \cf7 New Field Examples
+\b0\fs24 \cf0 \
+\
+\pard\pardeftab720\ql\qnatural
+
+\b \cf0 fixup expanded state (newfield1)
+\b0 \
+a04dc20b6ba943c51ad12ae37e67814a36f3a576\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Modifies behavior of isExpanded boolean that tracks whether a tree control is expanded.  Are there cases where the old value would be wrong and we would need to fix it up when updating?\
+\
+Interesting invariant (try to get it again):\
+control height % numItems == 0\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b prevent double complete events from firing
+\b0 \
+8b4a80c0ff26b7777e835146c39392391677430a\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Adds a "completed" boolean to ResourceDownloaderTorrentImpl.java.  \cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b fix no-space error message
+\b0 \
+3b6d160abc8e05ee900ce1b68403389ecadbfeaa\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Adds a force_status bool and sets it to true if space_on_device == 0.\cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\pard\pardeftab720\ql\qnatural
+
+\b\fs36 \cf7 Non-leak New Code Examples\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0 \
+TableView.setEnabled
+\b0 \
+793d828b39ca22d3ba2fb008f7792e05e4e4c6d9\
+\
+
+\b fix menu
+\b0 \
+47d6f5630469d0e65ba9d6e30da52dbce47aacb9\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs36 \cf7 Fixed Initialization\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0 \
+Buttons NPE safeguard (initfix1)
+\b0 \
+1c968a26c145a94c796521aa08be002d2341760a\
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalc \clcbpat2 \clbrdrt\brdrs\brdrw20\brdrcf0 \clbrdrl\brdrs\brdrw20\brdrcf0 \clbrdrb\brdrs\brdrw20\brdrcf0 \clbrdrr\brdrs\brdrw20\brdrcf0 \clpadl100 \clpadr100 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\ql\qnatural
+\cf0 Set MessageBoxShell.button to "new String[0]" if it would otherwise be "null"\
+\
+Places this happens:\
+  
+\f2\fs22 UIExitUtilsSWT.getExitConfirmation\
+ UIDebugGenerator.generate (a testing module)\
+ MenuFactory.addCheckUpdateMenuItem (popup appears when an update check is performed\
+                                     and there are none?)\
+ via UISWTInstanceImpl.promptUser (3rd argument is passed directly to "buttons")\
+ via MessageBoxShell.open (a static method of MessageBoxShell) - 4th arg is "buttons"\
+ via UIFunctionsImpl.getUserPrompter (3rd arg is "buttons")\
+ \
+
+\f1\fs24 Note:  Some places in the code set the buttons after constructing the MessageBox.  Examples:\
+
+\f2\fs22  SBC_DevicesView.deleteFiles
+\f1\fs24 \cell \lastrow\row
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+\pard\pardeftab720\ql\qnatural
+
+\b\fs36 \cf7 Collections
+\b0\fs24 \cf0 \
+\
+commit b944b17415ff2642c974978f44690073439c9e7e\
+Author: parg <>\
+Date:   Tue Dec 22 18:53:30 2009 +0000\
+\
+    drop http seeds when download stopped\
+\
+commit 485c992f5e8927fb29fda51250c0c5ca12c332bb\
+Author: parg <>\
+Date:   Tue Dec 22 18:31:58 2009 +0000\
+\
+    put a cap on the max pieces we'll remember\
+\
+commit 4f1687f10be6816fcf744c4005e5aff538384e16\
+Author: parg <>\
+Date:   Tue Dec 22 18:24:47 2009 +0000\
+\
+    ignore http seeds if seeding\
+\
+commit 32a782055e82b25da19d252ac6d26357ce322f9f\
+Author: parg <>\
+Date:   Fri Dec 4 05:13:26 2009 +0000\
+\
+    support multiple ranges\
+\
+\
+
+\b\fs36 \cf7 Constants
+\b0\fs24 \cf0 \
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+commit 8f44c8197a0886daed3d9d3a26b7dc3478f703ea\
+Author: parg <>\
+Date:   Fri Dec 18 01:17:47 2009 +0000\
+\
+    a bit of incomplete fast extension support\
+    see BTMessage.java\
+\
+commit 380464b820e7f205814ae6f617fa2db8340046f6\
+Author: parg <>\
+Date:   Mon Dec 14 22:44:48 2009 +0000\
+\
+    bye bye port 88\
+\
+\pard\pardeftab720\ql\qnatural
+
+\b\fs36 \cf7 Strings
+\b0\fs24 \cf0 \
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+commit 77d75ce94d2e1d5cddeae7adc19db8dbecee7ad1\
+Author: parg <>\
+Date:   Sat Dec 12 01:27:30 2009 +0000\
+\
+    add local ips\
+    note: requires a loop\
+\
+\pard\pardeftab720\ql\qnatural
+
+\fs36 \cf8 Currently At: 
+\b make library via registerEntry and set the title based on ui: 
+\b0 b02dd9568a3c79fcfd369126cd29db45003a60e0\
+\
+Matching command line:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs24 \cf0 java -jar match-snapshots.jar leak-1/980024434f3551df9dbfc75457589dc493a66e89 leak-1/980024434f3551df9dbfc75457589dc493a66e89-2 leak-1/cc61212e65f7a3e7252c4fce36c064a8b4d90965 org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl > out.txt}

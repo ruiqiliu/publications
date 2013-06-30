@@ -1,0 +1,33 @@
+\section{Related Work}
+
+Here we can talk about Gulwani's work on synthesis for string
+programs, since we are using that basic approach.  We have two
+contributions above what was done there.
+
+First, the effectiveness of the approach is highly dependent on the
+language used for synthesis.  You essentially want a domain-specific
+language with a good tradeoff between number of constructs and
+expressiveness.  Sumit mentions several times in his paper that it
+took some time to discover the right language for synthesis of string
+programs.  We are performing this very important task for the domain
+of Java object transformations (tailored to the dynamic update
+scenario).
+
+Second, in Sumit's work, input-output examples were provided by the
+user.  In our work, they must be discovered by analyzing the
+old-version and new-version heap.  We are contributing techniques to
+enable this matching process.
+
+When doing both of these, we get some advantages by working with Java.
+First, full type information is available at run-time.  Second, the
+fact that most programs make heavy use of Java's standard library
+helps, as it provides more high-level information.  Both these help
+with the matching problem.  For example, we can view a collection as a
+group of objects rather than a low-level pointer structure.  We can
+also use the fact that order is probably important for a List, but not
+important for a Set.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

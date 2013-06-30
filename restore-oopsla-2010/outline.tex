@@ -1,0 +1,157 @@
+\documentclass[natbib,preprint]{sigplanconf}
+
+\usepackage{color}
+\usepackage{alltt}
+\usepackage{mathptmx}
+\usepackage[override]{cmtt}
+\usepackage[scaled=.92]{helvet} % see www.ctan.org/get/macros/latex/required/psnfss/psnfss2e.pdf
+\usepackage{graphicx}
+\usepackage{setspace}
+\usepackage{subfigure}
+\usepackage{xspace}
+\newcommand{\javac}{javac\xspace} % This package lets you punctuate \javac normally and get good spacing, e.g., \javac.  gives you: javac.
+\usepackage{url}  % particularly useful for URLs in bib entries
+\newcommand{\stephencomment}[1]{\textcolor{blue}{SM --- #1}}
+
+\begin{document}
+
+\conferenceinfo{Mystery'09,} {January 1, 2009, Austin, TX.}
+\CopyrightYear{2009}
+\copyrightdata{2009}
+
+
+\title{Automating Heap Transformations for Dynamic Software Updating
+%   \thanks{COMMENT OUT FOR SUBMISSION, UNCOMMENT FOR final version. Some of these may or may not apply to your work.  Make Kathryn check.
+%     This work is supported by NSF SHF-0910818, NSF CSR-0917191, NSF
+%     CCF-0811524, NSF CNS-0719966, NSF CCF-0429859, Intel, IBM, CISCO,
+%     Google, and Microsoft.  Any opinions, findings and conclusions
+%     expressed herein are the authors' and do not necessarily reflect
+%     those of the sponsors.}
+    }
+
+% 2008: NSF EIA-0303609, DARPA F33615-03-C-4106,
+
+
+% Is the author order correct?
+
+\authorinfo{Suriya Subramanian}
+           {The University of Texas at Austin}
+           {suriya@cs.utexas.edu}
+
+\authorinfo{Stephen Magill}
+           {University of Maryland, College Park}
+           {smagill@cs.umd.edu}
+
+\authorinfo{Michael Hicks}
+           {University of Maryland, College Park}
+           {mwh@cs.umd.edu}
+
+\authorinfo{Kathryn S. McKinley}
+           {The University of Texas at Austin}
+           {mckinley@cs.utexas.edu}
+
+\maketitle
+
+\begin{abstract}
+\stephencomment{Fill in...}
+
+% problem, contribution, result, meaning - 1 or 2 sentences on each
+
+
+\end{abstract}
+
+\section{Introduction}
+
+In this paper we address the problem of automatically inferring state
+update functions for dynamic updates that fix memory leaks in Java
+programs.  Since Java uses garbage collection, a memory leak occurs
+when an unused object remains reachable.  We call the unused object
+\textit{leaky}.  A memory leak is fixed by inserting code that makes
+the leaky object unreachable, thus allowing it to be garbage
+collected.  This code should ideally be inserted at the earliest point
+at which the leaky object is no longer needed.
+
+When generating dynamic leak fixes, we assume that we have the
+original source (prior to the leak being fixed) and the patch that
+fixes the leak.  This patch is generally a small piece of additional code
+that causes the leaky object to become unreachable by either directly writing
+\texttt{null} to a field pointing to the object or by removing the
+object from a collection.
+
+While having the patch available helps, there are two primary
+difficulties that must be addressed before we can generate update
+functions that fix the leak.
+
+\begin{enumerate}
+\item
+\label{enum:identify}
+Since we are updating dynamically, there are potentially many leaky
+objects that should have been made unreachable, but were not.  These
+must all be identified so that they can be garbage collected.
+\item 
+\label{enum:different-loc}
+The location in the source where the state update function is called
+is generally not the same as the location at which the leak fix is
+inserted.  Thus, the commands that fix the leak may not be the correct
+commands to apply at the location of the update.  For example, suppose
+that the fix was to write \texttt{null} to the \texttt{server} field
+of all \texttt{Connection} objects satisfying predicate $P$.  To
+correct this leak, we will want to identify some \texttt{Connection}
+objects at update time and write \texttt{null} to their
+\texttt{server} field.  But the objects to change may no longer
+satisfy $P$, as their state may have been altered between the location
+of the memory leak fix and the location of the update.
+\end{enumerate}
+
+In order to address these issues, we search for predicates over object
+state that identify the leaky objects at the point of the update.  In
+order to scale easily, we compute these predicates using a dynamic
+analysis.
+
+\stephencomment{Best to motivate with example.  Put an example in around here.}
+
+The objects of interest at the point of update are exactly those satisfying certain temporal properties.  For example, if the leak fix is to add \texttt{a.foo = null} at line 87, then we want the set of all objects pointed to by \texttt{a} at line 87 which have not had their \texttt{foo} field overwritten.  This last part is important.  While the object pointed to by \texttt{a.foo} was leaky at line 87, the \texttt{foo} field may have been overwritten between that point and the update point.  In this case, the leaky object would have become unreachable due to this overwriting and the current value should be preserved (unless line 87 is reached again).  This indicates that we want a predicate describing all objects that were bound to \texttt{a} at line 87 (perhaps multiple times) and have not had their \texttt{foo} field overwritten (since the last time they reached line 87).  This corresponds to the following temporal formula.
+\[\texttt{Object b. $\neg$(b.foo = \_) S (b = a $\wedge$ atline(87))}\]
+This selects all objects \texttt{b} such that \texttt{b.foo} has not been assigned since \texttt{b} was equal to \texttt{a} at line 87.  And this is ``strong since,'' which requires that the \texttt{(b = a $\wedge$ atline(87))} condition must have actually occurred in the past.
+\stephencomment{The above is the general idea but the syntax will be different (we will want to use AspectJ's pointcut syntax for our state formulas).}
+
+This paper makes the following contributions.
+\begin{enumerate}
+\item The declarative marking scheme (need some short name for this.  ``Method for compiling PTLTL formulas into marking automata'' doesn't really roll off the tongue.).
+\item The method of using Daikon to infer predicates that are used to create an update function.
+\end{enumerate}
+
+\section{PTLTL as a Marking Language}
+
+\stephencomment{This is the description of the marking language, compilation strategy, etc.}
+
+\section{Common Patterns}
+
+\stephencomment{Here is where we can say that certain classes of leak fixes correspond to certain marking formulas.  The marking language is flexible, which is good, but this could also be viewed as a burden.  If we can say, ``leak fixes that write null to a field correspond to this formula'' and ``fixes that remove from a collection map to this formula'' then it is not such a burden and could be done automatically for a lot of cases.  It also gives us a place to explain what the examples we looked at were like, since these classes will correspond to what we saw in the examples.}
+
+\section{Daikon and Jvolve}
+
+\stephencomment{We show how we take the output of Daikon and convert this into an update function that can be used in Jvolve.  This will probably be a short section since the update function always has the form ``loop over the objects satisfying the predicate and correct the state'' where the meaning of ``correct the state'' depends on the leak fix (``remove from a collection'' or ``write null'').}
+
+\section{Experimental Results}
+
+\stephencomment{Fill in...}
+
+\section{Conclusion}
+
+\stephencomment{Fill in...}
+
+% {\scriptsize
+% \category{D.3.4}{Programming Languages}{Processors}[Memory management (garbage collection); Optimization] 
+% \terms
+% Experimentation, Languages, Performance, Measurement
+% \keywords
+% Heap
+% }
+
+\bibliographystyle{abbrvnat}
+% \renewcommand{\bibfont}{\footnotesize} % <--- change bib font size here
+% \setlength{\bibsep}{0.5ex}             % <--- change space between bib entries here
+\bibliography{paper}
+
+\end{document}

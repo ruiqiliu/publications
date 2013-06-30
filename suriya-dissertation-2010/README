@@ -1,0 +1,8 @@
+This dissertation shares several files (images, .bib, etc.) with the Jvolve
+PLDI 2009 paper. In order to be able to compile the disseration, checkout
+file:///projects/speedway/svn/trunk/papers/dsu-pldi-2009 and
+file:///projects/speedway/svn/trunk/papers/suriya-proposal-2008 as well.
+
+The final official copy of the dissertation is: suriya-thesis-final.pdf
+The MD5 sum of the file aecb180139e357223750e2e79e16b3b6.
+

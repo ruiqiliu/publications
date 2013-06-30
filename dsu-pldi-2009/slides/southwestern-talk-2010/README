@@ -1,0 +1,6 @@
+Installed a local copy of beamer here. Also set environment variable
+TEXINPUTS in the Makefile to use this version. Running make should be
+sufficient to build cleanly.
+
+If you want to run pdflatex from the command line, invoke as follows:
+TEXINPUTS=.:./latex-beamer-3.07/base: pdflatex slides.tex

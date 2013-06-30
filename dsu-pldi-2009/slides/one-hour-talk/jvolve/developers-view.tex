@@ -1,0 +1,82 @@
+
+\section{\DSU}
+\ShowTOC[]
+
+\begin{frame}{\DSU{} - System overview}%{A Sub-title is optional}
+\begin{center}%
+\includegraphics[width=0.93\paperwidth]{images/developers-view}%
+\end{center}%
+\end{frame}
+
+% \begin{frame}{Update Model}%{A Sub-title is optional}
+% \begin{itemize}
+% \item Update happens in one fell swoop
+% \item Simple to reason about
+% \item Code
+%   \begin{itemize}
+%   \item Old code before the update
+%   \item New code after the update
+%   \end{itemize}
+% \item Data
+%   \begin{itemize}
+%   \item \emph{Representation consistency} (all values of a type \\
+%         correspond to the latest version)
+%   \item Support a transformation function to convert objects to conform to
+%         their new definition
+%   \end{itemize}
+% \end{itemize}
+% \end{frame}
+
+\newcommand{\removed}[1]{\textcolor{red}{- #1}}
+\newcommand{\addedxx}[1]{\textcolor{OliveGreen}{+ #1}}
+
+\begin{frame}[fragile]{Supported updates}%{A Sub-title is optional}
+\begin{itemize}
+\item Changes within the body of a method \\
+\begin{footnotesize}
+\begin{semiverbatim}
+  public static void main(String args[]) \{
+    System.out.println("Hello, World.");
+\addedxx{  System.out.println("Hello again, World.");}
+  \}
+\end{semiverbatim}
+\end{footnotesize}
+\item Class signature updates
+  \begin{itemize}
+  \item Add, remove, change the type signature of fields and methods
+  \end{itemize}
+\begin{footnotesize}
+\begin{semiverbatim}
+  public class Line \{
+\removed{  private final Point2D p1, p2;}
+\addedxx{  private final Point3D p1, p2;}
+    ...
+  \}
+\end{semiverbatim}
+\end{footnotesize}
+% \item Changes can occur at any level of the class hierarchy
+\item Signature updates require an object transformer function
+\end{itemize}
+\end{frame}
+
+\input{jvolve/jes-example}
+
+\begin{frame}[fragile]{Compiling transformation functions}%{A Sub-title is optional}
+\begin{block}{}
+\begin{footnotesize}
+\begin{semiverbatim}
+ public static void jvolveObject(User to, v131_User from) \{
+    to.username = from.username;
+    ...
+ \}
+\end{semiverbatim}
+\end{footnotesize}
+\end{block}
+\begin{itemize}
+\item Very close to Java semantics
+\item Field {\tt username} is {\tt private} and {\tt final}
+\item Functions compiled specially by a JastAddJ extension to the Java
+language
+\item Ignores access protection and allows assigning to {\tt final} fields
+\end{itemize}
+\end{frame}

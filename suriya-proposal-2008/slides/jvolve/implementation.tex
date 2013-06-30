@@ -1,0 +1,260 @@
+\input{jvolve/dsu-steps}
+
+\subsection{Implementation}
+\ShowTOC
+
+\begin{frame}{Update model}%{A Sub-title is optional}
+\begin{itemize}
+\item Update happens in one fell swoop
+\item Simple to reason about
+\item Code
+  \begin{itemize}
+  \item Old code before the update
+  \item New code after the update
+  \end{itemize}
+\item Data
+  \begin{itemize}
+  \item Representation consistency (all values of a type correspond to the
+        latest version)
+  \item Support a transformation function to convert objects to the new
+        type
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Update process}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{}{}
+\begin{itemize}
+\item Offline Update Preparation Tool (UPT)
+\item \DSU{} VM
+  \begin{itemize}
+  \item Reach a safe point in the VM (thread synchronization)
+  \item Load new classes (classloader)
+  \item Transform objects to new definition (garbage collector)
+  \item Resume execution
+  \item<2-> Update active methods on stack (On-stack replacement)
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile,label=offline]{Update Preparation Tool}%{A Sub-title is optional}
+\vspace{-2ex}
+\JvolveTimeLine{current}{}{}{}{}
+\vspace{-2ex}
+\begin{itemize}
+\item Uses jclasslib\footnote{\url{http://jclasslib.sourceforge.net}}, a
+bytecode library
+\item Compares bytecode of the two versions
+\item Categorizes changes into
+  \begin{description}
+  \item[Class updates] Classes that add, remove, change signature of fields
+                       or methods
+  \item[Method updates] Changes within a method body. Only the method has
+                        to be loaded/updated
+  \item[Indirect updates] No change to method, but refers to changed
+                          classes
+  \end{description}
+\item Generates old version stubs and default object transformers
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile,label=suspend]{Safe point for the update}%{A Sub-title is optional}
+\JvolveTimeLine{}{current}{}{}{}
+\begin{itemize}
+\item Update must be atomic
+\item Updates happen at ``safe points'' (VM yield points with restriction
+      on what methods can be on stack)
+\item Uses a simple, non-deterministic timer retry
+\item<2-> Supported only on a single processor
+\item<2-> On-stack replacement support to allow more methods to remain on
+          stack
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Restricted methods}%{A Sub-title is optional}
+\JvolveTimeLine{}{current}{}{}{}
+\begin{itemize}
+\item Identified by UPT
+  \begin{itemize}
+  \item All methods in updated classes
+  \item Methods with new implementations
+  \item Methods that refer to updated classes (have to be recompiled since
+        field/method offsets might have changed)
+  \end{itemize}
+\item Identified by the VM
+  \begin{itemize}
+  \item With inlining, transitive closure of callers of methods identified
+        above
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+{
+\setbeamercovered{invisible}
+\begin{frame}[t,fragile,label=classload]{Loading new classes}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{current}{}{}
+\begin{itemize}
+\item Modifications to the classloader
+\item Involved a lot of engineering effort
+\item<2-> Correctly update metadata maintained by the VM
+  \begin{itemize}
+  \item Classes
+  \item Type information blocks
+  \item Methods
+  \item Fields
+  \item Subclass, superclass relations
+  \item Innerclasses
+  \item Exceptions
+  \item Annotations
+  \end{itemize}
+\end{itemize}
+\end{frame}
+}
+
+\begin{frame}{VM Datastructures}%{A Sub-title is optional}
+\begin{center}
+\includegraphics[width=0.84\paperwidth]{jvolve/vm-datastructures}
+\end{center}
+\end{frame}
+
+\begin{frame}{VM Datastructures}%{A Sub-title is optional}
+\begin{center}
+\includegraphics[width=0.84\paperwidth,height=0.7\paperheight]{jvolve/vm-datastructures-after-dsu}
+\end{center}
+\end{frame}
+
+% \begin{frame}[fragile]{FXIME: Hierarchy}%{A Sub-title is optional}
+% \begin{tikzpicture}
+% \tikzstyle{every node}=[font=\scriptsize,circle,draw,minimum size=0.7cm]
+% \tikzstyle{dsu node}=[every node,fill=structure.fg!50]
+% \node at (0,0) (root) {A}
+%   child {node {B}}
+%   child {node[dsu node] {C}
+%           child {node {D}}
+%           child {node {E}}};
+% \tikzstyle{level 1}=[sibling distance=3cm]
+% \tikzstyle{level 2}=[sibling distance=2cm]
+% \tikzstyle{level 3}=[sibling distance=1cm]
+% \node at (6,0) {A}
+%                       child {node {B}}
+%                       child {node {C}
+%                               child {node {D}}
+%                               child {node {E}}}
+%          child {node {Cx}
+%                               child {node {Dx}}
+%                               child {node {Ex}}}
+%                      ;
+% \end{tikzpicture}
+% \end{frame}
+
+\begin{frame}[t,fragile,label=transform]{Transforming objects}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+\begin{itemize}
+\item Built on top of a semi-space copying collector
+\item Allocate additional space and run object transformers as part of the
+      collector's visit
+\end{itemize}
+\end{frame}
+
+\ifdraft{}{
+\include{jvolve/semi-space-animation/macro-definitions}
+\include{jvolve/semi-space-animation/gc}
+}
+
+\begin{frame}[t,fragile]{\DSU{} Garbage collector}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+\begin{itemize}
+\item Identical to Semispace for ``regular'' objects
+\item For objects to be transformed
+  \begin{itemize}
+  \item Copy the object to ToSpace (like Semispace)
+  \item Also, allocate an empty object in ToSpace for the new version
+  \end{itemize}
+\item Forwarding pointers point to the ``new version'' object
+\item No field can point to an ``old version'' object
+\end{itemize}
+\end{frame}
+
+\ifdraft{}{
+\include{jvolve/semi-space-animation/dsu-gc}
+\include{jvolve/semi-space-animation/dsu-after-gc}
+\include{jvolve/semi-space-animation/revisiting-transformation-functions}
+}
+
+\begin{frame}[t,fragile]{Revisiting transformation functions}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+Solutions to the ordering problem \\
+\begin{itemize}
+\item Programmer can invoke a VM function that will transform objects on
+demand. Moves burden of safety to the programmer
+\item<2-> Insert read barrier code to perform this check when compiling the
+transformation function
+\item<2-> Perform some static analysis to determine an order to queue
+objects
+% \item<2-> Change the collector's traversal to reverse-postorder
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Proposed work}%{A Sub-title is optional}
+\begin{itemize}
+\item Improving flexibility: On-stack replacement (OSR) support
+\item Improving efficiency: Concurrent collector support
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{Extending On-stack replacement (OSR)}%{A Sub-title is optional}
+\JvolveTimeLine{}{current}{}{}{current}
+\begin{itemize}
+\item Some updates cannot be performed because the VM does not reach a DSU
+      safe point
+\item \JikesRVM{} employs OSR to promote long running methods for
+      optimization
+      \begin{itemize}
+      \item Extract compiler-independent state from an activation record
+      \item Generate a \emph{specialized prologue} that sets up local
+            variables
+      \item Jump to corresponding program counter in optimized code
+      \end{itemize}
+\item We can utilize this functionality taking into account old and new
+versions
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{OSR issues}%{A Sub-title is optional}
+\JvolveTimeLine{}{current}{}{}{current}
+\begin{itemize}
+\item What types of updates can benefit from OSR?
+\item How does OSR know where to resume execution?
+\item What about new local variables and those that need to be transformed?
+\item OSR in \JikesRVM{} can only replace the topmost method on stack.
+  \begin{itemize}
+  \item Implement ``return barriers''
+  \item Overwrite return addresses and jump to VM code that will perform
+        OSR for the current top method
+  \item Some methods might be long running and always belong to some old
+        version
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{\DSU{} efficiency}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+\begin{itemize}
+\item \DSU{} requires a stop-the-world full-heap GC
+\item Update time is dominated by GC time
+\item Real-time and highly available applications use a concurrent GC
+\end{itemize}
+\end{frame}
+
+\begin{frame}[t,fragile]{\DSU{} with a concurrent collector}%{A Sub-title is optional}
+\JvolveTimeLine{}{}{}{current}{}
+\begin{itemize}
+\item Application and collector run concurrently
+\item Guard application from accessing an object of the old version
+\item Collectors already use read/write barriers to guard the application
+      from disrupting the tricolor abstraction. Piggyback on these
+      barriers for DSU
+\item What is the additional overhead?
+\item How flexible can object transformers be?
+\end{itemize}
+\end{frame}

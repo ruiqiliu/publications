@@ -1,0 +1,70 @@
+Because software systems are imperfect, developers are forced to fix bugs
+and add new features. The common way of applying changes to a running
+system is to stop the application or machine and restart with the new
+version. Stopping and restarting causes a disruption in service that is at
+best inconvenient and at worst causes revenue loss and compromises safety.
+Dynamic software updating (DSU) addresses these problems by updating
+programs while they execute. Prior DSU systems for managed languages like
+Java and C\# lack necessary functionality: they are inefficient and do not
+support updates that occur commonly in practice.
+
+This dissertation presents the design and implementation of \JV, a DSU
+system for Java. \JV's combination of \emph{flexibility}, \emph{safety},
+and \emph{efficiency} is a significant advance over prior approaches.  Our
+key contribution is the extension and integration of existing Virtual
+Machine services with safe, flexible, and efficient dynamic updating
+functionality.  Our approach is flexible enough to support a large class of
+updates, guarantees type-safety, and imposes no space or time overheads on
+steady-state execution.
+
+\JV supports many common updates. Users can add, delete, and change
+existing classes.  Changes may add or remove fields and methods, replace
+existing ones, and change type signatures.  Changes may occur at any level
+of the class hierarchy.  To initialize new fields and update existing ones,
+\JV applies \emph{class} and \emph{object transformer} functions, the
+former for static fields and the latter for object instance fields.  These
+features cover many updates seen in practice.  \JV supports 20
+of 22 updates to three open-source programs---Jetty web server,
+JavaEmailServer, and CrossFTP server---based on actual releases occurring
+over a one to two year period. This support is substantially more flexible
+than prior systems.
+
+\JV is safe. It relies on bytecode verification to statically type-check
+updated classes.  To avoid dynamic type errors due to the timing of an
+update, \JV stops the executing threads at a \emph{DSU safe point} and then
+applies the update. DSU safe points are a subset of VM \emph{safe points},
+where it is safe to perform garbage collection and thread scheduling.  DSU
+safe points further restrict the methods that may be on each thread's
+stack, depending on the update.  Restricted methods include updated methods
+for code consistency and safety, and user-specified methods for semantic
+safety. \JV installs return barriers and uses on-stack replacement to speed
+up reaching a safe point when necessary.  While \JV does not guarantee that
+it will reach a DSU safe point, in our multithreaded benchmarks it almost
+always does.
+
+% \todo{Find out a way to nicely include this sentence, or drop it totally:
+% Much prior work does not support updating multithreaded programs.}
+
+\JV includes a tool that automatically generates default object
+transformers which initialize new and changed fields to default values and
+retain values of unchanged fields in heap objects.  If needed, programmers
+may customize the default transformers. \JV is the first dynamic updating
+system to extend the garbage collector to identify and transform all object
+instances of updated types.  This dissertation introduces the concept of
+object-specific state transformers to repair application heap state for
+certain classes of bugs that corrupt part of the heap, and a novel
+methodology that employes dynamic analysis to automatically generate these
+transformers. \JV's eager object transformation design and implementation
+supports the widest class of updates to date.
+
+Finally, \JV is efficient. It imposes no overhead during steady-state
+execution.  During an update, it imposes overheads to classloading and
+garbage collection.  After an update, the adaptive compilation system will
+incrementally optimize the updated code in its usual fashion. \JV is the
+first full-featured dynamic updating system that imposes no steady-state
+overhead.
+
+In summary, \JV is the most-featured, most flexible, safest, and
+best-performing dynamic updating system for Java and marks a significant
+step towards practical support for dynamic updates in managed language
+virtual machines.

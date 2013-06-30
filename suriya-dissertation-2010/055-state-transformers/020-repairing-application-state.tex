@@ -1,0 +1,145 @@
+\section{Repairing Application State}
+\label{sec:repair}
+
+The state transformer model presented above makes the
+implicit
+assumption that a to-be-updated application's execution state is correct.
+In particular, dynamic patches that are used to initialize the new
+version's state by examining the current state assume that this state is
+well-formed.  Most times, this assumption is correct. Perhaps the bug does
+not corrupt the heap, or has not yet been exercised, or only
+causes incorrect input/output processing. However, in some cases, this
+assumption can be faulty.
+
+\input{100-floats/memory-leaks-in-java}
+
+Consider a memory leak. After a while, there are
+many reachable, but dead objects in memory that need to be freed. \JV and other
+existing dynamic updating systems can apply a provided fix to the code to prevent
+further leaks, but DSU researchers have paid little attention to the problem of finding
+and freeing existing objects once the code is fixed. In this section, we
+explore source code updates that fix memory leaks in real programs, and our
+extending state transformers to repair application state at update time by
+cleaning up existing leaked objects.
+% 
+While this discussion is specific to one bug type, we use it to gain
+insight to more general mechanisms for fixing heap corruption.
+
+\subsection{Memory leaks in Java}
+In the context of a garbage collected language like Java, where unreachable
+objects are automatically reclaimed, researchers define a memory leak as
+follows. Any object that is still reachable from the roots of the heap
+(globals and locals) but will not be accessed by the application in the
+future is considered a memory leak. Consider the
+simple program in Figure~\ref{fig:leaks-definition}~(a). The function defines a
+local variable that points to a linked list. After populating the list,
+execution reaches an if-then-else conditional. The linked list is accessed
+only in the true branch of the if code block. If the conditional is
+false, the linked list will not be accessed again in the future and
+can be freed. This example leak is not too
+problematic because it does not grow over time. More problematic are leaks that
+continue to grow and eventually exhaust memory.
+% We present this contrived example to
+% present one instance of a memory leak in a garbage collected language. We
+% do not expect programmers to issue patches to fix such leaks.
+
+\input{100-floats/list-of-memory-leaks}
+
+Another commonly used definition of a memory leak is semantic and typically
+involves collections of objects such as an array, linked list, or hashmap.
+Leaky objects are those that are reachable, but is never used by the
+application for any real purpose.
+% They can still be accessed by library
+% code, for example, when a hashmap rehashes its buckets.
+Consider
+Figure~\ref{fig:leaks-definition}~(b).
+The programmer fails to remove from a
+hashset an object that is not required by application in the future. Note
+that if the set is reachable, the object is not only reachable, but also
+likely to be read by the program, when the hashset library re-hashes
+buckets in the set.  We define objects that will not used by application
+logic in the future as leaks. Developers do inadvertently introduce such
+leaks in applications and fix them in future
+versions~\cite{leak-pruning,cork}. In this work, when
+we dynamically apply the source patch that fixes the leak, we also remove
+leaky objects as part of state transformation.
+
+\subsection{Fixing corrupt heap state for leaks}
+We considered a total of four leaks in two Java applications jEdit and
+Eclipse IDE.  jEdit is a popular text editor used by programmers. jEdit
+provides common features such as syntax highlighting, folding, and
+automatic indentation, and advanced features such as plugin support, macro
+recording, and a built-in macro language. Eclipse IDE is a widely-used
+multi-language Integrated Development Environment (IDE). Eclipse is well
+known for its modularity and plugin architecture. While these applications
+are not prime candidates for dynamic updating, they are complex, easily
+available, and can run for a long time. They exhibit the same long-running
+loop structure of mission-critical always-on programs and are good
+candidates to demonstrate our work.
+
+\input{100-floats/memory-leaks/r8329}
+
+Table~\ref{tab:bugfixes} shows descriptions of four leaks, three in jEdit
+and one in Eclipse IDE. For all leaks, we wrote object transformers that
+fixed the existing leak in the application during update time. \JV is not
+yet robust enough to update the patch for Eclipse IDE. Therefore we
+simulated the update and the object transformer from within the application,
+by doing the following. We let the application initially run as normal.
+After some number of iterations of the outer loop, we invoked the object
+transformer code that would fix the leak, and in future iterations we
+called the updated code without the leak. \JV correctly updates all three
+jEdit patches and runs object transformers that fix the leaks at update
+time.  We now discuss the individual leaks and their object transformers.
+
+\input{100-floats/memory-leaks/r14027}
+
+\paragraph{jEdit SVN r8329} Figure~\ref{fig:r8329} shows source code patch
+for revision 8329 that fixes the leak and the object transformer that
+repairs the leak. jEdit maintains the last cursor position of each file in
+a hashmap. This information is meaningless for an ``untitled buffer,'' i.e.,
+an editor buffer that does not correspond to any file in the file system.
+jEdit creates an untitled buffer when a user opens a new empty buffer.
+After such a buffer is closed, jEdit has no use for its cursor position,
+and this information should be removed from the hashtable. Versions prior
+to r8329 failed to do so, and as a result leaked memory.
+Figure~\ref{fig:r8329}~(b) shows the object transformer function that
+repairs the leak. The function walks though all keys in the {\tt CARETS}
+hashtable, and removes those entries that correspond to untitled buffers.
+
+\input{100-floats/memory-leaks/115789}
+
+\paragraph{jEdit SVN r5178 and r14027} The leaks fixed by versions r5178
+and r14027 and similar and occur in the same function, but to two
+different fields. We only show the code for version r14027 here.
+Figure~\ref{fig:r14027} shows the source patch and object transformer for
+this leak. jEdit calls function {\tt markTokens} when it needs to split a
+string into tokens based on the type of the file being edited. Each file
+type (C, Java, Verilog, etc.) has special logic to split text in a line,
+embedded in an object of type {\tt TokenHandler}. The leaky jEdit version
+fails to set the field {\tt TokenMarker.tokenHandler} to {\tt null}. The
+object transformer is simple, it sets the leaky field to {\tt null}. It is
+safe to execute the transformer only when the {\tt markTokens} function is
+not active on stack. Since the update changes {\tt markTokens}, it will not
+be active at a DSU safe point.
+
+\input{100-floats/memory-leaks/115789-transformer}
+
+\paragraph{Eclipse IDE \#115789} Figure~\ref{fig:115789-patch} shows the
+source for a memory leak in Eclipse IDE. In the class {\tt
+NavigationHistory}, the IDE maintains two lists: one of {\tt History}
+objects called history, and another of {\tt Editor} objects called editors.
+Each {\tt History} object has an {\tt editor} field. Thereby, each object in the
+history list point to an object in editors list. An editor object may remain
+in the editors list only as long as it is pointed to by some history
+object. To enforce this property, the program maintains a reference count
+field with each editor object. This field represents the number of history
+objects pointing to that particular editor object. Whenever the
+application removes a history object, it should decrement the reference
+count of the editor object that the history object points to, and remove
+the editor object from the editors list if the count is zero. Function {\tt
+disposeEntry} implements this functionality. In one instance, the
+programmer failed to follow this procedure, causing a memory
+leak. Figure~\ref{fig:115789-transformer} shows the object transformer that frees
+the leak at update time. The transformer walks though all history objects,
+recomputes reference counts for editor objects, and frees editor objects
+with a reference count of zero.

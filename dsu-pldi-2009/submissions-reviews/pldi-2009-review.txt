@@ -1,0 +1,382 @@
+ PLDI: The ACM SIGPLAN 2009 Conference on Programming Language Design and
+                              Implementation
+
+----------------------------------------------------------------------
+
+     Title: Dynamic Software Updates: A VM-centric approach        
+ Authors: Suriya Subramanian, Michael Hicks and Kathryn McKinley 
+
+----------------------------------------------------------------------
+
+Review #1
+
+----------------------------------------------------------------------
+
+Scores
+                              Evaluation: A
+                                 Novelty: B
+                              Convincing: B
+                           Worth solving: A
+                              Confidence: X
+
+Summary
+
+This paper presents Jvolve, an extension to the Jikes RVM supporting
+dynamic software updates. It describes the design and implementation of
+the system and evaluates it on three open-source server applications,
+showing that Jvolve manages to apply 20 of the 22 observed upgrades and
+causes negligible performance overhead.
+
+Strength
+
+Jvolve is efficient: an updated application running under Jvolve has
+approximately the same performance as that same version of the
+application freshly started under the Jikes RVM without Jvolve.
+Moreover, the paper demonstrates that Jvolve is actually capable to
+apply many of the (non-trivial) updates in three open-source server
+applications. The specific strength of this paper is this combination of
+good performance with broad applicability.
+
+Weakness
+
+The evaluation could be better, both, with respect to applicability of
+updates and performance. The three applications all have little state
+that needs to be transformed, and the performance measurements raise
+some questions.
+
+Comments
+
+I really like this work. However, I do have some issues:
+
+The authors promise (Section 4.2) to use OSR in the final version. Given
+that the problem seems to be a bug in the Jikes RVM and not in Jvolve,
+can they do that in time?
+
+The applications you propose are not exactly the most complex. Jetty is
+significant, but JavaEmailServer seems to be trivial (20 classes). I
+wonder how more complex (more relevant) applications, like full-fledged
+application servers, would do. Moreover, the updates for the complex
+app, Jetty, are all minor (x.x.x) updates. How would your system do with
+major (x.x) updates?
+
+The pause time of your approach is probably significantly bigger for
+applications that have more state persisting between transactions
+(imagine a game server or a collaboration server, where you always have
+a large amount of state). In that respect your benchmarks are probably
+overly optimistic.
+
+If you were to use more complex application servers with more state, and
+would incur a significantly bigger pause time (maybe orders of
+magnitude, given that the number of transformed objects in your tests
+was less than 25), would dynamic software update still be practical? Or
+would it be as bad as rebooting the application server (which, by the
+way, does have some benefits, e.g. it can improve reliability by working
+around memory leaks).
+
+Your performance evaluation could be stronger:
+
+You mention the performance of the tree configurations to be "within the
+margin of error". You report (in Table 1) the standard deviation. Did
+you compute confidence intervals (at what confidence level)? Did you do
+multiple runs (or did you just take the 12 measurements of one run)? Did
+you vary the heap size? Did you measure when GC happened (given that GC
+probably will severely affect the response time)?
+
+It looks like "5.1.6 (upd.idle)" is generally slower than "5.1.6
+(Jvolve)" in Figure 5. So for some reason the version updated from 5.1.5
+to 5.1.6 is slower than the direct run of 5.1.6. Why is that? It's also
+visible in Table 1 (357.4 instead of 366.2). If this is really
+significant (confidence interval), then this needs an explanation (since
+you claim that there is _no_ overhead once updated). If it is not
+significant, do more runs (I don't understand why the req. rate is worse
+while the resp time is better).
+
+In Figure 5 there are two points where it is slow (the dipin "upd.
+midway"). Is this because the update pause straddled the measurement
+(and thus the time interval before and after the measurement were both
+negatively affected by the update pause)? Could you also measure GC and
+show in this figure when GC actually happened? GC should occur during
+that dip, and a (non-update) GC is probably also responsible for the dip
+in upd.idle at around 55s.
+
+The big jumps (e.g. 511ms to 2539ms when going from 0.5 to 0.6) in Table
+2 are suspicious. Are you sure they are due to caching? Did you do
+multiple runs, and you get similar times each time?
+
+The fact that one may have to (manually) try to apply an update several
+times (to find a time where no restricted method is active) is a bit
+disturbing. Shouldn't the system be able to automatically and
+intelligently find a safe point/safe points that actually works?
+
+How about supporting multiple old versions of a class? If a server uses
+serialization (e.g. to store objects in a file, or to communicate with a
+different remote server), there will probably be instances of class
+versions prior to the last version somewhere in the persistent store,
+and these might be deserialized at any time in the future. How would you
+deal with this?
+
+Minor points:
+
+In Section 5.1, it is slightly confusing when you write "results, which
+show object transformation to be the dominant cost" early on (I was not
+sure that this phrase already was everything you were going to say about
+this, or whether there was still something to come). Instead, write "we
+will show these results in the following subsection".
+
+Table 2 caption: "...various heap sizes" Really?
+
+Section 5.2: indirect method calls -> indirect method updates
+
+----------------------------------------------------------------------
+
+Review #2
+
+----------------------------------------------------------------------
+
+Scores
+                              Evaluation: A
+                                 Novelty: B
+                              Convincing: A
+                           Worth solving: A
+                              Confidence: X
+
+Summary
+
+The paper presents the design and implementation of dynamic software
+updating for Java, which is flexible, safe, and efficient. The authors
+used their system to dynamically update three open-source servers using
+the versions released over one of two years, showing their system
+supports 20 of the 22 updates.
+
+Strength
+
+- The authors present a new DSU. It is flexible, supporting a wider
+class of updates, while it is efficient, entailing no overhead during
+normal execution.
+
+- The authors implemented the DSU on top of JikesRVM, and evaluated it
+using three real world servers.
+
+Weakness
+
+- The authors discuss using on-stack replacement for reducing the number
+of restricted methods. However, it is not yet implemented.
+
+Comments
+
+The paper addresses an important issue of dynamic software updating.
+What I like most is that the implementation is serious, and can update
+one to two years of releases of three open-source servers. Also, the
+paper is well written.
+
+Figure 3: The new class references the old class in the signature of the
+jvolve_object method. This implies that the old class is never garbage
+collected even after the update has completed. I do not think this is a
+big problem, but that there would be a better way.
+
+4.4 Applying Transformers, 3rd paragraph: When the old version is copied
+to the "to" space, how would its TIB be dealt with?
+
+4.4 Applying Transformers, 5th paragraph: This paragraph is not clear
+enough. It would be good to show the problematic situation, which you
+want to solve, by an example.
+
+4.4 Applying Transformers, Discussion, 2nd paragraph: "Moreover,
+stateful actions by the program after an update may invalidate
+assumptions made by object transformer functions". Again, it would be
+good the situation you worry about, clearly or by an example.
+
+5.1 Performance: Since you are discussing the cost of updating which
+includes the cost of suspending threads, it would be good to show how
+many threads are running in Jetty in your experiment.
+
+5.3 Jetty webserver, "Jetty is a widely-used webserver...": It is not
+widely-used in terms of the web server survey by Netcraft. It would not
+be appropriate to say so.
+
+Table 4, 5 and 6: It would be good to show, for each row, how many
+objects are transformed and how many classes are transformed.
+
+----------------------------------------------------------------------
+
+Review #3
+
+----------------------------------------------------------------------
+
+Scores
+                              Evaluation: B
+                                 Novelty: B
+                              Convincing: B
+                           Worth solving: B
+                              Confidence: X
+
+Summary
+
+This paper describes a Java VM that allows classes and methods to be
+dynamically updated without stopping a program. This is useful for
+patching running applications in the field. The programmer provides a
+function that transforms modified classes and their objects, and the
+system automatically stops the program at a safe-point to update the
+classes and objects, and apply the transformations.
+
+Strength
+
+Improves on the state of the art of dynamic software update for Java.
+Compared to prior work, this system does not impose additional overheads
+(no extra levels of indirection). The authors do a nice job of
+demonstrating their technique on several realistic Java applications.
+
+Weakness
+
+Some of the workloads could no be updated because they did not reach a
+safe point, so the technique requires more aggressive on-stack
+replacement of modified methods. Email, ftp, and web servers could
+easily be restarted when they have an update, so the applications used
+in the evaluation aren't good reprentatives of the kind of applications
+you would apply dynamic updates to.
+
+Comments
+
+I thought this was a well written paper. The ideas are clearly
+explained, and this seems like an improvement in the state of the art in
+dynamic software updates. The authors do a nice job of demonstrating
+their technique on several realistic Java applications, although I
+didn't think these were the kinds of applications to which a programmer
+would take the effort to apply DSU (e.g., one of the servers couldn't be
+updated until its top level service loop was idle, so one might as well
+just restart the server with the updates when it is idle). It appears
+from the experiments that the technique does require full onstack
+replacement and loop extraction to be 100% effective. It would have been
+nice if the authors had done this implementation to make the tool 100%
+effective.
+
+Some comments to improve the paper:
+
+- The fifth paragraph in Section 4.4 could be clearer. This seems to be
+a key paragraph as it discusses some limitations on transformers so some
+elaboration would be worthwhile. (It was not clear to me when the
+programmer has to use the special VM function.)
+
+- A table showing the total LOC and the total modified LOC for each
+application would be helpful.
+
+- Some metrics on how much time it took to write the transformers would
+be helpful. Writing these transformers is a burden on the programmer.
+
+----------------------------------------------------------------------
+
+Review #4
+
+----------------------------------------------------------------------
+
+Scores
+                              Evaluation: B
+                                 Novelty: C
+                              Convincing: A
+                           Worth solving: B
+                              Confidence: Y
+
+Summary
+
+The authors present a design and implementation of an extension of Jikes
+RVM that allows dynamic updates of the software running on the VM, and
+makes the necessary updates to objects, classes and data structures
+within the VM. The system is evaluated with by applying real patches to
+running programs.
+
+Strength
+
+The quality of the design and implementation are high. The system is
+robust enough to allow real patches to be applied to real programs which
+is impressive. Experimental results are good and insightful.
+
+Weakness
+
+The ideas in the paper are not particularly novel; the novelty is in the
+design, implementation and experimental evaluation. The paper describes
+a very nice piece of software but there is a lack of insight into
+engineering alternatives.
+
+Comments
+
+Updating running software is an important problem for mission-critical
+systems that cannot be taken offline for updates. The major challenges
+are to create DSU systems that can cope with real updates, that are
+safe, and that minimise the impact on performance of the program. The
+authors present a robust VM implementation based on Jikes RVM that
+allows real updates to be applied to real programs as they run.
+
+The main novelty is in the design and implementation of the VM. Existing
+systems such as JDrum and DVM provide similar features to Jvolve, but
+with some drawbacks. One of the major drawbacks that the authors
+highlight is that these tools have not been used with real updates of
+real applications. So the key contribution of this paper is a really
+good implementation, which can be used to generate realistic
+experimental results. The authors evaluate their system by applying real
+updates to real programs where there was never any intention that the
+patches could be applied to the running program.
+
+Knowing that Jvolve is an extended version of Jikes RVM makes it much
+easier for the reader to understand exactly what the authors have done.
+Given that this paper is strongly focussed on an implementation, the
+authors should make this clear from the start.
+
+In section 5.1 the authors talk about the cost of an update, and list
+several items. You should also mention the cost of recompiling any
+invalidated methods. This cost may be minor, but it should be mentioned
+and you should say something about how large this cost might be.
+
+The machine that is used for the experiments is a dual P4 (or perhaps
+more likely a Pentium D). Is there any interaction between updates and
+multiple cores?
+
+Section 5.1 is poorly structured. The section opens talking about the
+cost of updates, and says that results are reported on these using
+microbenchmarks. The topic then switches abruptly to Jetty performance,
+and the microbenchmark data appears half a page later. It is almost as
+if a last-minute cut and paste resulted in half a page of text simply
+appearing in the wrong place. The section should be rewritten, and
+results for Jetty should not appear until after section 5.2, which gives
+considerable background on the Jetty benchmark.
+
+It is interesting that for Jetty results in section 5.1, that 99% of the
+update time is for the garbage collector whereas 0.1% is for the
+transformer execution. How are these figure measured. Given that the
+transformers are run during garbage collection it would seem difficult
+to easily separate the two figures. Furthermore, the process of copying
+and transforming a large number of objects probably involves large
+numbers of cache misses. Whether the cost of these misses is attached to
+the GC or transformer will inevitably affect the relative cost of each.
+However, they key information that explains the breakdown of cost
+between GC and transformers appears at the end of section 5.1, far
+removed from the discussion of Jetty.
+
+The microbenchmark results are particularly interesting, given that the
+time for a full GC does not depend much on the number of objects to be
+collected, but seems to be dominated by setup constants. It would be
+very interesting to have greater insight into these constant costs.
+Another important result is that the cost of the transformer functions
+can be high.
+
+One thing that is missing is any consideration of alternatives. The
+authors have built a fine VM, and made many good engineering decisions
+along the way. But there is no insight into alternative strategies that
+were considered, and perhaps tested and rejected. What does this paper
+tell us about building a DSU-enabled VM except that we should do the
+same as the authors? Some speculation about future directions would also
+be interesting. For example the major cost is a full GC. Is there some
+way that we could GC only the transformed objects, perhaps with some
+sort of read barrier?
+
+However, the authors' design and implementation of the VM are excellent.
+They provide valuable experimental results, and the appear to have been
+measured carefully and with attention to detail. This is good
+experimental work.
+
+Minor comments: Section 5.2 "Recall that when a class is updated....all
+its methods are considered restricted". You should provide a reference
+to the place in the paper where this is first mentioned, and a reminder
+to the reader of what "restricted" means.
+
+In the same section, you should clarify what you mean by "indirect
+method calls". The meaning you apply to it is not the usual one.

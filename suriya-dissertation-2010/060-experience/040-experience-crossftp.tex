@@ -1,0 +1,48 @@
+\input{100-floats/crossftp-code}
+
+\subsection{CrossFTP server}
+\label{subsec:crossftp}
+
+CrossFTP server is an easily configurable, security-enabled \FTP server.
+CrossFTP allows simple configuration through a \GUI and more advanced
+customization using configuration files. The \GUI interface also allows
+detailed monitoring of server operation and a real-time look at active
+clients and the commands they issue.  We did not use the GUI interface and
+therefore do not consider changes to that part of the program.
+
+\input{100-floats/experience/changes-to-crossftp}
+
+We looked at 4 versions of CrossFTP---1.05 through 1.08, details shown in
+Table~\ref{tab:crossftp-changes}---spanning a duration of more than a year.
+Version 1.08 contains about 18,000 \SLOC across 161 classes.  Version 1.07
+added over four thousand \SLOC by including code from JmDNS, a Java
+implementation of multi-cast DNS~\cite{jmdns}. We did not exercise this
+functionality in our runs. 
+
+Figure~\ref{fig:crossftp-code} shows the high level organization of the
+server's code. The server has one active thread, an instance of {\tt
+FtpServer} which listens on a socket for client connections. The main loop
+of the server is shown in function {\tt FtpServer.run()}. For each client,
+the server spawns a new thread, an instance of the class {\tt
+RequestHandler}.  At any point of time, the application is running one
+server thread and multiple connection threads, one for each active client
+connection. The main loop to handle a client is given in {\tt
+RequestHandler.run()}. The server reads a command from the client, services
+the command and waits for the next one. In steady state, {\tt FtpServer}'s
+{\tt run} method, {\tt RequestHandler}'s {\tt run} method and methods
+involved in processing particular \FTP commands from the client are active
+on stack.
+
+\subsubsection{Updates to CrossFTP}
+
+\JV successfully applies all three updates to this application. For all
+three updates, the default transformers we sufficient. Note that since all
+updates either add or delete fields, simple method body updating support on
+its own would be insufficient.
+
+\JV could only apply the update from version 1.07 to 1.08 when the server
+was relatively idle. The server runs a new {\tt RequestHandler} thread to
+process each \FTP session, and the \texttt{RequestHandler.run()} method was
+changed by the update. \JV installs a return barrier on this method, but
+with many active sessions, this method is essentially always on stack,
+preventing the update.

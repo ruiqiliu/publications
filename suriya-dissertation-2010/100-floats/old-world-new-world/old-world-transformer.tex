@@ -1,0 +1,22 @@
+\begin{figure}[t]
+\BC
+\begin{minipage}{0.8\textwidth}
+\begin{lstlisting}[frame=single]
+public static void jvolveObject(
+            r1_LinkedList to, LinkedList from) {
+  to.head = from.head;
+  Node prev = null;
+  Node current = from.head;
+  while (current != null) {
+    prev = current;
+    current = current.next;
+  }
+  to.tail = prev;
+}
+\end{lstlisting}
+\end{minipage}
+\hangcaption{Old World Model: Object Transformers to convert a
+singly-linked list into a doubly-linked list\label{fig:old-world-transformer}}
+\EC
+\VspaceFixForHangcaption
+\end{figure}

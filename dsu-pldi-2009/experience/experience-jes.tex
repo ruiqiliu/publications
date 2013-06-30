@@ -1,0 +1,53 @@
+\subsection{JavaEmailServer}
+\label{subsec:jes}
+
+\begin{table}[t]
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c|c||c|r|c|r|r|c|} \hline \T
+Ver.   & \multicolumn{2}{c||}{\# classes} &    \multicolumn{6}{c|}{\# changed} \\
+       & add & del & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields} \\
+       &     &     &         & add & del & chg   & add & del \\ \hline \hline \T
+1.2.2  & 0   & 0   & 3       & 0   & 0   & 3/0   & 0   & 0   \\
+1.2.3  & 0   & 0   & 7       & 0   & 0   & 14/2  & 12  & 0   \\
+1.2.4  & 0   & 0   & 2       & 0   & 0   & 4/0   & 0   & 0   \\
+1.3*   & 4   & 9   & 2       & 11  & 3   & 6/9   & 12  & 5   \\
+1.3.1  & 0   & 0   & 2       & 0   & 0   & 4/0   & 0   & 0   \\
+1.3.2  & 0   & 0   & 8       & 4   & 2   & 4/2   & 3   & 1   \\
+1.3.3  & 0   & 0   & 4       & 0   & 0   & 3/0   & 0   & 0   \\
+1.3.4  & 0   & 0   & 6       & 2   & 0   & 6/0   & 2   & 0   \\
+1.4    & 0   & 0   & 7       & 6   & 1   & 4/1   & 6   & 0   \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Summary of updates to JavaEmailServer}
+\label{tab:jes-changes}
+\end{table}
+
+For JavaEmailServer, we considered 10 versions---1.2.1 through
+1.4---spanning a duration of about two years.   Version 1.4 
+consists of 20 classes and about 5000 lines of code. 
+Table~\ref{tab:jes-changes} shows the summary of changes for each new
+version. Approaches that only support updates to method bodies will be able
+to handle only four of these updates. We
+could successfully construct updates for all versions we examined, and
+we could successfully apply all of them except the update to version 1.3.
+This update reworks the configuration framework of the server, among other
+things removing a GUI tool for user administration and adding several
+new classes that implement a file-based configuration system.  As a result, many of
+the classes are modified to point to a new configuration object.
+Among these classes are threads with infinite processing loops (e.g., to accept
+POP and SMTP requests). Because these threads are always active, the
+safety condition can never be met and thus the update cannot be
+applied.
+
+The update from 1.3.1 to 1.3.2 indirectly changes the
+\texttt{SMTP\-Sen\-d\-er.run()} and \texttt{Pop3\-Processor.run()} methods.  These
+methods contain processing loops run by several threads.  Though these
+methods are always running, \DSU{} applies OSR and the update succeeds.
+\DSU{} also uses OSR for the update from 1.3.2 to 1.3.3.
+%MWH: suriya says this statement just isn't true.  Updates fine.
+% A method used to process connections was also changed, and this method
+% is frequently active when the server is under load.  (A similar
+% method was changed in the update to version 1.3.3.)  A return barrier
+% installed on this method permits the update to take effect.  

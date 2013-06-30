@@ -1,0 +1,24 @@
+\begin{table}[t]
+\begin{center}
+\begin{tabular}{llp{0.57\textwidth}} \toprule
+\CC{Application} & \CC{Patch}        & \CC{Description of leak} \\ \midrule
+jEdit            & SVN r8329         & Application stores unnecessary information about closed
+                                       buffers that do not correspond to any file in
+                                       the file system. \\ \cmidrule{2-3}
+                 & SVN r5178         & Code that splits a line into tokens continues to
+                                       maintain references to that line. \\ \cmidrule{2-3}
+                 & SVN r14027        & Similar to r5178, application but maintains a reference to
+                                       an object of class TokenHandler. A TokenHandler
+                                       knows how to split a string of a particular
+                                       syntax (C, Java, Verilog, etc.) into
+                                       tokens. \\ \midrule
+Eclipse IDE      & Bug \#115789      & Application maintains reference counts to
+                                       objects in a collection. In some
+                                       cases, it neglects to correctly
+                                       decrement this reference count such
+                                       that application logic never
+                                       reclaims the object. \\ \bottomrule
+\end{tabular}
+\caption{Memory leak fixes to real applications\label{tab:bugfixes}}
+\end{center}
+\end{table}

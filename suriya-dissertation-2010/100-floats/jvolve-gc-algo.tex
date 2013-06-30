@@ -1,0 +1,21 @@
+\BCode[p]{0.75}
+\begin{lstlisting}[frame=single]
+function moveObject(object):
+    if object is real:
+        copy = copyObject(object)
+        copy.color = GREY
+        Q.add(copy)
+        if object.type.newVersion != null:
+           newCopy = malloc()
+           add newCopy to update log
+           newCopy.type = object.type.newVersion
+           // newCopy is currently empty
+           object.FP = newCopy
+           return newCopy
+        else:
+           object.FP = copy
+           return copy
+    if object is a forwarding pointer:
+        return object.FP
+\end{lstlisting}
+\ECode{\JV's modification to \RVM's semi-space copying collector\label{fig:jvolve-gc-code}}

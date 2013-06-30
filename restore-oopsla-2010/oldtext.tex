@@ -1,0 +1,917 @@
+\section{Kathryn Moved all this stuff here on 11/2, per our conversation on 11/1.}
+
+\section{Tracing}
+
+\subsection{Traces and Correspondence}
+
+As mentioned previously, our goal is to synthesize an update function
+$\delta$ such that, when executed at a valid update point, $\delta$
+converts a state $\sigma$ of the old-version program to a state
+$\sigma'$ of the new-version program.  Furthermore, if $\sigma$ is a
+reachable state of the old program, then $\sigma'$ should be reachable
+in the new program.
+
+Suppose such a $\delta$ exists.  The we can use it to formally define
+a notion of \emph{correspondence} that will be useful when describing
+synthesis.  Recall that $\delta$ defines a separate update for each
+class, and so it makes sense to talk about the result of $\delta$
+applied to individual objects as well as to apply $\delta$ to an
+entire state (which just runs the appropriate update function on each
+object in the heap).
+
+\mwh{I don't find the following definition very helpful.  Seems
+  circular.  Rather, correspondence seems to apply when the new
+  program simulates the old one, and corresponding states are those
+  for which the simulation relation holds (i.e., the non
+  ``stuttering'' states).  Within a corresponding state there are
+  corresponding objects; not all objects in the new heap will
+  correspond to objects in the old heap, but some will, at some
+  level.}
+
+\begin{defn}
+A pair of states $(\sigma,\sigma')$ \emph{correspond} if and only if
+$\sigma' = \delta(\sigma)$.  In such cases, we say that $\sigma$ and
+$\sigma'$ are \emph{corresponding states}.
+\end{defn}
+
+\begin{defn}
+A pair of objects $(o, o')$ \emph{correspond} if and only if $o' =
+\delta(o)$.  Objects $o$ and $o'$ are said to be \emph{corresponding
+  objects}.
+\end{defn}
+
+We would like to use correspondence as a concept to guide the
+synthesis of $\delta$.  However, note that $\delta$ appears in the
+formal definitions of correspondence and thus this approach would be
+circular.  To avoid this, we ask the programmer to provide a list of
+corresponding states.  The hypothesis is that it is easier for the
+programmer to provide these states (using his intuition and knowledge
+of the program's behavior) than it is to provide $\delta$ itself.
+That is, the programmer can state, ``any valid update function would
+map state $\sigma$ to state $\sigma'$'' more easily than he can say,
+``$\delta$ is a valid update function''.
+
+This hypothesis is justified in part by the relative sizes of the
+artifacts required to answer each question.  The update function
+$\delta$ has a transformer for each class whose code changed between
+versions (as well as classes dynamically affected by these changes).
+In a large project this could be tens or hundreds of classes
+\stephencomment{numbers from Azureus?}.  In contrast, generating
+corresponding states only requires executing the same high-level test
+case on both versions of the code.  Given that maintaining
+high-coverage test suites is considered a software engineering best
+practice, such tests may already exist, further lowering the effort
+required of the programmer.
+
+As a final step before discussing synthesis, we define a looser
+version of correspondence that operates on multi-sets of objects.  We
+write $\delta(s)$ where $s$ is a multi-set of objects to refer to the
+multi-set obtained by applying $\delta$ to each element of $s$.  Note
+that since these are multi-sets, $s$ and $\delta(s)$ will have the
+same size.
+
+\begin{defn}
+A pair of object multi-sets $(s, s')$ \emph{correspond} if and only if
+there exist non-empty subsets $s_0 \subseteq s$ and $s_0' \subseteq
+s'$ such that $s_0' = \delta(s_0)$.  Multi-sets $s$ and $s'$ are said
+to be \emph{corresponding sets} and their \emph{degree} of
+correspondence, written $\degree{\delta}{s,s'}$, is given by $\setsize{s_0}$.
+\end{defn}
+
+We will generally use the degree measure rather loosely, referring to
+pairs $(s, s')$ with degree close to $\setsize{s}$ or $\setsize{s'}$
+as having \emph{high-degree correspondence} and pairs with degree
+close to zero as having \emph{low-degree correspondence}.  If
+$\degree{s,s'} = \setsize{s} = \setsize{s} = \setsize{s'}$, we say
+  that $s$ and $s'$ have \emph{perfect correspondence}.  The following
+  theorem relates object-level and set-level correspondence.
+
+\begin{thm}
+\label{thm:sets-to-objects}
+Let $(s,s')$ be a pair of corresponding sets with $\degree{\delta}{s,s'} = n$.
+Then there exist $n$ distinct pairs of corresponding objects $(o,o')$
+with $o \in s$ and $o' \in s'$.
+\end{thm}
+
+The converse also holds.
+
+\begin{thm}
+\label{thm:objects-to-sets}
+Let $(s,s')$ be a pair of corresponding sets.  Let $P = \{(o,o') \mid
+o \in s \wedge o' \in s' \wedge \text{$o$ and $o'$ correspond}\}$.
+Then $\degree{\delta}{s,s'} = \setsize{P}$.
+\end{thm}
+
+We write $\maxdegree{s,s'}$ to represent the maximal correspondence
+degree that any update function can induce.
+
+\begin{defn}
+$\maxdegree{s,s'} = n$ if and only if $n$ is the least integer such
+  that $\forall \delta.\ \degree{\delta}{s,s'} \leq n$.
+\end{defn}
+
+Note that if $\setsize{s} = \setsize{s'}$ then $\maxdegree{s,s'} =
+\setsize{s}$.  That is, given multi-sets of the same size, they can
+always be put in perfect correspondence by some $\delta$.
+
+\subsection{Notation I don't know where to put}
+
+Let $\atrace$ be a vector of high-level actions.  We call such a thing
+a \emph{test case}.  We write $\atrace' \leq \atrace$ when $\atrace'$
+is a prefix of $\atrace$.  Let $\env$ represent an environment.  This
+captures all external state and behavior, e.g. time of day, network
+communications, solar radiation, etc.  With this all-encompassing
+notion of environment, we can never hope to run a program in the same
+environment twice.  We make this explicit in our notation for program
+runs.  We write $\runprog{P}{\atrace}{\env}$ for the multi-set of
+objects that are present in the heap at the first update point reached
+after running $P$ with input $\atrace$ in environment $\env$.
+
+\subsection{Synthesis Overview}
+
+The state of a Java program consists of the stack, heap, and program
+counter.  During synthesis we will be concerned solely with the heap.
+Given a pair of corresponding states $(\sigma,\sigma')$ we can easily
+obtain corresponding object sets $(s,s')$ by simply taking the heap
+components of $\sigma$ and $\sigma'$.  It is these corresponding sets
+from which we start synthesis.
+
+At a high level, our synthesis algorithm takes as input the name of a
+class $c$ for which we would like to generate a state transformer and
+a pair of corresponding sets $(s,s')$, where $s$ consists of an
+old-version objects and $s'$ contains solely new-version objects.  $s$
+and $s'$ should both contain instances of class $c$ and $s$ and $s'$
+should have a high degree of correspondence (though perfect
+correspondence is not necessary).
+
+These components, together with the programmers assertion that $s$ and
+$s'$ correspond, are sufficient to define a synthesis problem.
+Intuitively, we want to find the $\delta$ that maximizes the degree of
+correspondence between $s$ and $s'$.  In practice, the space of update
+functions is too large to permit a direct search for a
+degree-maximizing $\delta$.  We overcome this by using a
+\emph{matching} heuristic, described below, to further constrain the
+synthesis problem.
+
+Correspondence degree is not the whole story however.  We assume that
+the correct $\delta$ produces a high degree of correspondence, but the
+highest-degree $\delta$ may be undesireable for other reasons.  In
+particular, we want a $\delta$ that generalizes in the sense that it
+works for examples other than those we have seen.  We discuss this
+issue and how our approach avoids over-fitting the data in Section
+\ref{sec:overfitting}.
+
+
+\section{Matching}
+\label{sec:matching}
+
+We can apply Theorem \ref{thm:sets-to-objects} to break the
+maximization of correspondence degree into two phases.  According to
+Theorem \ref{thm:sets-to-objects}, a $\delta$ that causes $n$ object
+pairs from $s$ and $s'$ to correspond will result in a correspondence
+degree of $n$.  Thus we can maximize correspondence degree of $(s,s')$
+by maximizing the number of corresponding pairs.
+
+In theory, any two objects could be made to correspond if given the
+right $\delta$.  However, in real-world programs, certain
+correspondences are more likely than others.  For example, it is rare
+for the entirety of a class to change.  Typically some fields are
+added or removed, but many fields remain the same between versions.
+Our matching heuristic is based on identifying these unchanged fields.
+
+\subsection{Stable Fields and Key Fields}
+
+Since our synthesis procedure is based on observing the states to
+which a given high-level test case leads when executed on different
+program versions, we are necessarily restricted to fields that behave
+predictably during the test case.  We call such fields \emph{stable
+  fields}.  As an example, consider a \texttt{Connection} class from a
+network file server application.  If our test case consists of a
+series of connections by known clients, then we would expect the IP
+and port number fields of the \texttt{Connection} class to be stable.
+If \texttt{Connection} also tracked the time the connection was
+initiated, we would expect this value to vary across executions, even
+if they are executions of the same test case.  Such a field would be
+\emph{unstable}.
+
+We can formalize stability using our notion of correspondence.  We
+will say that a transformer function $\delta$ \emph{ignores} field $f$
+if and only if $\forall o.\ \delta(o).f = o.f$.  The set of stable
+fields are those fields that are ignored by a maximal-degree $\delta$.
+Formally, we have the following.
+
+\begin{defn}
+Let $s = \runprog{P}{\atrace}{\env}$ and $s' =
+\runprog{P}{\atrace}{\env'}$.  A set of fields $F$ is \emph{stable} if
+and only if there exists a $\delta$ such that $\degree{\delta}{s,s'} =
+\maxdegree{s,s'}$ and for all $f \in F$, we have that $\delta$ ignores
+$f$.
+\end{defn}
+
+Since stable fields are the only fields that are predictable across
+runs, they are the only fields for which we can hope to produce update
+functions using our synthesis technique.  Our matching technique is
+based on discovering the subset of stable fields that are stable
+across versions.  Because most fields do not change across program
+versions, we expect that some stable fields will remain unchanged
+across versions.
+
+\begin{defn}
+Let $P$ and $P'$ be two versions of a program.  Let $s =
+\runprog{P}{\atrace}{\env}$ and $s' = \runprog{P'}{\atrace}{\env'}$.
+A set of fields $F$ is \emph{cross-version stable} if and only if
+there exists a $\delta$ such that $\degree{\delta}{s,s'} =
+\maxdegree{s,s'}$ and for all $f \in F$, we have that $\delta$ ignores
+$f$.
+\end{defn}
+
+When matching objects, we want to find cross-version stable fields
+that also uniquely pair up objects.  We call such fields \emph{key
+  fields}.  We have found that for objects with several fields, one of
+these fields is likely to be a key-field.  To handle more cases, we
+also consider field paths, which are chains of object field
+dereferences---so if object $o$ contains field $f$ and $o.f$ contains
+field $f'$, we call $f.f'$ a field path (of depth 2) and when applied
+to $o$ this path denotes the value $o.f.f'$.  Even when an object has
+only one or two fields, it may have many field paths of some depth, in
+which case one of these paths often serves as a key.  In our
+experiments, we use a field path depth of 2.
+
+
+
+\section{End of what Kathryn moved on 11/2}
+
+\subsection{Matching}
+
+We have implemented two approaches to matching.  Together, these two
+algorithms can handle all the examples we have seen.  In the first
+approach, we search for \emph{key-fields}, which are object fields
+that serve as natural keys and help us track objects across runs of
+the program.  In the second approach, we use the synthesis algorithm
+itself to guide the matching.  Both these matching techniques, as well
+as the synthesis algorithm that we apply afterward, apply only to
+stable fields.  As such, the first step is to identify the stable
+fields.
+
+
+
+
+That is, we first find $o_1, o_2$ such that $o_2 = f(o_1)$ and then synthesize an $f$ that is consistent with this example.
+
+Consider the following equality relation on objects.
+\begin{defn}
+$o_1 \eqfv{f}{v} o_2$ if and only if $o_1.f = v$ and $o_2.f = v$.
+\end{defn}
+
+This defines an equivalence class consisting of those objects which
+all contain value $v$ in field $f$.
+\begin{defn}
+Let $\eqfvclass{f}{v} = \{o \mid o.f = v\}$.
+\end{defn}
+For all $f, v, o_1, o_2$ we have $o_1, o_2 \in \eqfvclass{f}{v}$ implies $o_1 \eqfv{f}{v} o_2$.
+
+We can similarly define an equality relation that equates objects that
+agree on the value of some designated field $f$.
+\begin{defn}
+$o_1 \eqf{f} o_2$ if and only if $o_1.f = o_2.f$.
+\end{defn}
+We then have, for any $f,v,o_1,o_2$, that $o_1 \eqfv{f}{v} o_2$
+implies $o_1 \eqf{f} o_2$.
+
+We can also use objects as representatives for equivalence classes.
+\begin{defn}
+Let $\eqfclass{f}{o} = \{o' \mid o \eqf{f} o'\}$.
+\end{defn}
+
+We can extend this to sets in a straightforward way.
+\begin{defn}
+$o_1 \eqf{\fset} o_2$ if and only if $\A[f \in \fset] o_1 \eqf{f} o_2$.
+\end{defn}
+\begin{defn}
+$\eqfclass{\fset}{o} = \{o' \mid o \eqf{\fset} o'\}$.
+\end{defn}
+
+
+
+The relation $\eqf{\fset}$ is defined for all objects.  In performing
+our matching, we will be interested in restrictions of this relation
+to smaller sets of objects.
+\begin{defn}
+Let $\fset$ be a set of fields.
+Let $n_1 = \setsize{\eqfclass{\fset} \cap \objset_1}$
+The \defemph{coverage} of $\eqf{\fset}$ with respect to object sets
+$\objset_1, \objset_2$ is $\setsize{\{o_1 \mid o_1 \in \objset_1
+  \wedge \E[o_2 \in \objset_2] o_1 \eqf{\fset} o_2\}}$.  That is, the
+coverage is the size of the subset of $\objset_1$ whose members are
+all $\eqf{\fset}$-related to objects in $\objset_2$.
+\end{defn}
+\begin{defn}
+Let $n_1 = \max_{o_1 \in \objset_1}\setsize{\{o_2 \mid o_2 \in
+  \objset_2 \wedge o_1\ R\ o_2\}}$.  That is, $n_1$ is the size of the
+largest subset of $\objset_2$ that is related by $\eqf{\fset}$ to some
+single element in $\objset_1$.  Let $n_2 = \max_{o_2 \in
+  \objset_2}\setsize{\{o_1 \mid o_1 \in \objset_1 \wedge
+  o_1\ R\ o_2\}}$.  That is, $n_2$ is the corresponding duplication
+measure for the elements in $\objset_2$.
+The \defemph{duplication factor} of $\eqf{\fset}$ with respect to
+object sets $\objset_1, \objset_2$ is then $\max(n_1,n_2)$.  That is,
+the duplication factor is the size of the largest set of objects that
+is related by $\eqf{\fset}$ to a single object in either $\objset_1$
+or $\objset_2$.
+\end{defn}
+
+The \emph{matching problem} is then defined as follows.
+\newtheorem*{mprob}{Matching Problem}
+\begin{mprob}
+Given two sets of objects $\objset_1, \objset_2$, find the set of
+fields $\fset$ such that $\eqf{\fset}$ has maximal coverage and
+minimal duplication factor with respect to $\objset_1, \objset_2$.
+\end{mprob}
+
+The optimal matching is one that relates each object in $\objset_1$ to
+a single distinct object in $\objset_2$.  This is not always possible.
+For example, if $\setsize{\objset_1} > \setsize{\objset_2}$ then we
+must accept either non-optimal coverage or non-optimal duplication
+factor.  The following theorems help guide us toward a matching.
+
+\begin{thm}
+If 
+\end{thm}
+
+Our matching heuristic takes as input three equal-length lists.  We
+will decorate variables representing new-version objects with a hat.
+So $\no$ is a new-version object, $\nobjset$ is a new-version set of
+objects, and $\nL$ below is a list of new-version object sets.
+\[
+\begin{array}{lcl}
+L &=& \objset_1, \objset_2, \ldots, \objset_n \\
+L' &=& \objset_1', \objset_2', \ldots, \objset_n \\
+\nL &=& \nobjset_1, \nobjset_2, \ldots, \nobjset_n
+\end{array}
+\]
+We write $L(i)$ to refer to the $i^{\text{th}}$ set of objects in list $L$.
+
+\stephencomment{The following is from a previous iteration.  Left in
+  here so we don't forget to talk about it.}
+
+\subsection{Special Classes}
+
+Here we talk about any special handling we introduce for strings,
+arrays, and collections.
+
+\subsection{Detecting Failure}
+
+Matching is based on a heuristic and synthesis is based on matching.
+Both of these work on a limited set of data that arises from some
+number of executions of the program, but may not be representative of
+all executions.  For these reasons, it is crucial that we have good
+techniques for detecting when our heuristics are failing or when there
+is not enough data to inspire confidence in the synthesis result.
+
+Some properties that help with this.
+\begin{enumerate}
+\item Matching should be 1-to-1.
+\item We only produce a result if synthesis succeeds (if it fails, it
+  doesn't matter that we may have had a bad matching---at least we
+  won't have screwed anything up).
+\item ``key fields'' identified should also be single-version key fields.
+\item Synthesis should produce a ``simple'' program.  By this I mean
+  that if synthesis says the only way to fit the data is with a giant
+  switch statement with 37 cases, all of which a assign a set of
+  constants to the new fields, then we probably have failed to find
+  the desired transformation function.
+
+  This is basically the problem of over-fitting in machine learning.
+  We don't want to over-fit.  In order to detect over-fitting, a
+  common technique is to split the data into \emph{training data} and
+  \emph{testing data}.  We could do the same thing.  Perform matching,
+  then take half the input-output pairs and use them to perform
+  synthesis.  Then check that this function also works for the other
+  half.  This would only work in cases where we have lots of
+  input-output examples though.
+\end{enumerate}
+
+\subsection{Azureus Example}
+
+\lstset{
+  numbers=left,numberstyle=\em\scriptsize,numbersep=5pt,
+  basicstyle=\sffamily,columns=flexible,mathescape=true,
+  lineskip=1pt,frame=single,escapeinside={/**}{*/},upquote=false,
+  escapechar=|
+}
+
+\begin{figure}
+\begin{minipage}{\textwidth/2}
+\begin{center}
+Old Version
+\end{center}
+\begin{verbatim}
+  public class PEPeerControlImpl
+         implements PEPeerControl, ParameterListener
+  {
+    public void stopAll() {
+      ...
+      _bContinue = false;
+      _server.stopServer();
+     ...
+    }
+  }
+
+  public class PESharedPortServerImpl
+
+\end{verbatim}
+\end{minipage}
+\begin{minipage}{\textwidth/2}
+\begin{center}
+New Version
+\end{center}
+\begin{verbatim}
+  public class PEPeerControlImpl
+         implements PEPeerControl, ParameterListener
+  {
+    public void stopAll() {
+      ...
+      //3. Stop the server
+      _server.stopServer();
+
+      _server.clearServerAdapter();
+      ...
+    }
+  }
+
+  public class PESharedPortServerImpl
+         implements PEPeerServerHelper
+  {
+    public void
+    clearServerAdapter()
+    {
+      adapter = null;
+    }
+  }
+\end{verbatim}
+\end{minipage}
+\caption{\label{fig:azureus-change}A change that fixes a memory leak
+  in a 2004 version of Azureus.}
+%\end{wrapfigure}
+\end{figure}
+
+One application we consider in our experiments is Azureus, a
+bittorrent client written in Java.  Bittorrent is a peer-to-peer file
+transfer protocol and Azureus is a very mature implementation of the
+protocol, having been in development for eight years.  Figure
+\ref{fig:azureus-change} gives an example of a change that was made to
+an early version of the client (March 2004).  The application
+maintains a server object for each file being transferred, and this
+server object includes a field, \texttt{adapter}, that points to the
+information associated with the download, such as the download status,
+the average speed, and connections to other peers that are serving the
+file.  When a download is stopped, this information is no longer
+necessary and should be garbage collected.  However failure to write a
+null to the \texttt{adapter} field in the old version prevents this
+collection from happening.  In the new version, the call to
+\texttt{stopServer()} is immediately followed by a call to
+\texttt{clearServerAdapter()}, which was absent in the old version.
+This writes \texttt{null} to the \texttt{adapter} field allowing the
+adapter object to be garbage collected.
+
+Before \texttt{stopServer()} is called, a private flag
+\texttt{\_bContinue} is set to \texttt{false}, and the status of this
+flag can be used to determine whether a download is currently active.
+The desired state update function is then the code given in Figure
+\ref{fig:leak-1-state-update}.  Identifying this function by hand
+requires careful analysis of the code in order to ascertain the
+connection between the code change (inserting the
+\texttt{clearServerAdapter()} call) and the state (the
+\texttt{\_bContinue} flag and the value of the \texttt{adapter}
+field).  In the remainder of this section, we give an overview of how
+our approach can be used to automatically infer the update function
+from program test cases.
+
+\begin{figure}
+\begin{verbatim}
+if(old._server._bContinue == false)
+  new._server.adapter = null
+else
+  new._server.adapter = old._server.adapter
+\end{verbatim}
+\caption{\label{fig:leak-1-state-update}The state update function for
+  the Azureus leak.}
+%\end{wrapfigure}
+\end{figure}
+
+\subsection{Snapshotting}
+
+As indicated by Figure \ref{fig:run-both}, we start by running each
+version of the program and providing them with the same set of
+actions.  We call an execution with a fixed set of actions a
+\emph{test run}.  In Azureus, there are a number of events that could
+potentially qualify as an ``action.''  There are network-level events,
+such as opening a socket or initiating a connection.  There are
+protocol-level events such as listing the pieces of a file that each
+peer is providing.  And there are user-level events such as adding,
+stopping, and resuming file downloads.  It is the latter that we take
+as the notion of ``action'' for Azureus.
+
+The choice of what set of events to consider when performing test runs
+will vary by application and may be constrained by the runtime
+environment.  For example, even if we wanted to use network-level
+events as our notion of action, the Oracle JVM does not provide
+support for capturing and replaying low-level network events.  The
+inability to precisely replay network traffic causes the heaps
+produced by two test runs to differ more than they would if we had
+more precise control over the application's execution.  However, we
+have developed techniques to address this and we believe that the
+ability to use a stock VM is an important feature of our approach.
+
+Once the notion of action has been determined, a test script can be
+written to execute these actions.  For Azureus, this script starts and
+stops a series of downloads.  If an application provides test scripts,
+unit tests, or regression tests, these can also be used to generate an
+action sequence.  As we mentioned previously, we assume that an update
+point has already been marked in the source code by the programmer.
+In our experiments, this location is marked by a call to a static
+\texttt{permitUpdate()} function.  When performing the test run, we
+link in a version of \texttt{permitUpdate()} that makes no changes to
+the code, but instead simply dumps the entire heap to a file.  We call
+a heap dump associated with an update point a \emph{snapshot}.
+
+In the case of Azureus, we use the console interface to perform the
+test run and snapshots occur whenever the interface reads a new line
+of input from the console.  Thus, an update can occur between any two
+high-level commands (start download, stop download, etc.) and given a
+test script with $n$ commands, we obtain $n$ snapshots for each
+program version.  Once we have these, we then compare the
+$i^\text{th}$ snapshot from version 1 with the $i^\text{th}$ snapshot
+from version 2 in order to infer the state update function.  In our
+example, we are transforming objects of type
+\texttt{PEPeerControlImpl} and our snapshots will contain one instance
+of this class for each download.
+
+\subsection{Matching}
+
+We next describe how we compare heaps.  The idea is to identify
+\emph{input / output examples} which we can use to guide the synthesis
+of the state update function.  This requires matching
+``corresponding'' objects from the version 1 and version 2 heaps.  Two
+objects $o_1,o_2$ \emph{correspond} if they serve the same role.  For
+example, in Azureus there is one \texttt{PEPeerControlImpl} instance
+per download.  Thus, two \texttt{PEPeerControlImpl} objects correspond
+if and only if they are associated with a download of the same file.
+Often, corresponding objects will have certain fields whose values
+match.  We call these \emph{key fields}.  In the Azureus example,
+\texttt{PEPeerControlImpl} has a field \texttt{nbPieces} that records
+the number of file pieces, which is proportional to the size of the
+file to be downloaded.  If the files being downloaded differ
+sufficiently in size, this can be used to match objects from version 1
+and version 2.  If we permit ourselves to dereference fields more than
+once when searching for keys, we can use
+\texttt{PEPeerControlImpl.\_diskManager.fileName}, which gives the
+name of the file being downloaded, and will thus be different even for
+files with the same size.  We can take the combination of the two
+fields to enable us to match objects even more precisely.  We call
+this process of finding input / output examples \emph{matching}.
+
+Suppose we choose the file name as a key and consider a point in the
+test run where four downloads have been initiated (with filenames
+\texttt{file1.dl} through \texttt{file4.dl}), but two of those were
+stopped (\texttt{file1.dl} and \texttt{file2.dl}).  In this case, we
+have four \texttt{PEPeerControlImpl} instances, each with different
+file names.  If we pair the instances from the old and new-version
+test runs based on the file name field, we obtain four pairs that
+serve as input-output examples for the state update function we want
+to synthesize.
+
+\subsection{Synthesis}
+
+We can now search for an update function for the field of interest.
+In our example, the field affected by the code change was
+\texttt{\_server.adapter}.  Figure \ref{fig:example-pairs} lists the
+four pairs of objects that are produced by the matching phase.  If we
+examine these, we find that for the two downloads that were stopped,
+\texttt{\_server.adapter} is \texttt{null}.  For the other two pairs,
+the \texttt{\_server.adapter} field is unchanged.  If \texttt{old}
+refers to the old instance and \texttt{new} refers to the new object
+instance, we obtain two update functions: \texttt{old.\_server.adapter
+  = null} and \texttt{old.server.adapter = new.server.adapter}.
+\begin{figure}
+\lstset{linewidth=3.8cm, numbers=none}
+\newcommand{\qq}{\texttt{\symbol{34}}}
+\newcommand{\fname}[1]{``\,{#1}\,''}
+\begin{minipage}{3.8cm}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : false
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file1.dl}|
+$\texttt{\_}$nbPieces : 1390
+$\texttt{\_}$server :
+  adapter : 0x108139668
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : false
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file1.dl}|
+$\texttt{\_}$nbPieces : 1390
+$\texttt{\_}$server :
+  adapter : null
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : false
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file2.dl}|
+$\texttt{\_}$nbPieces : 1651
+$\texttt{\_}$server :
+  adapter : 0x10811c1a0
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : false
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file2.dl}|
+$\texttt{\_}$nbPieces : 1651
+$\texttt{\_}$server :
+  adapter : null
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : true
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file3.dl}|
+$\texttt{\_}$nbPieces : 1387
+$\texttt{\_}$server :
+  adapter : 0x108042848
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : true
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file3.dl}|
+$\texttt{\_}$nbPieces : 1387
+$\texttt{\_}$server :
+  adapter : 0x108042848
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : true
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file4.dl}|
+$\texttt{\_}$nbPieces : 2837
+$\texttt{\_}$server :
+  adapter : 0x10822c230
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\begin{lstlisting}
+$\texttt{\_}$bContinue : true
+$\texttt{\_}$diskManager : ...
+  fileName : |\fname{file4.dl}|
+$\texttt{\_}$nbPieces : 2837
+$\texttt{\_}$server :
+  adapter : 0x10822c230
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}{\textwidth / 2}
+\ \ \ 
+\end{minipage}
+\caption{\label{fig:example-pairs}The input / output example pairs produced by the matching phase.}
+\end{figure}
+
+Now we need some method of determining which function to apply to an
+object.  To do this, we search for a boolean condition over
+old-version fields that holds for those example pairs to which the
+\texttt{new.\_server.adapter = null} update applies, but does not hold
+for the \texttt{new.\_server.adapter = old.\_server.adapter} update.
+In this case, the only condition satisfying this is
+\texttt{old.\_server.\_bContinue = false} and so we obtain the update
+below.
+\begin{verbatim}
+if(old._server._bContinue == false)
+  new._server.adapter = null
+else
+  new._server.adapter = old._server.adapter
+\end{verbatim}
+
+Performing this synthesis task for the remaining fields gives us a
+full update function that applies to any instance of
+\texttt{PEPeerControlImpl}.
+
+\subsection{Complications}
+
+We have elided some aspects of the procedure that make synthesis less
+straightforward.  One issue is that some fields inevitably vary
+between runs of the program.  Examples of these are timestamps and
+random number seeds.  These can be detected by performing two test
+runs at the old version and comparing those heaps.
+
+Object references pose another complication.  In the example pairs in
+Figure \ref{fig:example-pairs}, we listed the same address for
+\texttt{\_server.adapter} in both the old and new versions when that
+field was not overwritten with \texttt{null}.  In an actual run, the
+address assigned to any object will be non-deterministic.  However, if
+two addresses from separate runs point to corresponding objects, we
+should consider those addresses to be the same.  We leverage our
+matching infrastructure to determine when objects correspond and we
+consider addresses of corresponding objects to be equal.
+
+We also sometimes end up with a different number of objects being
+allocated in each test run.  For example, in Azureus there is a class
+that represents a connection to a peer.  When performing two test runs
+involving a file download, the exact peers to which the client
+connects will vary.  However, most peers will appear in both runs and
+we can use this fact to enable us to still perform matching and
+synthesis.
+
+We give more details on how these complications are handled in the
+remainder of the paper.
+
+\section{Move some of this to Overview?}
+
+We accomplish this by defining a restricted state update language and
+searching for functions in that language that are consistent with
+input-output examples gleaned from executions of the old and new
+versions of the program.  We do this on a per-class basis.  Thus our
+target is so-called \emph{class-based transformers} \sbm{what
+  are these actually called?}, where there is a single transformation
+function for each class and this function is run independently on each
+object of that class in order to transform the heap.  \sbm{Say
+  something about how most updates can be expressed in this way, even
+  data structure updates (or maybe don't talk about those since we
+  probably can't synthesize them).  Basically include one of the punch-lines
+of Suriya's thesis here: a Jvolve approach to updating is an effective
+way to handle updates to Java programs.}
+
+For example, one of the programs we consider is the Vuze BitTorrent
+server~\cite{vuze}.  To collect data for this program, we run each
+version with the same input script, which executes commands such as starting
+/ stopping torrents or pausing downloads, interspersed with
+waiting periods (to allow peer-to-peer connections to be set up).  We
+dump the heap just prior to executing each command.  In this approach,
+the high-level interaction proceeds deterministically, while
+non-determinism may occur in lower levels.  For the Vuze example, this
+means that the same torrent downloads are started in the same order in
+each interaction, while the specific connections and packets
+downloaded may differ.  Provided we are inferring updates for classes
+at the ``torrent level'' or above, this lower-level non-determinism
+does not cause problems.
+
+In the second stage of our algorithm, we examine individual pairs of
+heap dumps---one from the old version and one from the new version%
+---and search for instance pairs of a given type that are likely to
+constitute examples.  That is, we wish to find pairs where the first
+instance is an old-version object and the second instance is the image
+of the first object under the transformation function (which has yet
+to be inferred).  We call this process \emph{matching} and view it as
+an optimization problem where we wish to maximize the number of
+objects that are uniquely paired while minimizing the probability that
+objects match by random chance.
+
+Once a matching has been obtained, we enter the third stage, in which
+we synthesize a state transformer using the input-output examples that
+were previously discovered.
+
+
+We evaluate our approach empirically by inferring updates for X versions of
+  Y different programs from open source repositories.  This experience
+  shows that \TOS handles many updates that occur in practice and
+  significantly reduces programmer effort when preparing an dynamic
+  update.
+\sbm{Need to introduce \TOS as the name of our approach earlier.}
+
+\section{Overview}
+
+The matching process is couched as an optimization problem where we
+want to minimize the chance of instances matching by chance and maximize
+the number of objects that are matched.
+
+
+\sbm{ Maybe say something about why we restrict the language.
+  Synthesis of arbitrary Java code would be too computationally
+  complex and perhaps less trustworthy since we are basing the
+  synthesis on a limited number of examples.  Example of something we
+  might not be able to handle: a priority queue changing from a sorted
+  doubly-linked list implementation to a min-heap implementation.
+  Example of something similar that we could potentially handle:
+  switching from a LinkedList to an ArrayList.  When using Java
+  collections there is more high-level information available that we
+  can use to ensure we produce the right update function.}
+
+\sbm{I like the text below (from a prior version of the paper)
+  on how memory leaks are different from other fixes.  Leaks are no
+  longer the only thing we can handle, but it might still be nice to call
+  them out since they are interesting.}
+
+One limitation of prior work has been the assumption that a
+to-be-updated application's execution state is correct.  In
+particular, dynamic patches that are used to initialize the new
+version's state by examining the current state assume that this state
+is well-formed.  This assumption is sometimes reasonable: perhaps a
+bug in the program that could corrupt state has not (yet) been
+exercised, or it only causes incorrect input/output processing.  But
+for many bugs this assumption is faulty.  Consider a memory leak:
+after a while, there could be possibly many dead objects in memory
+that need to be freed.  Existing DSU systems can easily apply a
+provided fix to the code to prevent further leaks, but researchers
+have not considered the problem of finding and freeing existing
+objects once the code is fixed.
+
+\subsection{Full code for JES example}
+
+This User class is filled in by \code{ConfigurationManager.loadUser(...)}
+It is this function that changed between versions.
+
+\subsubsection{Old Version}
+\begin{lstlisting}
+public class ConfigurationManager
+  implements ConfigurationParameterContants {
+    ...
+    private User loadUser( String fullAddress, Properties properties )
+                   throws InvalidAddressException
+    {   ...
+        // Load the 'forward' addresses.
+        String forwardAddressesString =
+          properties.getProperty( USER_PROPERTY_PREFIX + fullAddress 
+                                + USER_FILE_FORWARDS );
+        String[] forwardAddresses = new String[0];
+        if( forwardAddressesString != null 
+         && forwardAddressesString.trim().length() == 0 )
+        {
+            forwardAddresses = tokenize( forwardAddressesString );
+        }
+        user.setForwardAddresses( forwardAddresses );
+        ...
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+public class User {
+    private String username;
+    private String domain;
+    private String password;
+    private String[] forwardAddresses;
+    ...
+}
+\end{lstlisting}
+
+\subsubsection{New Version}
+
+\begin{lstlisting}
+public class ConfigurationManager
+  implements ConfigurationParameterContants {
+    ...
+    private User loadUser( String fullAddress, Properties properties )
+                   throws InvalidAddressException
+    {   ...
+        // Load the 'forward' addresses.
+        String forwardAddressesString =
+          properties.getProperty( USER_PROPERTY_PREFIX + fullAddress 
+                                + USER_FILE_FORWARDS );
+        String[] forwardAddresses = new String[0];
+        if( forwardAddressesString != null 
+         && forwardAddressesString.trim().length() >= 0 )
+        {
+          forwardAddresses = tokenize( forwardAddressesString );
+        }
+        ArrayList addressList = new ArrayList( forwardAddresses.length );
+        for( int index = 0; index < forwardAddresses.length; index++ ) {
+            try {
+              addressList.add( new EmailAddress( forwardAddresses[index] ));
+            }
+            catch (InvalidAddressException e) {
+              log.warn( "Forward address: " + forwardAddresses[index]
+                        + " for user " + user.getFullUsername()
+                        + " is invalid and will be ignored." );
+            }
+        }
+
+        EmailAddress[] emailAddresses = new EmailAddress[ addressList.size() ];
+        emailAddresses = (EmailAddress[]) addressList.toArray( emailAddresses );
+
+        if( log.isDebugEnabled() ) 
+          log.debug( emailAddresses.length
+                   + " forward addresses load for user: "
+                   + user.getFullUsername() );
+        user.setForwardAddresses( emailAddresses );
+        ...
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}
+public class User {
+    private String username;
+    private String domain;
+    private String password;
+    private EmailAddress[] forwardAddresses;
+    ...
+}
+\end{lstlisting}
+
+

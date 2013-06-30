@@ -1,0 +1,112 @@
+%         & \mc{6}{c}{Java} && \mc{7}{c}{C and C++} \\ \cmidrule(r){2-7} \cmidrule(l){8-10}
+% Feature &
+% \rotatebox{90}{Jvolve \cite{jvolve}} &
+% \rotatebox{90}{Foo} &
+% \BS IDEs \cite{JVMhotswap,Dmit01a, VSEnC, eaddy05enc}\ES &
+% % Eisenbach \ET~\cite{BarrE03} and Milazzo et al.~\cite{Milazzo05updates}
+% \BS DUSC \cite{orso:java} \ES &
+% \BS PROSE \cite{nicoara:eurosys08} \ES &
+% \BS JDrums~\cite{ritzau00dynamic} \ES &
+% \BS DVM~\cite{Mala00a} \ES &
+% \BS Boyapati ~\cite{boyapati03lazy} \ES &
+% \BS Ksplice ~\cite{k42usenix} \ES &
+% \BS Ginseng \cite{neamtiu06dsu} \ES &
+% \BS Upstare \cite{upstare} \ES &
+% \BS DynamicML ~\cite{GilmoreKW97} \ES &
+% \BS Duggan~\cite{DBLP:journals/acta/Duggan05} \ES &
+% \BS UpgradeJ~\cite{bierman08upgradej} \ES \\ \midrule
+
+% Ksplice:
+%   only changes to functions
+%   no changes to types, or function signatures
+%   insert trampolines at update time
+%   activeness
+%   Operating systems
+% K42
+%   State transformers
+%   lazy or update time transformers
+%   Updates at class granularity
+%   Operating systems
+%   Understand K42's quiesence mechanism
+%   Activeness safety
+% Upstare:
+%   multi-threaded
+%   C programs
+%   stack reconstruction
+% Ginseng:
+%   state transformers
+% 
+% Jvolve:
+% 
+% DVM:
+  
+% vim:tw=0
+% What are the various measures that distinguish one DSU system from
+% another.
+% 
+
+\newcommand{\Y}{\ding{51}}
+\newcommand{\N}{\ding{53}}
+% \newcommand{\Y}{\rightthumbsup}
+% \newcommand{\N}{\rightthumbsdown}
+\newcommand{\Z}{\textbullet}
+
+\begin{table}[p]
+\centering \footnotesize
+\newcommand{\BM}{\begin{minipage}{0.40\textwidth}}
+\newcommand{\EM}{\end{minipage}}
+\centering \footnotesize
+\begin{tabular}{@{}b{0.40\textwidth}*{8}{c@{\hspace{2ex}}}@{}} \toprule
+
+& \mc{4}{c}{C/C++} & & \mc{3}{c}{Java} \\ \cmidrule(lr){2-5} \cmidrule(lr){7-9}
+
+&
+\BS Ginseng \ES &                      % 1
+\BS Upstare \ES &                      % 2
+\BS Ksplice \ES &                      % 3
+\BS K42 \ES &                          % 4
+\BS Boyapati \EA \ES &                 % 5
+\BS JDrums \ES &                       % 6
+\BS DVM \ES &                          % 7
+\BS Jvolve \ES \\ \midrule             % 8
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dsu features %                           1     2     3     4     5     6     7    8
+{\bf Supported changes}                                                                                              \\
+Method body                            &  \Y  & \Y  & \Y  & \Y  & \Y & \Y  & \Y & \Y                                 \\
+Method types                           &  \Y  & \Y  & \N  & \Y  & \Y & \Y  & \Y & \Y                                 \\
+Data/type signatures                   &  \Y  & \Y  & \N  & \Y  & \Y & \Y  & \Y & \Y                                 \\
+Across class hierarchy                 &   -  &  -  &  -  & \N  &  - & \N  & \N & \Y                                 \\
+Updates to active methods              &  \N  & \Y  & \N  & \N  & \N & \N  & \N & \N                                 \\ \midrule
+{\bf Update timing }                                                                                                 \\
+Old changed code runs after update     &  \Z  &     &     &     &    &     &    &                                    \\ 
+Atomic update implementation           &      &     & \Z  &     &    &     &    & \Z                                 \\
+Activeness safety                      &      &     & \Z  & \Z  & \Z & \Z  & \Z & \Z                                 \\ \midrule
+% Needs quiescence                       &  \Z  &     &     & \Z  &    &     &    &                                    \\
+% Supports multiple update points        &  \N  & \Y  & \Y  & \Y  &  ? &  ?  &  ? & \Y                                 \\ \midrule
+{\bf Data changes}                                                                                                   \\
+No access indirection                  &  \N  & \N  &  -  & \N  & \N &  -  &  - & \Y                                 \\
+Does not use padding                   &  \N  & \N  &  -  & \Y  & \Y &  -  &  - & \Y                                 \\ \midrule 
+% {\bf Code changes }                                                                                                  \\
+% No function indirection                &  \N  & \N  & \Y  & \N  & \Y &  ?  &  ? & \Y                                 \\
+% On-stack replacement                   &  \N  & \Y  & \N  & \N  &  ? & \N  & \N & \Y                                 \\
+% Stack reconstructions                  &  \N  & \Y  & \N  & \N  & \N & \N  & \N & \N                                 \\ \midrule
+{\bf State transformers }                                                                                            \\
+Automatically generated                &  \Y  & \Y  &  -  & \Y  & \Y &     &    & \Y                                 \\ 
+Refer to old/new state (O/N)           &   O  &  O  &  -  &  O  &  O &  -  &  - &  N                                 \\
+Run Lazily/Eagerly (L/E)               &   L  &  L  &  -  &  L  &  L &  -  &  - &  E                                 \\ \midrule
+{\bf Flexibility }                                                                                                    \\
+Multi-threaded                         &  \Y  & \Y  & \Y  & \Y  & \Y & \N  &  \N& \Y                                 \\ \midrule
+{\bf Performance }                                                                                                   \\
+No steady-state time overhead          &  \N  & \N  & \Y  & \N  & \Y & \N  &  \N& \Y                                 \\
+No steady-state space overhead         &  \N  & \N  & \Y  & \Y  & \N & \N  &  \N& \Y                                 \\ \bottomrule 
+\end{tabular} \\[2ex]
+\begin{tabular}{c@{\hspace{2ex}}lc@{\hspace{2ex}}l}
+\mc{4}{c}{{\bf Legend}} \\
+\Y & Advantage & \N & Disadvantage \\
+\Z & Neutral   & -  & Not applicable
+\end{tabular}
+\caption{Comparison of \USD systems\label{tab:related}}
+\end{table}
+
+% vim:tw=0

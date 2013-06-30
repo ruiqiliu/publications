@@ -1,0 +1,84 @@
+% \input{experience/performance-microbench-table}
+\input{experience/performance-microbench-graph}
+
+\paragraph{Microbenchmarks.}
+The two dominant factors that determine \DSU{} update time are the time to
+perform a GC, determined by the number of objects, and the time to run
+object transformers, determined by the fraction of objects being
+updated.  To measure the cost of each, we devised a simple 
+microbenchmark that creates an array of objects and transforms a specified
+fraction of these objects when a \DSU{} update is triggered. The
+microbenchmark has two simple classes, \texttt{Change} and
+\texttt{NoChange}. Both contain three integer fields, and three reference
+fields that are always {\tt null}. The update adds an integer field to
+{\tt Change}. The user-provided object transformation function copies the
+existing fields and initializes the new field to zero.
+% The benchmark contains two arrays,
+% one for \texttt{Change} objects and one for \texttt{NoChange} objects.
+We measure the cost of performing an update while varying the total
+number of objects and the fraction of objects of each type. The number of
+objects is the maximum that can fit in heap sizes 32, 64, 128 and 256
+MB.  Note that \JikesRVM{}'s heap includes VM data structures as well. We
+measure the running time in a generous heap, five times the minimum required size, such that the only collections are those DSU triggers. We report the
+median of 21 runs.
+
+Table~\ref{tab:microbench} shows the elapsed time
+while varying the number of total objects and the fraction of the objects that are updated.  The
+variance was insignificant, so we do not report it.   % KSM: I deleted the first row, since it is the only one with this problem, which is due to other costs dominating, e.g., stack walking etc. because apparently copying 40,000 objects takes no time at all. \todo{some of the
+%   results are unintuitive; e.g., the time goes down as you move to the
+%   right, sometimes.  Make a comment here about that being the way of
+%   things with sophisticated machines?  Can't blame it on the
+%   variance.}
+The first group of rows reports
+garbage collection time, the second group reports the time to transform
+all updated objects, and the final group reports the total update time, which
+includes the sum of the GC and transformation time, the time to load and install the updated classes, synchronize
+running threads, and find a DSU safe point. 
+The first column of the table shows the number of objects in the test, and
+the second column the heap size. Columns 3 though 13 show pause times for
+varying fractions (from 0\% to 100\%) of updated objects. 
+% Looking at
+% the last column of the table, we can see that the GC time results
+% (first group of rows) for
+% various heap sizes are roughly the same as the transformation time
+% results (second group of rows), showing the time to transform an
+% object to be roughly equal to the time to copy an object in the collector.
+
+To shed light on the results in the table,
+Figure~\ref{fig:microbench} plots collection time, transformer time and
+total update time for the microbenchmark with 3.67 million objects in a
+1280 MB heap.  The figure shows that the costs of garbage collection and
+transformation increase  as a function of the number of changed objects.  The slope of the ``GC time'' line illustrates the cost to deal
+with an increasing number of transformed objects.  This cost includes
+creating an additional copy of each transformed object; creating the
+update log entry with a pointer to the old and new copy; and caching a
+pointer to the old copy from the new copy.  The slope of the
+``Running transformers'' line illustrates the added cost of iterating
+over the update log and actually running the transformers.  This extra
+processing to handle transforming objects increases the total pause
+time with all objects updated by roughly four times compared to the
+pause time with no object updated.  The ``Running
+Transformers'' line is steeper than the ``GC time'' line, revealing that
+the cost of running transformers is higher than the extra copying cost
+incurred during GC\@.
+
+Transformations are more expensive than standard copying GC. The GC uses
+\texttt{memcopy}, which is highly optimized, whereas our transformer
+functions use reflection to look up \texttt{jvolveObject}, and this
+function copies one field at a time.  One optimization would be to eliminate the log by copying
+the old and new objects to their own space and % appending to each one a
+% pointer to their corresponding new object.
+walking through and transforming each object.
+The cost of reflection could be
+reduced by caching the lookup, but even then a na\"ively compiled
+field-by-field copy is much slower than the collector's
+highly-optimized copying loop.  % Another possible optimization is to
+% specially compile transformers to replace idiomatic use of copying
+% assignments to contiguous fields by a \texttt{memcopy} over the
+% corresponding range.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../pldi64"
+%%% End: 

@@ -1,0 +1,164 @@
+% $Id: intro.tex 9934 2009-03-31 09:49:43Z mwh657 $
+
+\section{Introduction}
+
+Software is imperfect.  To fix bugs and adapt software to user
+demands, developers must modify deployed systems.  However, halting a
+software system to apply updates creates new problems: safety concerns
+for mission-critical and transportation systems; substantial revenue
+losses for businesses~\cite{gartner98downtime,roc1}; maintenance
+costs~\cite{zorn05}; and at the least, inconvenience for users. These
+problems may translate into serious security risks if patches are not
+applied promptly~\cite{altekar05opus,ksplice}.  
+
+Dynamic software updating (DSU) is a general-purpose mechanism that
+solves these problems by updating programs while they run without a
+special software architecture or redundant
+hardware~\cite{kspliceslashdot08}. A practical DSU system must be safe,
+flexible, and efficient.  \emph{Safe} updates insure the program is as
+correct as deploying it from scratch.  The update model would ideally
+be \emph{flexible} enough to support all software changes, but DSU is
+still useful if the system supports most software updates.  Since
+updates should be rare events, an \emph{efficient} DSU system would
+ideally impose no 
+runtime overhead during steady-state program execution.
+
+Researchers have made significant strides toward making DSU practical
+for systems written in C or C++, supporting server feature
+upgrades~\cite{neamtiu06dsu,chen:icse07,upstare}, security
+patches~\cite{altekar05opus}, and operating systems
+upgrades~\cite{K42reconfig,k42usenix,baumann07reboots,dynamos_eurosys_07,chen06vee,ksplice}.
+Enterprise systems and embedded systems---including safety-critical
+applications---are increasingly written in managed languages, such as
+Java, Ruby, and C\#.  Unfortunately, work on DSU for managed languages
+lags behind work for C and C++.  For example, while the HotSpot
+JVM~\cite{JVMhotswap} and some .NET languages~\cite{VSEnC} support
+on-the-fly method body updates, this support is too inflexible for all
+but the simplest updates---limiting changes to method bodies would
+support less than half of the updates
+to our three Java benchmark programs.  Academic
+approaches~\cite{ritzau00dynamic,Mala00a,orso:java,bierman08upgradej} offer more
+flexibility, but have not been proven on realistic applications.
+Furthermore, they employ method
+and object indirection to make applications DSU capable, imposing substantial space
+and time overheads on steady-state execution.
+
+This paper presents the design of \DSU, a DSU system for Java, which
+we implement in \JikesRVM, a Java Virtual Machine. \DSU's combination
+of flexibility, safety, and efficiency is a clear advance over prior
+approaches.  The 
+paper's key contribution is to show how to extend and integrate
+existing VM services to support DSU that is flexible enough to support
+a large class of updates, guarantees type-safety, and imposes no space
+or time overheads on steady-state execution.
+% \DSU{} is built on 
+% \JikesRVM, a Java research virtual machine.
+% \suriya{Say that Jvolve is built on top of JikesRVM. Reviewer 4 wanted us
+% to say this earlier}
+
+\DSU{} DSU supports many common updates. Users can add, delete, and
+change existing classes.  Changes may add or remove fields and methods,
+replace existing ones, and change type signatures.  Changes may occur
+at any level of the class hierarchy.  To initialize new fields and
+update existing ones, \DSU{} applies \emph{class} and \emph{object
+  transformer} functions, the former for static fields and the latter
+for object instance fields.  The system automatically generates
+default transformers, which initialize new and changed fields to
+default values and retain values of unchanged fields.  If needed,
+programmers may customize the default transformers.
+
+%MWH: Suriya asserted that we don't rely on bytecode verification.
+%Are you saying that we don't actually verify the classes we load in?
+%If we do, we get assurances of type safety, right?
+% bytecode verification is a specific term to describe a technology that
+% JVMs use to assure the safety/correctness of the loaded bytecode.
+% JikesRVM does not have a bytecode verifier.
+\DSU{} relies on bytecode verification to statically type-check
+% ISSUE: no bytecode verification in JikesRVM
+updated classes.  To avoid type errors due to the timing of an
+update~\cite{StoyleHBSN06,neamtiu06dsu,k42usenix}, \DSU{} stops the executing
+threads at a \emph{DSU safe point} and then applies the update. DSU
+safe points are a subset of VM \emph{safe points}, where it is safe to perform garbage collection (GC) and thread scheduling.  DSU safe points further
+restrict the methods that may be on each thread's stack, depending on
+the update.  These methods include (1) updated methods,
+(2) methods that refer to updated classes (since their machine code 
+may contain hard-coded offsets that the update changes), and (3) user-specified methods
+as needed for safety~\cite{Gupta94,neamtiu08context}.  \DSU{} installs return
+barriers~\cite{return-barrier} on these methods to inform the run-time system when
+a running method returns, to speed up reaching a safe point.  \DSU{}
+also applies on-stack replacement (OSR) to recompile methods in the
+second category even as they run, as long as they do not contain inlined
+updated methods.  This approach does not guarantee \DSU{} will reach a DSU safe point, but in our
+multithreaded benchmarks it does in nearly all cases. More sophisticated
+thread scheduling support could attain greater
+flexibility~\cite{neamtiu09stump}. 
+
+\DSU{} makes use of the garbage collector and JIT compiler to
+efficiently update the code and data associated with changed classes.
+\DSU{} initiates a whole-heap GC to find existing object
+instances of updated classes and initialize new versions using the
+provided object transformers.  \DSU{} invalidates existing compiled 
+code and installs new bytecode for all changed method implementations.
+When the application resumes execution these methods
+are JIT-compiled when they are next invoked.
+The adaptive compilation system naturally optimizes updated methods
+further if they execute frequently.
+
+\DSU{} imposes no overhead during steady-state execution.  During an
+update, it imposes overheads in 
+classloading and garbage collection. After an update, the adaptive
+compilation system will incrementally optimize the updated code in its
+usual fashion.  Eventually, the code is fully optimized and running
+with no additional overhead.  The zero overhead in steady-state
+execution for a
+VM-based approach is in contrast to DSU techniques for C and C++. These
+approaches
+must use a compiler or dynamic rewriter to insert levels of
+indirection~\cite{neamtiu06dsu, orso:java} or
+trampolines~\cite{chen06vee,chen:icse07,altekar05opus,ksplice}, which
+add a constant overhead during normal execution.
+% Garbage collection also
+% provides substantial flexibility.  Rather than padding objects in case they
+% become larger due to an update~\cite{neamtiu06dsu}, the collector
+% copies changed objects, grows them only if necessary, and thus
+% supports a richer set of updates.
+
+We assessed \DSU{} by applying updates corresponding to
+one to two years' worth of releases of three open-source
+multithreaded applications: Jetty web server,
+JavaEmailServer (an SMTP and POP server), and CrossFTP server.  We
+found that \DSU{}
+can successfully apply 20 of the 22 updates---the two updates it does
+not support change a method within an infinite loop that is always on the
+stack.
+% REFACTOR: add sentence here about the Jetty refactoring, if we can get
+% that to work.
+Microbenchmark results show that the pause time due to an
+update depends on the size of the heap and fraction of transformed
+objects. 
+% Compared to the highly-optimized copy operation the GC would
+% normally use, our compilation of user-provided object transformers is
+% significantly slower, which in the limit could incur a high cost.
+% However, most updates transform only a small fraction of heap objects
+% and this cost is incurred only during the update itself.
+Experiments
+with Jetty show that applications updated by \DSU{} enjoy the same
+steady-state performance as if started from scratch.
+
+In summary, this paper's main contributions are (1) techniques to extend and
+integrate standard virtual machine services for managed languages to
+support flexible, safe, and efficient dynamic software updating
+services, (2) the design, implementation, and evaluation of \DSU, a
+Java VM with support for dynamic software updating. \DSU{} is
+distinguished from prior work in its realism, flexibility, technical
+novelty, and high performance.  We believe our demonstration is a
+significant step towards supporting flexible, efficient, and safe
+updates in managed code virtual machines.
+%% The remainder of the paper first
+%% compares our approach carefully to related work, and then describes
+%% our model of updates, our implementation, and experimental results.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pldi64"
+%%% End: 

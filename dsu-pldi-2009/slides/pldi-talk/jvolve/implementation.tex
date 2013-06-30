@@ -1,0 +1,231 @@
+\input{jvolve/dsu-steps}
+
+% \subsection{Implementation}
+% \ShowTOC
+
+% \begin{frame}[fragile]{Update process}%{A Sub-title is optional}
+% \JvolveTimeLine{}{}{}{}{}
+% \begin{itemize}
+% \item Offline Update Preparation Tool (UPT)
+% \item \DSU{} VM
+%   \begin{itemize}
+%   \item Reach a safe point in the VM%(thread synchronization)
+%   \item Install new classes%(classloader)
+%   \item Transform objects to new definition%(garbage collector)
+%   \item Resume execution
+%   \end{itemize}
+% \end{itemize}
+% \end{frame}
+
+%L  \begin{frame}[t,fragile,label=offline]{Update Preparation Tool}%{A Sub-title is optional}
+%L  % \vspace{-2ex}
+%L  \JvolveTimeLine{current}{}{}{}{}
+%L  % \vspace{-2ex}
+%L  \begin{itemize}
+%L  \item Uses jclasslib\footnote{\url{http://jclasslib.sourceforge.net}}, a
+%L  bytecode modification library
+%L  \item Compares bytecodes of the two versions
+%L  % \item Categorizes changes into
+%L  %   \begin{description}
+%L  %   \item[Updated classes] Classes that add, remove, change signature of fields
+%L  %                        or methods
+%L  %   \item[Updated methods] Changes within a method body. Only the method has
+%L  %                         to be loaded/updated
+%L  %   \item[Indirect updates] No change to method, but refers to changed
+%L  %                           classes
+%L  %   \end{description}
+%L  \item Generates old version stubs and default object transformers
+%L  \end{itemize}
+%L  \end{frame}
+%L
+%L  \begin{frame}[t,fragile]{Compiling transformation functions}%{A Sub-title is optional}
+%L  \begin{itemize}
+%L  \item All transformers specified in a separate source file
+%L  \item Class transformers  \\ \hspace{6ex} {\footnotesize {\tt jvolveClass(ClassName unused)}}
+%L  \item Object transformers \\ \hspace{6ex} {\footnotesize {\tt jvolveObject(old\_ClassName from, ClassName to)}}
+%L  \item Compiled specially by a JastAddJ extension to the Java language
+%L  \item Ignores access protection and allows assigning to {\tt final} fields
+%L  \end{itemize}
+%L  \end{frame}
+
+%L% \begin{frame}[t,fragile,label=offline]{Update Preparation Tool}%{A Sub-title is optional}
+%L% % \vspace{-2ex}
+%L% \JvolveTimeLine{current}{}{}{}{}
+%L% % \vspace{-2ex}
+%L% \begin{itemize}
+%L% \item Uses jclasslib\footnote{\url{http://jclasslib.sourceforge.net}}, a
+%L% bytecode modification library
+%L% \item Generates old version stubs and default object transformers
+%L% \item Compiled specially by a JastAddJ extension to the Java language
+%L% \begin{itemize}
+%L%   \item Ignores access protection and allows assigning to {\tt final} fields
+%L% \end{itemize}
+%L% \end{itemize}
+%L% \end{frame}
+
+\input{jvolve/safe-point}
+
+% \begin{frame}{Updating code}%{A Sub-title is optional}
+% \vspace*{-1mm}%
+% \hspace*{1mm}%
+% \includegraphics[scale=0.73]{images/process-state/both-process-state-arrow-highlight-code}%
+% \end{frame}
+
+%L  \begin{frame}[t,fragile,label=classload]{Installing new classes}%{A Sub-title is optional}
+%L  \JvolveTimeLine{}{}{current}{}{}
+%L  The VM maintains Class, Method and Field data structures
+%L  % \begin{itemize}
+%L  % \item The VM maintains Class, Method and Field data structures
+%L  % \item For Method updates: Only load the new method's bytecodes
+%L  % \item For Class updates: Rename the old class and load the entire class
+%L  % file (equivalent to have loaded two different class)
+%L  % \end{itemize}
+%L  \begin{center}
+%L  \includegraphics[scale=0.40]{images/vm-meta-data/vm-meta-data}%
+%L  \end{center}
+%L  \end{frame}
+%L
+%L  % \ifdraft{}{
+%L  % \include{jvolve/installing-classes-figure}
+%L  % }
+%L
+%L  \begin{frame}{Updating a method}%{A Sub-title is optional}
+%L  \vspace*{-1mm}%
+%L  \begin{center}
+%L  \includegraphics[scale=0.36]{images/vm-meta-data/vm-meta-data-updated-method}%
+%L  \end{center}
+%L  \end{frame}
+%L
+%L  \begin{frame}{Updating a class}%{A Sub-title is optional}
+%L  \vspace*{-1mm}%
+%L  \begin{center}
+%L  \includegraphics[scale=0.36]<1>{images/vm-meta-data/vm-meta-data-renamed-class}%
+%L  \includegraphics[scale=0.36]<2>{images/vm-meta-data/vm-meta-data-updated-class}%
+%L  \end{center}
+%L  \end{frame}
+
+% \begin{frame}{Updating heap data}%{A Sub-title is optional}
+% \vspace*{-1mm}%
+% \hspace*{1mm}%
+% \includegraphics[scale=0.73]{images/process-state/both-process-state-arrow-highlight-heap}%
+% \end{frame}
+
+\begin{frame}{Update code}%{A Sub-title is optional}
+\vspace*{-3mm}%
+\begin{center}%
+\includegraphics[scale=0.73]{images/process-state/both-process-state-highlight-code}%
+\end{center}%
+\end{frame}
+
+\begin{frame}{Update code}%{A Sub-title is optional}
+\begin{itemize}
+\item Modify class loader to recognize new versions of classes
+\item Install new versions of classes and methods
+\item Rely on Just-in-time Compiler to compile new versions of methods on
+demand
+\item Extend On-stack replacement to update active methods
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Update data}%{A Sub-title is optional}
+\vspace*{-3mm}%
+\begin{center}%
+\includegraphics[scale=0.73]{images/process-state/both-process-state-highlight-heap}%
+\end{center}%
+\end{frame}
+
+\input{jvolve/jes-example}
+
+\begin{frame}[t]{Transforming objects in the GC}%{A Sub-title is optional}
+\vspace*{-6ex}
+\begin{center}
+\includegraphics[scale=0.6]{images/singly-doubly/linked-lists-without-gc}%
+\end{center}
+Happens in two steps \\
+\begin{itemize}
+\item Garbage collector creates an additional empty copy for updated objects
+\item Walk through and transform all these objects
+\end{itemize}
+% \begin{itemize}
+% % \item Supported on top of a semi-space copying collector
+% % \item Regular GC
+% %   \begin{itemize}
+% %   \item Copies all live objects to ``to'' space
+% %   \end{itemize}
+% \item Jvolve's GC
+%   \begin{itemize}
+%   \item Built on top of a semi-space copying collector
+%   \item Copies all live objects to ``to'' space
+%   \item For updated objects, allocate an empty object in ``to'' space
+%   \item Forwarding pointers and object pointers point to these empty
+%   objects
+%   \item After GC, walk through all updated objects and run their
+%   transformation functions
+%   \end{itemize}
+% \end{itemize}
+\end{frame}
+
+% \ifdraft{}{
+% \include{jvolve/semi-space-animation/macro-definitions}
+% % \include{jvolve/semi-space-animation/gc}
+% }
+
+\input{jvolve/singly-doubly}
+
+% \begin{frame}[t,fragile]{\DSU{} Garbage collector}%{A Sub-title is optional}
+% \begin{itemize}
+% \item Identical to Semispace for ``regular'' objects
+% \item For objects to be transformed
+%   \begin{itemize}
+%   \item Copy the object to ToSpace (like Semispace)
+%   \item Also, allocate an empty object in ToSpace for the new version
+%   \end{itemize}
+% \item Forwarding pointers point to the ``new version'' object
+% \item No field can point to an ``old version'' object
+% \end{itemize}
+% \end{frame}
+
+% \ifdraft{}{
+% % \include{jvolve/semi-space-animation/dsu-gc}
+% \include{jvolve/semi-space-animation/dsu-after-gc}
+% % \include{jvolve/semi-space-animation/revisiting-transformation-functions}
+% }
+
+% \begin{frame}[t,fragile]{Revisiting transformation functions}%{A Sub-title is optional}
+% Solutions to the ordering problem \\
+% \begin{itemize}
+% \item Programmer can invoke a VM function that will transform objects on
+% demand. Moves burden of safety to the programmer
+% \uncover<2>{
+% \item Insert read barrier code to perform this check when compiling the
+% transformation function
+% \item Perform some static analysis to determine an order to queue
+% objects
+% }
+% \end{itemize}
+% \end{frame}
+
+% \begin{frame}[fragile]{Updating from a singly to doubly linked list}%{A Sub-title is optional}
+% \begin{footnotesize}
+% \begin{verbatim}
+% public static void jvolveObject(LinkedList.Node to,
+%                                 r0_LinkedList.Node from) {
+%   to.next = from.next;
+%   to.data = from.data;
+%   if (to.next != null) to.next.prev = to;
+% }
+% 
+% public static void jvolveObject(LinkedList to, r0_LinkedList from) {
+%   Jvolve.transformReferences(from);
+%   to.head = from.head;
+%   LinkedList.Node n0 = null;
+%   LinkedList.Node n1 = to.head;
+%   while (n1 != null) {
+%     n0 = n1;
+%     n1 = n1.next;
+%   }
+%   to.tail = n0;
+% }
+% \end{verbatim}
+% \end{footnotesize}
+% \end{frame}

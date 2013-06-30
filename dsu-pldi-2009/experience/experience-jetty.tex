@@ -1,0 +1,139 @@
+
+\newcommand{\ChangedClassesColumn}{third}
+\begin{table}
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c||c|c|c|r|c|c|} \hline \T
+Ver.    & \#      & \multicolumn{6}{c|}{\# changed} \\
+        & classes & \multicolumn{1}{c|}{classes} & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields} \\
+        & added   &         & add & del & \multicolumn{1}{c|}{chg}             & add & del \\ \hline \hline \T
+5.1.1   & 0       & 14      &\ 4  & 1   &  38/0            &  0  & 0   \\
+5.1.2   & 1       &\ 5      &\ 0  & 0   &  12/1            &  0  & 0   \\
+5.1.3*  & 3       & 15      & 19  & 2   &  59/0            & 10  & 1   \\
+5.1.4   & 0       &\ 6      &\ 0  & 4   &   9/6            &  0  & 2   \\
+5.1.5   & 0       & 54      & 21  & 4   & 112/8            &  5  & 0   \\
+5.1.6   & 0       &\ 4      &\ 0  & 0   &  20/0            &  5  & 6   \\
+5.1.7   & 0       &\ 7      &\ 8  & 0   &  11/2            &  9  & 3   \\
+5.1.8   & 0       &\ 1      &\ 0  & 0   &   1/0            &  0  & 0   \\
+5.1.9   & 0       &\ 1      &\ 0  & 0   &   1/0            &  0  & 0   \\
+5.1.10  & 0       &\ 4      &\ 0  & 0   &   4/0            &  0  & 0   \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Summary of updates to Jetty}
+\label{tab:jetty-changes}
+\end{table}
+
+\subsection{Jetty webserver}
+\label{subsec:jetty}
+
+Jetty is a popular webserver written in Java. It supports static
+and dynamic content and can be embedded 
+within other Java applications. \JikesRVM, and thus \DSU, is not able to run the
+most recent versions of Jetty (6.x).  Therefore we considered 11
+versions, consisting of 5.1.0 through 5.1.10 (the last version prior to
+version 6).  Version 5.1.10 contains 317 classes and about 45,000 lines
+of code.  Table~\ref{tab:jetty-changes} shows a summary of the changes
+in each update.  Each row tabulates the changes relative
+to the prior version. For the column listing changed methods, the
+notation $x/y$ indicates that $x+y$ methods were changed, where $x$
+changed in body only, and $y$ changed their type signature as well.
+For dynamic updating systems that only support changes to method
+bodies, only the first and last three of the ten updates could be
+supported, since the rest either change method signatures
+and/or add or delete fields.
+
+\paragraph{Reaching a safe point in Jetty.}
+We  successfully wrote dynamic updates to all
+versions of Jetty that we examined. For each version starting at 5.1.0, we ran
+Jetty under full load. After 30 seconds we tried to apply the update to the
+next version. We did this five times per version.  Other than the
+update to 5.1.3, all versions immediately 
+reached a safe point every time, with no need of return barriers.
+
+We could not apply the update to version 5.1.3 (denoted with an
+asterisk in the table) 
+because \DSU{} was never able to reach a safe point. The update modified
+{\tt ThreadedServer.accept\-Socket()}, a method that waits for a connection
+from the client, and this method is nearly always on stack. 
+We installed a return barrier that is triggered when {\tt
+  acceptSocket} returns, but this barrier is not sufficient to perform the
+update since the main methods of several threads were themselves
+modified. For example, we also install a return barrier on {\tt
+  Pool\-Thread.run()}, but this barrier is never triggered because
+this method never becomes inactive.
+
+% REFACTOR: add para back if we get things to work.
+% We refactored the various long-running main methods in versions 5.1.2 and
+% 5.1.3 to extract the modified bodies of long running methods into separate
+% methods and leave the main method containing the loop unmodified between
+% the two versions.  (This sort of transformation is performed by other
+% systems automatically by programmer directive in
+% Ginseng~\cite{neamtiu06dsu}.) 
+% When we attempted to perform a dynamic update, \DSU{}
+% installed a return barrier for {\tt acceptSocket()}. This function waits
+% for a connection and returns after a timeout. \DSU{} was able to update the
+% application when this function returned. 
+
+% To understand why, we instrumented the VM to emit information about
+% restricted method set and, if a safe point cannot be reached, which
+% restricted method was active. 
+
+% \suriya{The following information about inlining is commented out. What
+% should we do with this? See .tex file}
+%     For each version, starting at 5.1.0, we
+%     ran Jetty under full load.  After 30 seconds we tried to apply the
+%     update to the next version; if a safe point could not be immediately
+%     reached, we deemed the attempt as failed.
+%     The results are presented in
+%     Table~\ref{tab:inlining}.  Column 2 shows the number of times out of
+%     five such runs where the application reached a safe point.  The methods
+%     whose presence on a thread stack precluded the application from
+%     reaching a safe point are mentioned below the table.  For the update to
+%     5.1.3, the offending method was always active because it contained an
+%     infinite loop.  The other updates either always succeeded, or did after a
+%     small number of retries.
+%     
+%     Column 3 contains the total number
+%     of methods in the program at runtime, where the number in parentheses is the
+%     number of those which the compiler inlined when using aggressive
+%     optimization.
+%     This provides an upper bound on the effect of inlining in reaching a
+%     safe point.  The next group of columns contains the restricted method
+%     set. Each column in the group specifies the number of methods loaded at
+%     run time by the VM, followed by the total number of methods in that
+%     category in the program. The first column in this group is the number of methods in
+%     classes involved in a class update. Recall that when a class is updated, say by adding
+%     a field, all its methods are considered restricted (see section~\ref{sec:safe}).
+%     \suriya{Provide reference to where we explain restricted. and redefine
+%     restricted}
+%     The second column in this group is the number of methods whose
+%     bodies are updated, the third is the number of methods
+%     indirectly updated, and the fourth sums these, with the number of methods
+%     that were inlined written in parentheses. % The first and second
+%     % columns in this group together constitute all the methods of classes that
+%     % were changed, as enumerated in the \ChangedClassesColumn{} column in table~\ref{tab:jetty-changes}.
+%     The final two columns list
+%     the total number of methods in the restricted set; they differ from the
+%     first number in the fourth column by the number of (transitively)
+%     inlined callers of the restricted methods that were not already
+%     restricted.  The final column uses \DSU{}'s OSR analysis to determine the
+%     number of restricted methods although OSR itself was not applied.
+%     
+%     The table shows that both indirect method calls \suriya{or updates?} and inlining significantly
+%     add to the size of the restricted set.  Inlining though, is small by
+%     comparison, because all callers of an updated class's methods are
+%     \emph{already} included in the indirect set. Therefore, inlining these
+%     methods adds no further restriction.
+%     In most cases OSR support would dramatically reduce the number of
+%     restricted methods and increase the likelihood of reaching a DSU safe
+%     point.
+%     Interestingly, having a greater number of restricted methods overall
+%     does not necessarily reduce the likelihood that an update will take
+%     effect; rather, it depends on the frequency with which methods in this
+%     set are on the stack.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "../pldi64"
+%%% End: 

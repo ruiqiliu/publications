@@ -1,0 +1,234 @@
+\subsection{DSU safe points}
+\label{sec:safe}
+
+\JV enforces various update safety properties by restricting at what points
+in the program an update can happen, called {\em DSU safe points}.  DSU
+safe points occur at \emph{VM safe points} but further restrict the methods
+on the threads' stacks.  These restrictions provide sensible update
+semantics: no code from the new version executes before the update
+completes, and no code from the old version executes afterward. These
+restrictions also ensure that the update is type-safe, that the compiled
+version of methods are consistent with the update, and that the update
+respects program semantics.  As mentioned in Section~\ref{sec:system-intro} and
+above, we
+divide restricted methods into three categories: (1) methods whose bytecode
+has changed; (2) methods whose bytecode has not changed but that access an
+updated class; and (3) methods the user blacklists.
+
+We next discuss why these restrictions improve the safety and semantics of
+updates, and then describe the actions \JV takes to reach a DSU safe
+point.
+
+\paragraph{Semantics of DSU safe points.}
+
+To understand why
+category~(1) methods are restricted, consider the update from
+Figure~\ref{fig:jes-string-emailaddress-example}.  Assume the thread is
+stopped at the beginning of the {\tt ConfigurationManager.loadUser} method.
+If the update takes effect at this point, the new implementation of {\tt
+User.setFor\-wardedAddresses} will take an object of type {\tt
+EmailAddress[]} as its argument.  However, if the old version of {\tt
+loadUser} were to resume, it would still call {\tt setForwardedAddresses}
+with an array of {\tt String}s, resulting in a type error.
+
+Preventing an update until changed methods are no longer on the stack
+ensures type safety because when the new version of the program resumes, it
+will be self consistent.  If a programmer changes the type signature of a
+method {\tt m}, for the program to compile properly, the programmer must
+also change any methods that call {\tt m}.  In our example, the fact that
+{\tt setForwardedAddresses} changed type necessitated changing the function
+{\tt loadUser} to call it with the new type.  With this safety condition,
+there is no possibility that the signature of method {\tt m} could change
+and some old caller could call it---the update must also include all
+updated callers of {\tt m}.
+These cases must be considered by dynamic updating systems.
+Our choice of restricted methods is similar to other DSU
+systems~\cite{ritzau00dynamic, Mala00a, altekar05opus, eaddy05enc,
+JVMhotswap, VSEnC, chen:icse07, K42reconfig}.
+
+\paragraph{Ensuring type-safety}
+
+% As mentioned above,
+\JV does not allow methods with changed bytecodes to
+be active on stack when performing the update. This restriction by itself
+ensures type-safety of \JV's update process. Let us consider the set of
+all method bodies in the old and new versions of the application. Some
+methods exist in the old version and not the new, either because these
+these methods are modified, or are completely removed in the new version.
+Similarly, some methods exist in the new version but not in the old one.
+Several method bodies (bytecodes) are common to both the old and
+new versions. From standard Java semantics, the old and the new
+versions are individually type-safe. \JV requires that only methods
+common to both versions be active on the stack at the time of the update.
+This restriction together with the fact that we transform all heap objects
+to conform to their new type signature, ensures that the
+application is type-safe after the update.
+
+\paragraph{Ensuring correct compiled code}
+
+Category~(2) methods stem from indirect updates as mentioned in
+Section~\ref{sec:dsu-view-of-changes}. Suppose some method {\tt getStatus}
+calls method {\tt getForwardedAddresses} from our example, but {\tt
+getStatus} source code and bytecode has not changed from versions 1.3.1 to
+1.3.2.  Nevertheless, {\tt getStatus}'s \emph{machine code}, produced by
+the JIT compiler, may need to be recompiled.  For example, if the new
+compiled version of \getForwardedAddresses is at a different offset
+than before, then the VM must recompile \getStatus to correctly refer
+to the new offset.  An update may also change field offsets in modified
+classes, which requires recompiling any class that accesses them as well.
+Ginseng~\cite{neamtiu06dsu} and POLUS~\cite{chen:icse07}, two DSU systems
+for C, likewise consider functions as changed if their source code is the
+same but they access data types whose (compiled) representation is
+different.  Note that a VM would not need to restrict category~(2)
+methods if it used an interpreter that looked up offsets at each access.
+
+Note that when the \VM \JIT compiler uses inlining, we may need to
+increase the number of restricted methods to include those into which
+the compiler inlined restricted methods.
+In particular, if a category~(1),~(2),
+or~(3) method {\tt m} is inlined into method {\tt n}, we also
+restrict {\tt n} (and recompile it lazily after the update) to prevent the old
+{\tt m} from running after the update. \RVM initially compiles a method
+with its \emph{base}-compiler, which generates machine code but does not
+apply sophisticated optimizations. Based on run-time profiling information,
+the VM may recompile the same method later using its optimizing compiler,
+which performs standard optimizations, including inlining.  It performs
+inlining of small, frequently used methods; cost-based inlining for larger
+methods; and may inline multiple levels down a hot call
+chain~\cite{jalapeno}.  As a
+consequence, \JV restricts inlined callers of restricted methods.
+
+%   The compiler records its inlining
+% decisions and \DSU restricts these methods as well.
+% , when an update is available,
+% computes a transitive closure of all methods that have inlined methods
+% appearing in the changed set.
+% \DSU adds these additional methods to the set of restricted methods
+% used to determine a safe point.
+% \suriya{\DSU does not compute this transitive closure. It only checks for
+% this information when it encounters an opt compiled method on stack.}
+% \ksm{I guess we care--is the above correct enough?}
+
+
+% enough---we must also restrict those methods updated indirectly, 
+% because these methods
+% depend on the particular field and method offsets of the classes to
+% which they refer, and 
+% must be recompiled.  
+
+\paragraph{Ensuring program specific semantics}
+
+Even if a method has not changed, a user may need to manually blacklist it.
+For example, suppose a method \texttt{handle} calls methods
+\texttt{process} and \texttt{cleanup}, and the method \texttt{cleanup}
+initializes a field that it uses.  Now suppose we update this program to
+move the initialization statement into \texttt{process}, because
+\texttt{process} needs to use the field as well.  In both versions, the
+field is properly initialized when the program runs from scratch.  However,
+suppose that \JV  applies the update and the thread running
+\texttt{handle} yields in between the calls to \texttt{process} and
+\texttt{cleanup}.  In this case, \texttt{handle}'s bytecode has not been
+changed, so we could go ahead with the update.  But if we did, then the
+program would have called the old \texttt{process} method, which did not
+perform any initialization, and then would call the new \texttt{cleanup}
+method, which performs no initialization either, since the new version
+\texttt{process} does it, leading to incorrect semantics.  To avoid such
+\emph{version consistency} problems~\cite{neamtiu08context} the programmer
+should include \texttt{handle} in the restricted set. DSU testing can also
+help produce such a list~\cite{dsu-testing}.
+Our benchmarks
+discussed in Chapter~\ref{chap:experience} did not require manual
+restrictions, but a DSU system must support it to provide correctness in
+many cases.
+
+While these restrictions informally assure the safety of updates,
+more work is needed to formally define update semantics and guarantee
+safety, as mentioned in Section~\ref{sec:safety}.
+
+\paragraph{Reaching a DSU safe point.} To safely perform \VM services such
+as thread scheduling, garbage collection, and JIT compilation, \RVM, like
+most production VMs, inserts yield points on all method entries, method
+exits, and loop back edges.  If the VM wants to perform a garbage
+collection or schedule a higher priority thread, it sets a yield flag, and
+the threads stop at the next VM safe point. \JV piggybacks on this
+functionality.  When \JV is informed that an update is available, it sets
+the yield flag.  Once application threads on all processors have reached
+\VM safe points, \JV checks the paused threads' stacks.  If no stack
+refers to a restricted method, \JV applies the update.  
+
+If any thread is running a restricted method, \JV defers the update and
+installs a \emph{return barrier}\index{return
+barrier}~\cite{return-barrier} on the topmost restricted method of each
+thread.  A generic return barrier replaces the specified method return branch
+back to the next instruction in the calling method with a branch instead to
+\emph{bridge code}, which performs some special action and then executes
+the return branch.  We added this generic return barrier functionality to
+\RVM. This technology is standard in other VMs.  Our bridge code
+restarts the update process.  When a restricted method returns,
+the thread will block and \JV will restart the update process, which will
+either reach a DSU safe point, or the VM will insert more return barriers.
+If \JV does not reach a safe point within 15 seconds, it aborts the update
+(the length of the timeout is arbitrary, and can be configured by the user).
+However, with some additional care and stack state transformation, we
+proceed 
+% it turns out we can sometimes proceed
+with some updates despite
+category~(2) methods active on stack, as described next.
+
+\input{100-floats/fink-osr-example}
+
+\subsection{On-Stack Replacement to lift category~(2) restrictions}
+\label{sec:osr}
+\JV reduces the number of
+restricted methods in category~(2) by leveraging \VM support for
+\acf{OSR}~\cite{osr-self-1,osr-self-2}. State-of-the-art \VM{}s use
+\emph{adaptive}
+strategies to selectively compile and recompile methods at increasing
+levels of optimization as they get invoked more number of times, i.e.
+become \emph{hot}. Usually, after recompilation, the next method invocation
+runs the optimized version. However, some methods are long-running and
+\VM{}s need a mechanism to transition from an actively running compiled
+version of a method to a more optimized version.  \RVM normally uses \OSR
+to replace a \emph{base}-compiled version of an active method with an
+optimized version.  We observe that for category~(2) restricted methods,
+the situation is much the same. An unchanged, on-stack method requires
+recompilation, in our case to fix any changed offsets. If the stack only
+contains unchanged and category~(2) methods, \JV first performs OSR on the
+category~(2) methods, and then starts the
+update. \JV currently supports \OSR only for \emph{base}-compiled
+category~(2) methods. We leave engineering \JV to support \OSR for
+optimized methods to future work.
+
+\RVM has an excellent \OSR\index{\acl{OSR}} functionality \cite{osr} that is
+simple and mostly compiler independent, expect for extracting stack state. The \OSR mechanism does not depend
+on the compilers used to compile the two different versions of methods.
+\OSR in \RVM takes effect when the thread running the to-be-recompiled
+method reaches a yield point. After reaching the yieldpoint, \RVM
+recompiles the topmost method on the thread's stack and modifies the
+thread's \PC to switch to the newly recompiled method body. The key
+challenge in making \OSR work is to correctly transition the \PC to the new
+compiled code. The \VM must construct a new stack frame as expected by the
+new code and find the \PC value in the new code that corresponds to the old
+one. \RVM first examines the currently active stack frame and extracts
+the values of local variable. It then generates a special prologue, in
+bytecode, that will set local variables to their correct values. The last
+bytecode instruction of this special prologue jumps to the bytecode at which to
+resume execution. \RVM makes this transition
+compiler-independent by expressing it in bytecode. The optimizing compiler
+can compile the method with this special prologue. Jumping to the start
+of the method will allow the \VM to set up the stack frame as expected by the
+new version and resume execution at the right location.
+Figure~\ref{fig:fink-osr-example} shows an example of \RVM's \OSR
+transition mechanism. This example is taken from Fink \EA \cite{osr}.
+Figure~\ref{fig:fink-osr-example} shows the specialized prologue that sets
+up the stack frame.
+
+We  extend \RVM's OSR facilities to support multiple stack activation
+records, and multiple stack frames on the same stack. This later addition
+makes it more likely to reach a DSU safe point when more than one
+category~(2) method precedes a changed method on the stack.  Given this
+support, \JV ignores \emph{base}-compiled category~(2) methods when
+testing for a safe point.  If any \emph{base}-compiled category~(2) methods
+are on stack at an otherwise DSU safe point, \JV uses \OSR to replace
+them. Once \JV reaches a DSU safe point, it next installs the modified
+classes.

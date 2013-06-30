@@ -1,0 +1,139 @@
+
+\section{Introduction}
+
+Suppose you are running an on-line service and a memory leak in your
+server software causes it to regularly run out of memory and
+crash.  Eventually you discover the one-line fix: the
+\code{Connection} class's \code{close} method should
+unlink some metadata when a connection closes.  To apply this
+fix in a standard deployment you would stop your server and restart
+the patched version, but doing so would disrupt active users.  If your
+server has \emph{dynamic software updating} (DSU) support,
+e.g., by running on an extended VM like JRebel~\cite{javarebel}, you
+can do better: apply a \emph{dynamic} patch 
+to the \code{Connection} class of your \emph{running}
+system to prevent further leaks and without disrupting current users.
+In some DSU systems, such as Jvolve~\cite{jvolve}, you can do better
+still: you can include \emph{state 
+  transformation} code in your dynamic patch that will traverse the
+heap and unlink the metadata that was left alive by the bug.
+
+% Prior work shows how to implement code and
+% data updates with special compilation support~\cite{update-streaks},
+% run-time binary rewriting~\cite{}, and extended virtual machine (VM)
+% functionality~\cite{jvolve}.    They further demonstrate successful
+% application of years' worth of changes to applications and servers,
+% such as the OpenSSH daemon, Very Secure FTP daemon (vsftpd), and
+% memcached, to running systems to bring them up to date, even when they
+% are actively performing work~\cite{jvolve,update-streaks}.
+
+An important goal toward furthering the adoption of DSU systems is to
+make them easy to use, i.e., to minimize the effort required to
+produce a correct dynamic patch from two versions of a system.  As a
+step in this direction, many DSU systems employ simple
+\emph{syntactic}, \emph{type-based} tool support for constructing a
+dynamic patch from the old and new program
+versions~\cite{jvolve,ksplice,neamtiu06dsu, HicksNettles03}.  For
+example, if class \code{C}'s method \code{m}'s bytecode has changed, Jvolve
+will include \code{C.m} in the dynamic patch.  If \code{C}'s field
+definitions have changed, in type or number, Jvolve will include a an
+\emph{object transformation function} that will be applied to all
+\code{C} objects when the patch is applied; the function will retain
+the values of unchanged fields and initialize the rest with a default
+value, e.g., \code{null}.
+
+While tool support for identifying changed code is highly effective,
+existing support for constructing state transformation code is rarely
+sufficient, meaning the programmer must modify or add to the
+generated code.  Indeed, the programmer would have to add the code that
+unlinks the leaked metadata in our example.  Unfortunately, the cases
+that require manual intervention are often challenging to get right.
+For our example, the state transformer cannot simply unlink all
+connection metadata unconditionally; instead, it must use appropriate
+context, garnered from the running program's heap and stack, to
+identify and unlink only the metadata that is logically dead.
+Transformations that require moving objects between collections or
+partitioning single objects into several objects---examples we have
+observed in practice---require similar care in their construction.
+Thus, writing state transformation code for DSU systems can be a
+time-consuming, error-prone process.
+
+Toward improving this state of affairs, this paper presents a
+general-purpose approach for sythesizing state transformation code for
+dynamic patches.  Our approach, which we call \emph{targeted object
+  synthesis} (\TOS), works by comparing execution traces gathered from
+similar runs of the old and new program versions.  Examining objects
+from the two traces that play a similar role, we synthesize code that
+could produce the new objects given the old ones (and objects related
+to them).  We developed \TOS for the Java-based DSU system Jvolve, but
+our techniques should adapt readily to other DSU systems that support state
+transformation.
+
+% shows how to automatically synthesize object state
+% transformers and thus in many cases, significantly reduce or eliminate
+% developer effort due to DSU.  
+
+In more detail: \TOS has two phases, \emph{matching} and \emph{synthesis}.
+Matching produces a 1 to $n$ mapping of old to new objects,
+where $n \geq 0$ and $n=1$ is frequent.  \emph{Synthesis} infers an
+object transformation function for this mapping.  \TOS matching
+analyzes the code to target heap observations to the subset of objects
+in the heap that correspond to changed classes. It executes the old
+and new version of the program on the same input and observes the old
+and new target objects. Matching finds anchor fields that are the
+same in old and new objects, exploits type information on references
+for inexact matching, and allocation order to avoid an exponential
+search.  The result is a proposed 1 to $n$ mapping of old to new
+objects.
+
+To ease \TOS \emph{synthesis}, we define a simple \TOS object
+transformation language and then search for functions in this language
+consistent with the examples.  The choice of language is crucial to
+accuracy and efficiency\textemdash the simpler the language the more
+efficient, but the less expressive.  Since object references refer to
+other objects, we recursively interleave matching and synthesis.
+Object transformation synthesis is similar to recent work on
+synthesizing string, Excel table, and code transformation functions
+from input and output
+examples~\cite{Gulwani:popl:11,Gulwani:pldi:11,MKM:11}.  Compared to
+the prior work, \TOS object transformation functions have a richer
+domain, require matching, and require recursive synthesis. For example, object transformers  are a
+superset of string transformations, more general than tables, and
+orthogonal to inserting and deleting code.  The result of the \TOS
+synthesis step is a class transformation function that the DSU system
+executes on heap objects in the old version executable that transforms
+them to objects in the new class that are type correct and
+semantically consistent with the new version executable.
+
+We demonstrate our approach on a variety of updates from
+widely used open-source Java programs and derived microbenchmarks. We show
+that \TOS produces correct functions for a large variety of updates,
+e.g., simple object field additions, string partitioning, partitioning
+a collection based on a predicate, and deleting objects that leak
+based on a predicate. Furthermore, this work is the first to show that
+DSU systems can correct errors such as memory leaks at update time
+using class-based transformation functions.
+
+In summary, our contributions are as follows:
+\begin{enumerate}
+\item An object matching method to produce input-output examples
+  that act as the specification for object transformation synthesis.
+\item A method for synthesizing object transformers from input-output
+  examples produced by matching.
+\item A method of recursively interleaving the matching and synthesis
+  steps to find composite object (e.g., collections) transformations.
+\item The application of these techniques to actual dynamic updates,
+  including those to undo the effects memory leaks, an application not
+  previously explored in the literature.
+\end{enumerate}
+
+This paper thus shows a significant step towards completely automating
+DSU systems by automatically generating data transformation functions,
+in addition to the code transformation functions, both of which are
+required to keep programs executing while fixing bugs and add features
+to them.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End: 

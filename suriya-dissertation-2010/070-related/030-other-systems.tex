@@ -1,0 +1,43 @@
+% \section{Other proposals}
+% 
+% This part is not well written. Appreciate any suggestions.
+
+\section{Updates in a persistent object store}
+\label{sec:boyapati}
+
+Boyapati et al.~\cite{boyapati03lazy} support dynamic updates to classes
+kept in a \emph{persistent object store} (POS).  While the setting is
+different, their basic update model, and in particular their notion of
+object transformer function, is similar to ours.  In their system,
+programmers manually write an object transformer that they view as a method
+on the old version of the updated class, i.e., the transformer method is
+type-safe with respect to the old class.  In \JV, object transformers may
+access the \emph{new} versions of objects pointed to from the old class.
+Instead, Boyapati et al.'s transformers may access the \emph{old} versions.
+To implement this model, they rely on \emph{encapsulation} based on
+\emph{ownership types}: if an object $a$ of class $A$ has an ``owned''
+field pointing to an object $b$ of class $B$, then only $a$ can point to
+(and access) $b$.  Encapsulation thus ensures the system will always
+transform $a$ before $b$, which makes the transformation algorithm more
+efficient.  They rely on the programmer to enforce encapsulation, and
+describe how the compiler could automate language support for encapsulation
+in a non-standard type system.  \JV takes the opposite tack of forcing old
+object fields to point to up-to-date objects, and thus requires no special
+language support.  Moreover, \JV's model follows that of earlier
+work~\cite{k42usenix, neamtiu06dsu, neamtiu09stump, upstare} which has
+proven its effectiveness on a half-dozen realistic applications across
+several years' worth of releases.
+% However, further research to understand
+% the costs and benefits of the two updating models would be useful.
+
+Boyapati et al. also differs from \JV in that, like JDRUMS and DVM, updates
+are applied incrementally as objects are accessed following an update
+rather than all at once using a stop-the-world GC\@. This incremental cost
+is more natural in a POS since indirection is already required to access
+external objects. The POS model also permits programmers to specify ACID
+transaction boundaries, which can help ensure that updates are applied
+consistently and safely.  In contrast, our work focuses on supporting
+dynamic upgrades in a high-performance VM for Java, and thus many of the
+issues we consider---reaching a safe point via return barriers and OSR, and
+coexisting with the JIT compiler---are the unique contributions of our
+work.

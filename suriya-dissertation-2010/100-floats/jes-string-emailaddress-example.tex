@@ -1,0 +1,48 @@
+\begin{figure}[p]
+\BC \begin{minipage}{0.92\textwidth}
+\begin{lstlisting}[frame=single]
+public class User {
+  private final String username, domain, password;
+  private String[] forwardAddresses;
+  public User(...) {...}
+  public String[] getForwardedAddresses() {...}
+  public void setForwardedAddresses(String[] f) {...}
+}
+public class ConfigurationManager {
+  private User loadUser(...) {
+     ...
+     User user = new User(...);
+     String[] f = ...;
+     user.setForwardedAddresses(f);
+     return user;
+  }
+}
+\end{lstlisting}
+\end{minipage} \\
+(a) Version 1.3.1 \EC
+
+\BC \begin{minipage}{0.92\textwidth}
+\begin{lstlisting}[frame=single]
+public class User {
+  private final String username, domain, password;
+  private EmailAddress[] forwardAddresses;
+  public User(...) {...}
+  public EmailAddress[] getForwardedAddresses() {...}
+  public void setForwardedAddresses(EmailAddress[] f) {...}
+}
+public class ConfigurationManager {
+  private User loadUser(...) {
+     ...
+     User user = new User(...);
+     EmailAddress[] f = ...;
+     user.setForwardedAddresses(f);
+     return user;
+  }
+}
+\end{lstlisting}
+\end{minipage} \\
+(b) Version 1.3.2 \EC
+\hangcaption{Changes to JavaEmailServer \User and {\tt
+ConfigurationManager} classes from version 1.3.1 to version 1.3.2}
+\label{fig:jes-string-emailaddress-example}
+\end{figure}

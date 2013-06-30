@@ -1,0 +1,48 @@
+
+\paragraph{\acf{OSR}.}
+\label{paragraph:osr}
+
+By utilizing \acs{OSR}, we can push the envelope of active methods on stack
+that \DSU{} allows during an update. \JikesRVM{}'s adaptive compiler
+employs \acs{OSR} \cite{Fink:CGO:03} to transition from a long running
+base-compiled version of a method to an optimized version. OSR
+transformation involves the following three steps. 1) The VM extracts
+compiler-independent state from the activation record of a suspended
+thread. 2) The VM then generates specialized code for the suspended
+activation. This code consists of a \emph{specialized prologue} that saves
+values into locals and loads these values on the stack. 3) This specialized
+code also transfers execution in the suspended thread to the optimized
+version of the method at the current program counter.
+
+\DSU{} can piggyback on OSR support to allow \emph{indirectly updated
+methods} to be active on stack. The source code for these methods is
+unchanged, but these methods must be recompiled because they refer to
+offsets of fields or methods in updated classes. OSR needs no additional
+information to recompile the method and jump to its new body.
+
+To allow methods whose bodies are updated to be active on stack during the
+update, \DSU{} must be able the compare their implementations to find a
+correspondence between the old and updated versions, and identify the
+method location to resume execution at after the update. This problem is in
+general undecidable. We propose to implement an approach that we believe
+will work in many cases. We propose to have \acs{UPT}, the offline tool
+compare method implementations and provide \DSU{} a list of
+methods and equivalent program execution points between the two versions,
+that would let \DSU{} support updates to these methods.
+% \DSU{} can use this list to support updates to these methods.
+Also, a
+method body change might add or remove local variables, and \DSU{} must
+maintain a consistent stack mapping between the old and updated versions.
+Moreover, these local variables might refer to objects whose classes are
+updated and need to be transformed before the updated method can resume
+execution.
+
+\acs{OSR} in \JikesRVM{} and the extensions describes above only support
+changes to the topmost method on the activation stack. We propose to use
+stack barriers to support changes to other methods on stack. In order to
+replace other methods on stack, we propose to overwrite the return address
+of their activation records to jump to special barrier code. This code
+examines the stack, uses \acs{OSR} to update the current method and returns
+control back to the application. By maintaining the invariant that the
+topmost method will always be of the new version, \DSU{} can update all
+active methods on stack.

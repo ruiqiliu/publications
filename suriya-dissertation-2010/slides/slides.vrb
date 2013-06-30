@@ -1,0 +1,18 @@
+\frametitle{Azureus memory leak fix}
+\begin{center}
+% Transformers \\[1ex]
+\begin{minipage}{0.7\textwidth}
+\begin{lstlisting}[frame=single]
+void
+transform(PEPeerControlImpl to,
+          old_PEPeerControlImpl from)
+{
+    if (from.bContinue == false) {
+        to.s.adapter = null;
+    } else {
+        to.s.adapter = from.s.adapter;
+    }
+}
+\end{lstlisting}
+\end{minipage}
+\end{center}

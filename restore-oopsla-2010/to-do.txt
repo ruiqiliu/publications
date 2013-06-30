@@ -1,0 +1,8 @@
+Spellcheck!
+
+Optional:
+- The algorithm code for synthesis tries to distinguish the
+  synthesized code from teh algorithm code, but is not consistent.
+  Would be great to fix this.
+- in main body, unify uses of \textsf{} and \code{}.  They are
+  currently different sizes.

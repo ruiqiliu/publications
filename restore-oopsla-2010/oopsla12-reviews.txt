@@ -1,0 +1,333 @@
+First
+reviewer's
+review	
+          >>> Classification <<<
+B: I can accept this paper, but I will not champion it (accept, but could reject).
+
+          >>> Summary of the submission <<<
+
+The paper presents Targeted Object Synthesis (TOS), an algorithm for
+automatic construction of state transformation procedures for dynamic
+software update systems. The algorithm uses number of heap snapshots
+taken at corresponding points while running both versions on the same
+inputs to match objects in the old and the new versions using key
+fields, i.e. object fields that uniquely identify and correlate
+objects in both versions.
+
+
+          >>> Evaluation <<<
+
+The technique discussed in this paper solves an important problem in
+dynamic software updating, namely the automatic synthesis of
+transformation functions. To solve this problem, TOS runs the old and
+new versions on the same tests and employ a series of heuristics to
+match objects that have changed between the two versions. The
+heuristics are shown to be effective to synthesize several simple
+object transformation functions in real programs, but it's unclear
+what are the main requirements for their success, and how they would
+perform on a broader class of updates.
+
+One obvious question is the impact of the test inputs used. The
+quality of the synthesis will obviously be dependent on the quality
+and diversity of the inputs. The authors provide little information
+regarding the source of inputs they used for evaluation, and the type
+of coverage needed for a successful synthesis. They mention that "the
+developer must snapshot executions that produce a sufﬁcient number of
+objects," but it's not clear how they would know when this is the
+case.
+
+SBM: We need at least enough test cases to differentiate between
+potential update functions.  e.g. if an object has fields a and b and
+in v1 we have {a: 1, b: 2} and in v2 we have {a: 1, b:1}, we cannot
+tell whether the update function is new_version.b = 1 or new_version.b
+= old_version.a.  We need another example to differentiate between
+these two.  v1: {a:2, b3} and v2: {a:2, b:2} would imply new_Version.b
+= old_version.a, while v1: {a:2, b:3} and v2: {a: 2, b: 1} would imply
+new_version.b = 1.
+
+Second, the authors impose a number of requirements on snapshots. How
+restrictive are these in the context of real applications? One of the
+requirements is determinism. This is a strong requirement, especially
+in the context of multi-threaded applications. How does TOS handle
+various sources of non-determinism (e.g. time and date, threads and
+scheduling)?
+
+SBM: Determinism is required only with regard to the objects for which TOS
+is inferring an update.  For example, Azureus is multi-threaded and
+many aspects of connections, such as the order in which pieces of a
+file are downloaded, are non-deterministic.  However, for the revision
+on which TOS suceeds, the changed class represents the connection as a
+whole and the changed field tracks whether the download is currently
+paused.  This information is not dependent on thread interleaving
+order.  In general, the only determinism requirement for TOS is that
+the set of objects of the target class and their high-level state at
+an update point should be predictable for a given test case.  We
+expect this to be the case for many classes, even in multi-threaded
+programs.
+
+What do the authors mean by "running both versions in a
+controlled setting"?
+
+SBM: We just mean that the desired behavior (that which is affected by
+the update) should be reproducible within the test framework.  For
+example, if a bug is being fixed that is dependent on the timing of a
+particular network reply packet, then we need to have enough control
+over the network to force this timing.
+
+Another requirement is that snapshots in both versions are taken at
+the same conceptual update points. Here, it is not clear what authors
+mean by the term "conceptual". What if control flow differs across
+both versions? Do they implicitly presume control flow equivalence
+(or a weaker relation, e.g. bisimulation)?
+
+SBM: The requirement is closer to bisimulation, but only along the
+path taken by the test case.  It must be the case that the new and old
+version are in comparable states *at every update point* hit during
+execution of the test case; states reached between update points need
+not match up exactly.  "comparable" means "same high-level state",
+conceptually.
+
+Overall, this is a nice paper, but which would benefit from a little
+more discussion regarding its scope and applicability.
+
+
+
+Second
+reviewer's
+review	
+
+          >>> Classification <<<
+B: I can accept this paper, but I will not champion it (accept, but could reject).
+
+          >>> Summary of the submission <<<
+
+Dynamic software updating systems aim to update software dynamically while the
+system is running. This is comparatively easy when the only change is to the
+method body. However if the class/method signature changes due to addition,
+deletion or modification of a field/parameter, then the DSU system needs to
+implement additional logic in order to change the structure of the objects that
+are already in the heap or on the stack. This paper is about automatically
+generating the code that fixes the running program's execution state to make it
+compatible with the new code.
+
+TOS first executes the same set of tests on the old and new program versions
+separately, observing the program heap state at key points. Given two
+corresponding heap states, TOS matches objects in the two versions using key
+fields that uniquely identify objects and correlate old and new-version
+objects. TOS then synthesizes the simplest-possible function that transforms an
+old-version object to its new-version counterpart
+
+
+
+
+          >>> Evaluation <<<
+
+While this paper is well-written, there are some points that need to be
+clarified:
+1. How do you correlate the corresponding program points in the old and new
+versions when the method code itself may have changed? This appears to be
+something that requires manual intervention.
+
+SBM: It helps that the points at which we perform matching are exactly
+the update points.  Generally programs require only one or two update
+points, placed in their long-running/infinite event loops.  Manually
+specifying these points is both feasible and advantageous (cf. [7]).
+These points tend to be shallow in the stack and tend not to change
+location between releases.  Whatever other ways the program might
+change, the beginning of an event-processing loop is clearly
+identifiable in both versions of a program.  We will explain this
+point more clearly in the revision.
+
+2. On what basis does the programmer specify "update points" and how much
+effort is it? How many update points are typically required for a given
+transformation?
+
+SBM: As in the previous response, for most programs one (static)
+update point is sufficient.  In some cases more are required with the
+most we have seen (in either this and other DSU work by the authors)
+is 13.  Note that identifying these points is mostly one-time work
+that is already required if the program is to support dynamic
+updating.  Barring substantial structural changes to the program, the
+location of these points does not have to be changed between versions.
+They tend to be in methods that do not change between versions.
+
+3. Most of your logic for matching appears to be geared towards Strings as the
+basic primitive type. If the "key" field is an integer, and further if the new
+version has (say) val-x and the older (buggy) version has val+1, then your
+system may not find the key at all? Or worse still, may correlate an object in
+the old version to an incorrect object in the new version.
+
+SBM:  It has been our experience that the matching procedure does a good job
+of failing when an update is too complicated for our algorithm, mostly
+due to our requirement that the matching produced must be 1-to-1.  For
+example, if a field f was initialized to x+1 in version 1 and to x in
+version 2, then version 1 objects might have values 2, 3, 4, 5 for f
+whereas version 2 objects would have values 1, 2, 3, 4.  While three
+of these objects match, two of them (f=5 from v1 and f=1 from v2) do
+not.  Given any set of objects with this code change, we will have two
+objects that cannot be matched.  Note that synthesis-based matching,
+which we describe in Section 3.2 would be able to match these objects
+correctly if we supported the synthesis of integer updates such as
+new_obj.f = old_obj.f - 1 (we do not, though synthesis of linear
+functions has been studied and could easily be added to our
+framework).
+
+4. Do you actually explore all possible functions? If yes, then what is the
+complexity of such an exercise?
+
+SBM:  We do not actually enumerate updates.  Instead, we use information
+from the example to quickly filter out the (many) updates that will
+obviously not work.  For example, given our restricted update
+language, for a field g with type int and a new-version objects with g
+= 3, the only possible updates are:
+
+  new_obj.g = 3
+
+and
+
+  new_obj.g = old_obj.some_other_field
+
+But we know that some_other_field must be a field with value 3 in the
+old-version object, which in practice eliminates many fields from
+consideration.  There are generally more string updates that are
+consistent with a given example, since our language of string updates
+is more expressive.  However similar tricks apply.  Unfortunately,
+such heuristics make the expected complexity difficult to formally
+analyze.
+
+5. And how do you determine which one is simpler?
+
+SBM: The algorithm is designed to prefer updates with less branching
+and prefer constant updates (new_obj.f = constant) to copy update
+(new_obj.f = old_obj.g).  These are heuristic based on the types of
+update functions that occur most commonly.
+
+On the whole I feel the algorithms and the arguments have been well thought
+out. And the examples make the paper eminently readable.
+
+Third
+reviewer's
+review	
+          >>> Classification <<<
+B: I can accept this paper, but I will not champion it (accept, but could reject).
+
+          >>> Summary of the submission <<<
+
+In Dynamic Software Updating (DSU), a program is patched during execution
+to avoid downtime. DSU involves not only modifying the code, but also
+transforming the objects currently in the heap to reflect the updated code.
+This paper presents an automated solution to this state transformation problem
+that consists of two step. The first step, matching, involves comparing
+snapshots of the heap at corresponding points in the execution of the old
+and the new version of the program to identify so-called key fields that
+uniquely determine the identity of an object. In the second step, synthesis,
+a transformer function is generated that maps objects from the old version
+to the corresponding objects in the new version. This function is created
+using a predefined set of values and operations, including the old values
+of fields, constant updates, string concatenation, etc. The generation of
+the transformer function is done in a way that prefers a more general 
+transformer function over a more specific one. To make this problem 
+tractable, a small number of assumptions is made (e.g. the number of
+objects of the type-to-be-mapped must be the same in the two versions, 
+the number of snapshots must be the same, and the snapshots must be taken
+at "corresponding" update points in both versions provided by the programmer).
+The approach has been evaluated by considering 7 updates applied to
+4 subject programs, 3 of which are long-running server applications where
+downtime would be highly undesirable so that DSU would make sense.
+
+
+          >>> Evaluation <<<
+
+Updating the objects in the heap is a difficult part of dynamic software
+updating. In my opinion, this paper makes a significant step forward
+by presenting an automated solution. Overall, the solution seems 
+reasonable, and I found the paper mostly easy to read and well-organized.
+The main criticisms I have are concerned with the evaluation: the authors
+currently consider only 7 patches in 4 programs, and if I understand things
+correctly, the tool is only able to infer the appropriate transformer function
+in 5 of these 7 cases. 
+
+SURIYA: Information about updates where the default transformers were sufficient
+--------------------------------------------------------------------------------------
+Application         Updates     # updates        # updates       # updates with
+                   timespan     considered       supported       default transformer
+--------------------------------------------------------------------------------------
+Jetty                1y3m          10               9/10                7/9
+JavaEmailServer      1y8m           9               8/9                 7/8
+CrossFTP             1y             3               3/3                 3/3
+--------------------------------------------------------------------------------------
+
+Suriya:
+
+Version 1.07 of CrossFTP added two fields over 1.06. These fields control a
+feature in the new version. The default transformer disables the
+feature, whereas the transformer that TOS infers enables them. TOS
+compared the old and new versions and figured that the feature was
+enabled (field was true) in the new version.
+
+----
+
+While the presentation of the paper is fairly good, I am not thrilled
+about the very operational way in which the matching and synthesis
+algorithms are presented in pseudo-code, and I would have preferred
+a more declarative style of defining things.
+
+Comments:
+
+ - from a presentational point of view, it would be helpful to add
+  a schematic diagram in section 2 that visualizes how the analysis of
+  snapshots, matching and synthesis are done offline, and that the results
+  of this analysis are transformer functions that are then applied to the
+  objects in the heap of the running deployed system.
+
+SBM:  say that we will include such a diagram.
+
+ - Regarding the identification of key fields, it wonder if it would be
+  possible to analyze the equals() methods in the target class to
+  detect key fields because equals() methods often compare precisely
+  those fields that determine object identity. Of course, not every
+  class defines an equals() method, so you would have to resort to
+  a matching step in other cases. I wonder if analyzing equals() methods
+  would have revealed key fields in your subject programs.
+
+SBM: None of the classes that were changed in our experiments had
+equals() methods defined.
+
+SBM: comments below that have been fixed are prefixed with #
+ # page 2, typo "stoping"
+
+ - Figures appear out of order
+
+ # page 5: I think I prefer the terminology "most general" over "simpler"
+
+ # page 6, typo "mail fail"
+
+ # page 6, incomprehensible sentence "More executions are required for
+fewer.."
+
+ # page 11, typo "it is can also"
+
+ - page 11, undefined reference "Figure ??"
+
+ - Table 1: why are there entries missing in the table for the second
+  patch of jEdit?
+
+ # section 5.2: please discuss the subject programs in the same order
+  as in Table 1
+
+ - Azureus: would you be able to manually construct a transformer
+  function for Azureus after transforming the code in a more
+  profound way than the adding of ghost fields? I'm wondering what
+  it would take to make things work for this subject program.
+
+SBM: You could manually construct an update for this example.  Will
+run the experiment tonight to see if we get some information even
+though TOS fails on this (that is, does its ranking of potential key
+fields highlight the field that ends up being involved in the
+manually-constructed update).
+
+ - the conclusion of the paper is oddly silent about the fact that
+  TOS isn't always successful
+
+SBM:  If the above works out, then that would be a good thing to say here.
+

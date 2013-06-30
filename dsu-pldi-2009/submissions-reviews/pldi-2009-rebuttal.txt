@@ -1,0 +1,55 @@
+We thank all reviewers for their careful reading of our paper and
+their fair and thoughtful reviews. In this short rebuttal we cannot
+respond to every comment or suggestion, but we can say that no point
+raised is a showstopper; we will address each point in time for the
+final version, if accepted.
+
+Some reviewers wondered whether Jvolve would work for other, larger
+applications. To study Jvolve's likely effectiveness, our evaluation
+focused on long-running, open-source applications; these applications
+never considered DSU and have a history from which to derive patches.
+While more research remains, our experience suggests we can handle
+updates in which the basic, top-level application structure is not
+dramatically altered; e.g., such that thread event loops operate in
+roughly the same way, but functions/objects can change. 21 of 22 of
+our example patches had this flavor, and experience with other DSU
+systems [23] finds similar evolution patterns. Inevitably there will
+be some updates we cannot support. But keeping applications running
+longer, if not indefinitely, permits patching bugs and security
+vulnerabilities and adding new features more quickly and easily,
+without downtime.
+
+Reviewers asked if our applications made a proper case for
+DSU---couldn't they just be stopped and restarted? Without extra
+hardware/OS-support (e.g., load balancing, connection migration) or
+application-specific modifications, stopping and restarting would
+cancel active connections and discard their attendant application and
+OS state; DSU is a general-purpose solution that preserves this state,
+creating less disruption. Reviewer 3 wondered whether Jvolve DSU was
+tantamount to stop-and-restart if updates can only happen when servers
+are idle; for the particular server in question (JES), idleness was
+required only for the 1.3-to-1.3.1 update, and full OSR support would
+mitigate the need for idleness at all. Reviewer 1 points out that
+other applications may have more state and incur lengthy update-time
+pauses; more state does not necessarily imply a lengthy pause if the
+state does not change between versions or only requires the default
+transformer. In any case, we believe our VM-based architecture
+is sensible: future work will consider a concurrent GC to amortize
+pauses due to transformation.
+
+Reviewers 1 and 4 wondered about our performance results, and had very
+good suggestions for improving our experiments (using confidence
+intervals, etc.); we can and will address these points. We also plan
+to report on more systematic feature testing in the final version.
+
+All reviewers wondered about the state On-Stack Replacement (OSR)
+support in Jvolve, since it's clear it will be helpful in accepting
+more updates. Since submitting, we have fixed several bugs in Jikes
+and improved our OSR support substantially. Jvolve currently supports
+replacing indirectly updated methods and methods with changed code but
+the same stack layout, and OSR may be applied to multiple on-stack
+methods (something vanilla Jikes RVM does not support).
+# The following line was not a part of the rebuttal that was turned in.
+# The problematic Jetty update is now basically working, though a few kinks
+# remain.
+We will report on this experience in the final version.

@@ -1,0 +1,37 @@
+\BCode[p]{0.75}
+\begin{lstlisting}[frame=single]
+public class FtpServer implements Runnable {
+  // main loop of server
+  public void run() {
+    while (true) {
+      Socket cl = serverSocket.accept();
+      RequestHandler rh = new RequestHandler(cl);
+      (new Thread(rh)).start();
+    }
+  }
+}
+
+// Handle a single client
+public class RequestHandler implements Runnable {
+  private BufferedReader reader;
+  private FtpWriter writer;
+  private boolean isClosed;
+
+  // main loop of server-client conversation
+  public void run() {
+    while (!isClosed) {
+      String command = reader.readLine();
+      service(command, writer);
+    }
+  }
+}
+
+// Creates a single server thread
+public class CommandLine {
+  public static void main(String args[]) {
+    FtpServer server = new FtpServer();
+    (new Thread(server)).start();
+  }
+}
+\end{lstlisting}
+\ECode{CrossFTP code: High level organization\label{fig:crossftp-code}}

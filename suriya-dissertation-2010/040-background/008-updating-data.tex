@@ -1,0 +1,92 @@
+% Updating data
+%   state transformers
+%   when to apply state transformers
+%   how to apply transformers
+%   supporting data structure changes
+%   type wrapping
+%   type representation/padding
+%   indirection
+
+\section{Updating data}
+\label{sec:updating-data}
+
+The most essential and challenging feature of any dynamic updating system is to change
+application state --- stored in local and global variables, and in heap
+allocated objects --- to conform to the semantics, type specification, and
+concrete representation of the new version. Dynamic updating systems by
+Hj\'{a}lmt\'{y}sson and Gray~\cite{HjalmtyssonG98} and
+Duggan~\cite{DBLP:journals/acta/Duggan05} allow multiple versions of a type
+to coexist, where code and data objects from the old and new program
+versions interact freely with each other. In this section, we restrict our
+discussion to a model where all data values in the application are
+logically of the latest version of their corresponding type, a property
+called {\em representation consistency}~\cite{mutatis}. A system that
+maintains representation consistency transforms all objects to correspond to their new
+type at update time, or transforms each object when the
+application next accesses it.
+
+In order to satisfy the semantics of the update, updating systems use
+automatically-generated or programmer-written \emph{state transformers}
+that return new program state from old state.  Depending on the dynamic
+updating context, state transformers operate on stack
+state, global variables, heap objects, or database tables. This section
+discusses mechanisms that systems employ to support updates to application
+data and the semantics of updating data using state transformers.
+
+\subsection{Implementation mechanisms}
+To update data, a system must address two questions. First, how does the
+concrete representation of objects facilitate updating? Second, when are
+object transformers invoked?
+
+\paragraph{Concrete representation}
+Systems such as Ginseng create a wrapper type for each updateable type in
+the application. The system instruments the program so that all object
+accesses go through the wrapper types. The wrapper type uses padding to
+allow a new version to add fields to a type. The advantage of padding is
+that it is straightforward to implement and integrates seamlessly with the
+rest of the application. Objects declared as local variables and those
+allocated dynamically on the heap are all update ready and are treated the
+same. The disadvantages are that it wastes space and that a type cannot
+grow larger than the initially allocated space.
+
+An alternative approach is to use indirection where a field of the object
+points to the additional fields in the updated types. Such an approach is
+employed in the K42 operating system~\cite{K42reconfig}. Indirection allows
+types to grow arbitrarily large in size, but adds a memory access to
+dereference the indirection pointer for each access to fields of the new
+version.
+
+Another approach is to retain the same representation of objects as in a
+system without dynamic updating. With this approach, the system allocates
+new objects during update time and appropriately copies over contents from
+old objects. However, such a system has to ensure that pointers to objects
+are changed during the update to point to the newly allocated objects.  \JV
+is the first to implement this functionality. \JV does so by extending the Virtual Machine's
+garbage collector, as explained in detail in Section~\ref{sec:xformers}.
+
+\paragraph{Transforming objects}
+A design decision that dynamic updating systems make is when and how to
+invoke state transformers on objects in the application. One approach is to
+lazily transform objects after the update~\cite{neamtiu06dsu,
+boyapati03lazy, ritzau00dynamic}. The system instruments every data access
+to check whether the concerned object is of the latest type and invoke its
+state transformer if the object is not up to date. The disadvantage of this
+approach is that the system must always incur the
+overhead of instrumentation and the addition of a field in every object to
+keep track of the version number.
+The advantage is that
+lazily transforming objects
+amortizes the cost of invoking state transformers by spreading it across
+application execution.
+
+The other alternative is to eagerly transform all objects during update
+time which requires a way to access all objects in the application.
+With this model,
+the programmer must specify how to explicitly trace and
+transform objects starting from global variables~\cite{hicks-thesis}, or
+the system must maintain
+a registry of all live objects in the
+application~\cite{K42reconfig}. \JV which implements eager transformation
+piggybacks on the garbage collector to trace and identify live objects that
+need updating, and updates each such object based on programmer
+specification.

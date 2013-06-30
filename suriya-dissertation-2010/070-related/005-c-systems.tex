@@ -1,0 +1,140 @@
+\section{Dynamic Software Updating for C/C++}
+
+There are several substantial systems for dynamically updating C and C++
+programs that target server applications~\cite{HjalmtyssonG98,
+altekar05opus, neamtiu06dsu, chen:icse07, upstare, neamtiu09stump} and
+operating systems components~\cite{K42reconfig, k42usenix, chen06vee,
+lee06linuxmod, dynamos_eurosys_07}.  While these systems are mature
+and offer substantial updating experience, the flexibility afforded by \JV
+is comparable or superior. 
+
+\JV's timing restrictions and Java's type
+safety also provide comparable or superior safety. Because C is a type-unsafe
+language, DSU systems for C have to restrict certain unsafe C idioms and
+perform conservative analysis to enforce type-safety of updates.
+% ; the fact that C and C++
+% programs often circumvent the languages' weak type systems greatly
+% complicates efforts to ensure that updates behave correctly. 
+The lack of a VM is a disadvantage for
+C and C++ DSU.  For example, because a VM-based JIT can compile and
+recompile replacement classes, it imposes no steady-state execution
+overhead.  By contrast, C and C++ implementations must use either
+statically-inserted indirections~\cite{HjalmtyssonG98, neamtiu06dsu,
+K42reconfig, k42usenix, upstare} or dynamically-inserted trampolines to
+redirect function calls~\cite{altekar05opus, chen06vee, chen:icse07,
+ksplice}.  Both cases impose persistent space and time overhead on normal
+execution and inhibit optimization.  Likewise, because these systems lack a
+garbage collector, they either do not update object instances at
+all~\cite{ksplice}, update them lazily~\cite{neamtiu06dsu, chen:icse07} or
+perform extra allocation and bookkeeping to locate the objects at
+update-time~\cite{k42usenix}.
+
+Because these systems lack support
+for on-stack replacement, they must pre-compile potentially long-running
+methods specially, so that they can be updated while they run. These
+techniques impose time and space overheads on steady-state execution, and
+in some cases limit update flexibility.
+Some prior
+systems~\cite{neamtiu09stump, upstare, chen:icse07} have focused on means
+to reach DSU safe points quickly, and \JV is comparable in support when it
+comes to single-threaded applications. For multithreaded applications, {\sc
+Stump}'s synchronization of multiple threads to reach a safe
+point~\cite{neamtiu09stump} and Upstare's support to update active methods
+on stack~\cite{upstare} are superior to what \JV provides. While we did not
+implement such features in \JV, its model does not preclude such support.
+
+\subsection{K42 Operating System}\index{K42}
+
+K42 is an object-oriented research operating system with dynamic updating
+support out of IBM Research. Updates are performed at the granularity of an
+{\em object instance}. K42 is structured as a set of objects, with objects
+exporting an interface by declaring a virtual base class. All objects that
+are updated must provide state transfer functions to export the old version
+to a common format and import from the common format to the new version.
+K42 reaches a safe point by reaching a quiescent state. The OS services
+requests by creating a new kernel thread for each request. To perform an
+update, K42 restricts new accesses to updated objects, waits until all prior
+requests/threads have completed, and then performs the update. Finally, to
+support access to the new version of an object, K42 uses an {\em object
+translation table}. Each object in the system has an entry in the table,
+and all object invocations go through the table. At update time, K42
+modifies the table to invoke the new versions of an object.
+
+\subsection{Ksplice}\index{Ksplice}
+
+Ksplice~\cite{ksplice} is a dynamic updating system for the Linux kernel.
+Ksplice is very easy to use and takes as input a source patch to the
+currently running kernel, and generates a binary patch that can be applied
+to the running kernel. Ksplice only supports changes to method bodies, and
+does not support function or type signature changes. However, this
+flexibility has been sufficient to support most patches that fix security
+vulnerabilities. Like all C systems, Ksplice needs some form of function
+indirection to jump to the new version of a method. Ksplice does so by
+installing {\em trampolines} at update time. Ksplice overwrites the first
+few instructions of the old version's method body with a jump instruction
+to the new method. Future calls to an updated method jump through this
+trampoline to the latest version's body.  Ksplice uses activeness check and
+prevent updates when changed methods are active on some thread's stack.
+
+\subsection{Ginseng}\index{Ginseng}
+
+Ginseng~\cite{neamtiu06dsu, neamtiu-thesis} is a \USD system for
+C server applications, and is very flexible in supporting changes to method
+bodies, method signatures, structure definitions, and global data.
+Ginseng uses standard techniques needed of \USD systems without a managed
+runtime to support updates to code and data. Ginseng uses function
+indirection to make calls to the right version of a method and ``type
+wrapping'' to check that accessed data has the right version of a type.
+Ginseng's offline patch generator generates state transformers for updated
+types, and the runtime uses padding to accommodate additional space required
+by new versions of objects. The application invokes state transformers
+lazily when it first accesses an object after the update.
+
+While Ginseng does not support changes to active methods on stack,
+programmers may annotate long running loops, extract loop bodies
+into their own methods, and then update between loop iterations. To
+guarantee type-safety, Ginseng must first deal with the type-unsafeness of
+C\@. Ginseng prohibits the use of certain C idioms that are {\em unsafe}.
+% and performs an {\em abstraction violation alias analysis} for types, and
+% {\em updatability analysis} that guarantees type-safety of programmer
+% specified update points.
+Ginseng also introduced a notion of safety called
+{\em transaction safety} in which programmers mark transaction regions. The
+system's analysis restricts certain update points within a region to ensure
+that a transaction runs entirely as the old version or as the new version.
+
+\subsection{Upstare}\index{Upstare}
+
+Upstare~\cite{upstare, upstare-thesis} supports dynamic updates to
+multi-threaded C programs. Upstare performs a whole-program compilation and
+extensively instruments an application to make it update-compatible.
+Upstare uses function indirection for function calls,
+instruments function entry and exit points, and loop back edges to
+guarantee ``immediate updates'' when the user signals the application to
+update. These instrumentation points are precisely the same \VM safe points
+that \JV uses. Like \JV, Upstare allows the programmer to specify update
+points by making \API calls from within the application, or initiate an
+immediate update upon receiving a signal from a user. Upstare suspends all
+application threads and performs atomic updates, just like \JV does. It
+relies on complex synchronization to suspend all but one application
+thread, the {\em update co-ordinator} thread which performs the update.
+Upstare cannot perform an update when threads are waiting on
+blocking system calls. This restriction is especially problematic for
+multithreaded server application threads which are often blocked waiting
+for requests. \JV's thread synchronization mechanism is much simpler and
+supports blocking system calls in a straightforward manner.
+
+Upstare's support for {\em stack reconstruction} is unique among dynamic
+updating systems.
+% is an improvement over \JV.
+Upstare extracts the state of a function's stack, and
+reconstructs it as expected by the new version of a function. This
+reconstruction support enables even modified functions to be active on
+stack. Stack reconstruction requires the programmer to specify state
+transformers for the local variables of functions, and correspondence
+between execution points in the old and new function bodies. \JV restricts
+its \acf{OSR} support to methods with identical bytecodes in the old and
+new versions. As a result, \JV currently does not require a stack state
+transformer or a mapping or execution. There is no conceptual reason why \JV
+wouldn't be able to support an extended \OSR, but for the additional burden
+on the programmer.

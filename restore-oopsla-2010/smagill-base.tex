@@ -1,0 +1,214 @@
+% packages
+\usepackage{slashed}
+
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+
+
+\usepackage{stmaryrd}
+\usepackage{ifthen}
+\usepackage{marvosym}
+\usepackage{graphicx}
+\usepackage{calc}
+\usepackage{wasysym}
+\usepackage{rotating}
+
+% \usepackage{pdfsync}
+% \usepackage{proof}
+% \usepackage{bussproofs}
+% \usepackage{mathpartir}
+% \usepackage{varwidth}
+
+% \usepackage{tikz}
+% \usetikzlibrary{calc}
+% \usetikzlibrary{arrows}
+% \usetikzlibrary{positioning}
+% \usetikzlibrary{chains}
+% \usetikzlibrary{decorations.pathmorphing}
+% \usetikzlibrary{decorations.pathreplacing}
+% \usetikzlibrary{shapes.misc}
+% \usetikzlibrary{shapes.multipart}
+% \usetikzlibrary{shapes.geometric}
+% \usetikzlibrary{backgrounds}
+
+% Select symbols from bbding
+\newcommand{\dingfamily}{\fontencoding{U}\fontfamily{ding}\selectfont}
+\newcommand{\dingSymbol}[1]{{\dingfamily\symbol{#1}}}
+\newcommand{\RectangleThin}{\dingSymbol{'164}}
+\newcommand{\Rectangle}{\dingSymbol{'165}}
+\newcommand{\RectangleBold}{\dingSymbol{'166}}
+
+% semantic styles
+% \usepackage[ligature,shorthand,reserved]{semantic}
+% \newcommand{\semanticdomainstyle}[1]{%
+%   \ensuremath{\mathchoice%
+%     {\mbox{\textit{#1}}}%
+%     {\mbox{\textit{#1}}}%
+%     {\mbox{\textit{\scriptsize#1}}}%
+%     {\mbox{\textit{\tiny#1}}}}}
+% \reservestyle{\semanticdomain}{\semanticdomainstyle}
+% \semanticdomain{Int[\ensuremath{\mathbb{Z}}]}
+
+% \newcommand{\semanticvaluestyle}[1]{\ensuremath{\bf{\mathrm{#1}}}}
+% \reservestyle{\semanticvalue}{\semanticvaluestyle}
+
+% Rotating characters
+\newcommand{\rotxc}[1]{\begin{sideways}#1\end{sideways}}
+\newcommand{\rotrotxc}[1]{\rotxc{\rotxc{#1}}}
+
+
+% Funky underline types
+\def\dotuline{\bgroup
+  \ifdim\ULdepth=\maxdimen  % Set depth based on font, if not set already
+   \settodepth\ULdepth{(j}\advance\ULdepth.4pt\fi
+  \markoverwith{\begingroup
+  \advance\ULdepth0.08ex
+  \lower\ULdepth\hbox{\kern.15em .\kern.1em}%
+  \endgroup}\ULon}
+
+\def\dashuline{\bgroup
+  \ifdim\ULdepth=\maxdimen  % Set depth based on font, if not set already
+   \settodepth\ULdepth{(j}\advance\ULdepth.4pt\fi
+  \markoverwith{\kern.15em
+  \vtop{\kern\ULdepth \hrule width .1em}%
+  \kern.01em}\ULon}
+
+% Common constructs
+\renewcommand{\iff}{\text{ iff }}
+\newcommand{\hole}{\Box}
+\newcommand{\true}{\mathsf{true}}
+\newcommand{\fail}{\mathsf{fail}}
+\newcommand{\false}{\mathsf{false}}
+\newcommand{\strue}{\mathrm{T}}
+\newcommand{\sfalse}{\mathrm{F}}
+
+% math ligatures
+% \mathlig{--`}{\rightharpoonup} % partial function
+% \mathlig{|->}{\mapsto} % tight points-to
+% \mathlig{->}{\rightarrow} % remap for functions
+% \mathlig{-->}{\longrightarrow} % remap for functions
+% \mathlig{[[}{\llbracket} % open double bracket
+% \mathlig{]]}{\rrbracket} % close double bracket
+% \mathlig{<=>}{\Leftrightarrow}
+
+% quantifiers
+\newcommand{\A}[1][]{\forall \ifthenelse{\equal{#1}{}}{}{\mbox{$#1.$}\ }}
+\newcommand{\E}[1][]{\exists \ifthenelse{\equal{#1}{}}{}{\mbox{$#1.$}\ }}
+\newcommand{\Lam}[1][]{\lambda \ifthenelse{\equal{#1}{}}{}{\mbox{$#1.$}\ }}
+\newcommand{\Am}[1][]{\forall_{\!*} \ifthenelse{\equal{#1}{}}{}{#1.\,}}
+\newcommand{\Em}[1][]{\exists_{*} \ifthenelse{\equal{#1}{}}{}{#1.\,}}
+\newcommand{\nA}[1][]{\not\forall \ifthenelse{\equal{#1}{}}{}{#1.\,}}
+\newcommand{\nE}[1][]{\nexists \ifthenelse{\equal{#1}{}}{}{#1.\,}}
+
+% Common functions
+\newcommand{\dom}{\mathit{dom}}
+
+% Common Decorations
+\newcommand{\defemph}[1]{\textbf{#1}}
+\newcommand{\estate}[1]{\langle #1 \rangle}
+
+% make eqnarrays have more space
+\renewcommand\arraystretch{1.2}
+
+% Theorem Environments
+\newtheorem{lem}{Lemma}
+\newtheorem*{lemstar}{Lemma}
+\newtheorem{thm}{Theorem}
+\newtheorem{corr}{Corollary}
+\newtheorem{defn}{Definition}
+\newtheorem{claim}{Claim}
+\newtheorem{obs}{Observation}
+\newtheorem{prob}{Problem}
+
+% comment blocks
+\newcommand{\deleted}[1]{}
+\newcommand{\draftonly}[1]{}
+\newcommand{\stephencomment}[1]{
+\begin{quote}
+{\bf *** Stephen says:} {\it #1}
+{\bf ***}
+\end{quote}}
+
+% indentation
+\newcommand{\ind}{\hspace*{0.5cm}}
+
+% \usepackage[ruled]{algorithm2e}
+% Algorithm package options
+% \SetInd{1ex}{1ex}
+
+% extra algorithm constructs
+% \SetKwIf{Let}{Failed}{let}{in}{match failed $=>$}{end}
+% \SetKwSwitch{Match}{MCase}{MOther}{match}{with}{}{\_}{end}
+% \SetKwInput{Type}{Type}
+% \SetKwBlock{Ind}{\vspace{-3ex}}{}
+% \SetKwBlock{IndEnd}{\vspace{-3ex}}{end}
+% \SetKwIf{DefFn}{}{fun}{=}{}{in}
+% \SetKwFor{uForEach}{foreach}{do}{\vspace{-3ex}}
+
+\newcommand{\none}{\mathsf{None}}
+\newcommand{\some}[1]{\mathsf{Some}\bigl(#1\bigr)}
+\newcommand{\somenop}[1]{\mathsf{Some}#1}
+
+% Bnf definitions
+\newcommand{\GoesTo}{\mathrel{::=}}
+\newcommand{\bnfdef}{\GoesTo}
+\newcommand{\bnfalt}{\Or}
+\newcommand{\bnfas}{\bnfdef}
+
+% Math constructs
+\newcommand{\sembrack}[1]{\llbracket#1\rrbracket\,}
+\newcommand{\imp}{=>}
+
+% Transition systems
+\newcommand{\steps}[1]{\stackrel{#1}{\rightarrow}}
+\newcommand{\stepst}[1]{\stackrel{#1}{\rightarrow^{*}}}
+\newcommand{\stepsp}[1]{\stackrel{#1}{\rightarrow^{+}}}
+\newcommand{\gentrans}{\dashrightarrow}
+\newcommand{\gentransnum}[1]{\stackrel{#1}{\dashrightarrow}}
+\newcommand{\trans}[1][]{\stackrel{#1}{\leadsto}}
+\newcommand{\transt}[1][]{\mathrel{\trans[#1]{\!\!}^{*}}}
+\newcommand{\transp}[1][]{\mathrel{\trans[#1]{\!\!}^{+}}}
+
+%% derivation rules
+% note that horizontal space can be hacked with:
+%% \def \mpr@andskip {1em plus 0.25fil minus 0.25em}
+% \renewcommand{\TirName}[1]{$#1$}
+% \renewcommand{\RefTirName}[1]{$#1$}
+
+\newcommand{\infrulelabel}[1]{\mbox{\normalfont\small\textsc{#1}}}
+\newcommand{\drule}[4][]
+  {\inferrule*[lab=\<#2>,right=\ensuremath{#1}]{#3}{\textstyle#4}}
+\newlength{\templength}
+\newcommand{\userule}[4][leftskip=0em]
+  {\inferrule*[right=\textsc{#2},before=\setlength{\templength}{\widthof{\textsc{#2}}},rightskip=\templength,#1]{#3}{\textstyle#4}}
+\newcommand{\daxiom}[3][]{\drule[#1]{#2}{ }{#3}} % derivation axiom
+\newcommand{\daxiombc}[3]{\drulebc{#1}{#2}{ }{#3}}
+\newcommand{\usingrule}[3]{\prooftree[#1]\using#2\leadsto#3\endprooftree}
+\newcommand{\belowcondition}[1]{\rule{0pt}{3ex} {}^\dagger #1}
+\newcommand{\drulebc}[4]{\drule[{}^\dagger]{#2}{#3}{#4\\\\\belowcondition{#1}}}
+\newcommand{\eqjudg}[2]{\stackrel{\textstyle#1}{#2}}
+%% \newcommand{\eqjudg}[2]{\begin{eqnalign}[c][b]#1\\[-2.5ex]#2\end{eqnalign}}
+\newcommand{\pfdots}[1]{\stackrel{\textstyle\vdots}{#1}}
+
+% \reservestyle{\infrule}{\infrulelabel}
+% \infrule{}
+
+% Stacking
+\newcommand{\stacklabel}[1]{\stackrel{\smash{\scriptscriptstyle \mathrm{#1}}}}
+\newcommand{\Def}{\stacklabel{def}}
+\newcommand{\Fin}{\stacklabel{fin}}
+
+\newcommand{\spec}[3]{\{#1\}\;#2\;\{#3\}} % Hoare triple
+
+% Separation Logic
+\newcommand{\emp}{\mathbf{emp}}
+\newcommand{\pto}{\mapsto}
+\newcommand{\lbl}[1]{\mathsf{#1}}
+\newcommand{\dll}[1]{\mathrm{dll}(#1)}
+
+% Program commands
+\newcommand{\assume}{\mathsf{assume}}
+\newcommand{\nondet}[1]{#1 :=\ ?}

@@ -1,0 +1,127 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colors
+\colorlet{black object color}{black!60}
+\colorlet{grey object color}{black!20}
+\colorlet{forwarding pointer color}{structure.fg!40}
+\colorlet{dsu v0 color}{blue!60}
+\colorlet{dsu v1 empty color}{blue!20}
+\colorlet{dsu forwarding pointer color}{forwarding pointer color!50!dsu v0 color}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define the style for each field of the object
+\newlength{\drawthickness}
+\setlength{\drawthickness}{0.6pt}
+\newlength{\fielddimension}
+\setlength{\fielddimension}{5mm}
+\tikzstyle{field}=[
+    rectangle,
+    draw=black,
+    line width=\drawthickness,
+    minimum width=\fielddimension,
+    minimum height=\fielddimension,
+    inner sep=0pt,
+    font=\tiny,
+]
+\tikzstyle{new space grey field}=[field,fill=grey object color]
+\tikzstyle{new space black field}=[field,fill=black object color]
+\tikzstyle{dsu v0 field}=[field,fill=dsu v0 color]
+\tikzstyle{dsu v1 empty field}=[field,fill=dsu v1 empty color]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define the style for each object
+\tikzstyle{object}=[
+    column sep=-\drawthickness,
+    nodes=field,
+    inner sep=0pt,
+]
+\tikzstyle{new space grey object}=[object,nodes=new space grey field]
+\tikzstyle{new space black object}=[object,nodes=new space black field]
+\tikzstyle{dsu v0 object}=[object,nodes=dsu v0 field]
+\tikzstyle{dsu v1 empty object}=[object,nodes=dsu v1 empty field]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Style for arrows
+\tikzstyle{regular}=[-to,draw]
+\tikzstyle{transparent}=[-to,draw=black!15!bg]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define a macro for creating an object with two fields
+\newcommand{\twoFieldsObject}[3]{% name, position, object style
+\matrix[#3,ampersand replacement=\&] (#1) at #2 {
+  \node (#1 0) {}; \& \node (#1 1) {}; \\
+};}
+\newcommand{\fourFieldsObject}[3]{% name, position, object style
+\matrix[#3,ampersand replacement=\&] (#1) at #2 {
+  \node (#1 0) {}; \& \node (#1 1) {}; \& \node (#1 2) {}; \& \node (#1 3) {}; \\
+};}
+
+
+% Command to write a label next to an object
+\newcommand{\labelObject}[4]{% label text, object name, label position, label anchor
+\draw (#2.#3) node[anchor=#4,inner sep=0.5pt,font=\tiny] {#1};}
+\newcommand{\oldSpaceLabelObject}[2]{% label text, object name
+\labelObject{#1}{#2}{north west}{north east}}
+\newcommand{\newSpaceLabelObject}[2]{% label text, object name
+\labelObject{#1}{#2}{150}{south west}}
+
+\newcommand{\oldSpaceObject}[3][object]{% object style, name, position
+\twoFieldsObject{#2}{#3}{#1}\oldSpaceLabelObject{#2}{#2}}
+\newcommand{\dsuOldSpaceVersionZeroObject}[2]{% name, location
+\twoFieldsObject{#1}{#2}{dsu v0 object}\oldSpaceLabelObject{#1 $v_0$}{#1}}
+\newcommand{\dsuOldSpaceVersionOneObject}[2]{% name, location
+\fourFieldsObject{#1 v1}{#2}{dsu v1 empty object}\oldSpaceLabelObject{#1 $v_1$}{#1 v1}}
+
+\newcommand{\newSpaceObject}[4][]{% extra name, name, position, object style
+\twoFieldsObject{#2}{#3}{#4}\newSpaceLabelObject{#2#1}{#2}}
+\newcommand{\newSpaceVersionOneEmptyObject}[2]{% name, position
+\fourFieldsObject{#1 v1}{#2}{dsu v1 empty object}\labelObject{#1 $v_1$}{#1 v1}{165}{south west}}
+\newcommand{\newSpaceGreyObject}[2]{% name, position
+\newSpaceObject{#1}{#2}{new space grey object}}
+\newcommand{\newSpaceBlackObject}[2]{% name, position
+\newSpaceObject{#1}{#2}{new space black object}}
+\newcommand{\dsuNewSpaceGreyObject}[2]{% name, position
+\newSpaceObject[\ $v_0$]{#1}{#2}{new space grey object}}
+\newcommand{\dsuNewSpaceBlackObject}[2]{% name, position
+\newSpaceObject[\ $v_0$]{#1}{#2}{new space black object}}
+
+\newcommand{\forwardingPointer}[1]{% name
+\node[field,minimum width=2\fielddimension,fill=forwarding pointer color] at (#1.center) {#1'};
+}
+\newcommand{\dsuForwardingPointer}[1]{% name
+\node[field,minimum width=2\fielddimension,fill=dsu forwarding pointer color] at (#1.center) {#1' $v_1$};
+}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Define coordinates of the various objects
+\newcommand{\objectRoot}{(-3,0.8)}
+\newcommand{\objectA}{(0,0)}
+\newcommand{\objectB}{(-2,-1)}
+\newcommand{\objectC}{(2,-1)}
+\newcommand{\objectD}{(-3,-2)}
+\newcommand{\objectE}{(-1,-2)}
+\newcommand{\objectF}{(1,-2)}
+\newcommand{\objectG}{(3,-2)}
+
+\newcommand{\objectAprime}{(-3.5,0.25)}
+\newcommand{\objectBprime}{(-2.5,0.25)}
+\newcommand{\objectCprime}{(-1.5,0.25)}
+\newcommand{\objectDprime}{(-0.5,0.25)}
+\newcommand{\objectEprime}{(+0.5,0.25)}
+\newcommand{\objectFprime}{(+1.5,0.25)}
+\newcommand{\objectGprime}{(+2.5,0.25)}
+
+% old space
+\newcommand{\objectCVersionOne}{(2.5,0)}
+\newcommand{\objectFVersionOne}{(1,-3)}
+% new space
+\newcommand{\objectCprimeVersionOne}{(-3,-1.75)}
+\newcommand{\objectFprimeVersionOne}{(-0.75,-1.75)}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% vim:tw=0:nospell

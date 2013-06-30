@@ -1,0 +1,75 @@
+
+% \newcommand{\DraftOrFinal}{draft}
+\newcommand{\DraftOrFinal}{final}
+
+\documentclass[\DraftOrFinal,11pt,letter]{article}
+
+\newcommand{\DSU}{{\sc Jvolve}}
+\newcommand{\transformObject}{\texttt{jvolve\_object}}
+\newcommand{\transformClass}{\texttt{jvolve\_class}}
+\newcommand{\VMClass}{\texttt{VM\_Class}}
+\newcommand{\TIB}{\texttt{TIB}}
+\newcommand{\JTOC}{\texttt{JTOC}}
+\newcommand{\GroupC}{\suriya{Some name for Group C}}
+\newcommand{\JikesRVM}{Jikes RVM}
+
+\usepackage{acronym}
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage{fullpage}
+\usepackage{float}
+\usepackage{setspace}
+\usepackage{url}
+\usepackage{srcltx}
+\usepackage[\DraftOrFinal,inline]{showlabels}
+\usepackage{hyperref}
+\usepackage{ifdraft}
+\usepackage[usenames]{color}
+\usepackage[override]{cmtt}
+% \usepackage[centering,scale=0.80]{geometry}
+% \usepackage{nopageno}
+% \usepackage{array}
+
+\ifdraft{
+\newcommand\maybecolor[1]{\color{#1}}
+\newcommand\mwh[1]{[{\maybecolor{red}\textbf{Mike says:} #1}]}
+\newcommand\ksm[1]{[{\maybecolor{red}\textbf{Kathryn says:} #1}]}
+\newcommand\suriya[1]{[{\maybecolor{blue}\textbf{Suriya says:} #1}]}
+}{
+\newcommand\mwh[1]{}
+\newcommand\ksm[1]{}
+\newcommand\suriya[1]{}
+}
+
+\begin{document}
+
+\title{
+       Dynamic Software Updates for Java:\\ A VM-Centric Approach\\
+       \vspace{+0.5em}
+       Ph.D. Proposal}
+
+\author{Suriya Subramanian \\
+        Department of Computer Sciences \\
+        The University of Texas at Austin}
+
+\date{July 21, 2008}
+
+\maketitle
+
+\input{abstract}
+\input{intro}
+\input{related}
+\input{model}
+\input{implementation}
+\input{experience}
+\input{schedule}
+\input{conc}
+
+\begin{small}
+\bibliographystyle{plain}
+\bibliography{paper}
+\end{small}
+
+\input{dsu-acronyms}
+
+\end{document}

@@ -1,0 +1,212 @@
+\section{Automating State Transformer Generation}
+\label{sec:automate}
+
+Thus far, we have relied on the programmer to provide heap transformer
+functions. In this section, we explore techniques to automate generation of
+the transformer based on the patch to ease programmer burden.
+
+This section presents a technique that starts from a patch and
+automatically produces state transformers that repair application state.
+Our methodology takes into account the code fix for a particular
+heap-corrupting bug, and uses a combination of dynamic and static analysis
+to discover predicates on heap objects.
+% object transformers can use to repair the heap.
+We employ the garbage collector to invoke object transformers on relevant
+heap objects satisfying the discovered heap predicates. While our focus is
+on memory leaks, our technique is general and we have applied it to other
+sorts of conditional heap updates as well.
+
+Our technique works as follows. Suppose we have a Java program in which
+field \texttt{f} of class \texttt{C} is the source of a memory leak, and
+the fix is to insert a line \texttt{x.f = null;} in some method
+\texttt{foo}. Figure~\ref{fig:simple-automatic-transformers} shows the
+patch for this method. The new version sets field {\tt f} to {\tt null}
+causing the object pointed to by {\tt f} to be garbage collected and freed.
+% (assuming \texttt{x} has type \texttt{C})
+% so that the object
+% pointed to by \texttt{f} is properly garbage collected (GCed).
+Given this fix, we would like to dynamically update the program to correct
+the code of \texttt{foo}. The patch prevents further leaks, and our
+object transformer needs to modify the existing leak to free already-leaked
+objects. We use a combination of dynamic and static analysis to
+automatically generate the object transformer function.
+
+\input{100-floats/simple-automatic-transformers-example}
+
+
+The object transformer function must find existing objects \texttt{x} of
+class \texttt{C} (or a subclass of \texttt{C}) and assign \texttt{null} to
+\texttt{x.f}.  But we must be careful to only null out \texttt{x.f} if that
+object is actually leaked; if we null out \texttt{x.f} while the program is
+still using it, then the update will introduce incorrect behavior or
+a crash.  We thus need to distinguish leaked objects from in-use ones. In
+Figure~\ref{fig:simple-automatic-transformers}, the fixed version of
+\texttt{foo} introduces the statement \texttt{x.f = null;} on line 8.  The
+\emph{leaky objects} consist of all objects \emph{o} that have been bound
+to \texttt{x} during execution (of the old program) that have reached this
+line.  If the fix had been in place, \texttt{x.f = null} would have been
+executed, and thus the \texttt{f} field of these objects would have been
+set to null.  All other objects of class \texttt{C} (or subtypes of
+\texttt{C}) that have \emph{not} been bound to \texttt{x} at line 8 are not
+leaking, and so we should leave their \texttt{f} field alone.  We
+call these the \emph{non-leaky objects}.
+
+The problem with literally implementing this idea is that the bug is
+discovered, and the fix discerned, only after the program is deployed.  At
+this point, the patch has no information about which objects reached line 8
+and which did not. To remedy this problem, as part of update preparation, we attempt to generate a
+\emph{heap predicate} offline, that unambiguously distinguishes the leaky and
+non-leaky objects. Then we
+generate a dynamic patch to correct the heap:
+
+\begin{center}
+\begin{minipage}{0.53\textwidth}
+\begin{lstlisting}[frame=single]
+for all objects x of class D < C:
+   if heap_pred(x):
+       x.f = null
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+The code to fix a particular object's state (line 3) comes from the code
+patch and is applied to all objects of type D satisfying the heap
+predicate.  We execute this code at update time, together with other object
+and class transformers. We use a modified version
+of the \JV garbage collector to traverse the heap to find the matching
+objects and null their fields.
+
+We generate the heap predicate by performing a dynamic analysis. We run the
+old program and \emph{mark} all objects of class C that reach the said
+line. 
+In our current implementation, we modify the concerned class and explicitly add a boolean field named {\tt \_\_marked}.
+To mark an object, we set this field to {\tt true}.
+In addition, each time program execution reaches a
+legal update point, we dump the heap. We use the Sun JVM's heap dumping
+support. Our goal is to now discover a heap predicate that distinguishes
+marked objects from the unmarked ones, i.e., {\tt (heap-predicate(x) ==
+true)} if
+and only if {\tt (marked(x) == true)}. We do this by feeding information about
+marked objects to an invariant detection tool. For our work, we use Daikon,
+a tool that discovers dynamic invariants in a running program and across
+multiple runs of the program~\cite{daikon}. We construct a special Java
+program and run it through Daikon. The program contains a function whose
+parameters match the signature of the concerned class. The main method
+reads each marked object from the snapshot and calls this function with the
+fields of the object as parameters. We control how deep to look for
+invariants by passing the contents of referred objects, objects pointed by
+them, and so on. We also pass the type and count of references pointing to
+marked objects.
+We run this Java program though Daikon which infers invariants among the
+parameters of our specially constructed function. The invariants that hold
+across all runs can be used as predicates to identify marked objects.
+% These snapshots come from several
+% legal update points in the source program, and from numerous runs of the
+% source program.
+However, we can use only those predicates that definitely \emph{do not}
+hold for any unmarked object. To do so, we negate each predicate identified
+by Daikon and check whether the negated predicate holds for every unmarked
+object in all heap snapshots. A predicate that is satisfied by every
+marked object and is not satisfied by even a single unmarked object can be
+used at runtime to distinguish marked and unmarked objects. We use the
+conjunction of all predicates identified by this process as our heap
+predicate to identify leaky objects.
+
+% We then only keep the those invariants inferred by
+% Daikon that definitely \emph{do not} hold for the unmarked objects. The
+% final heap predicate is the conjunction of the remaining invariants, which
+% we can be sure uniquely identify the marked from unmarked objects.
+
+There are two caveats that we need to keep in mind. First, this is a
+dynamic analysis, so we need adequate test coverage to be convinced that
+the predicates we have inferred are general. Second, we need to consider
+that some objects should be unmarked
+if the program subsequently writes to the field that the patch modifies.
+In the example in
+Figure~\ref{fig:simple-automatic-transformers}, the absence of line~8 in
+the old version is a leak. However, it might be the case that there is a
+future legitimate write to field {\tt f} that makes the object non-leaky.
+% However, we cannot assume that the field {\tt f} not being {\tt null} constitutes a leak.
+Therefore, whenever there is a write to field {\tt f}, we unmark the
+concerned object, i.e., change its identification to non-leaky.
+%
+In general, whenever a leak occurs in the old version we mark the concerned
+object as leaky, and after any access to that object that invalidate its
+leaky state we mark it as non-leaky.
+% For example, if failing to remove an
+% object from a collection constitutes a leak,
+% not removing an object
+% from
+
+This approach can be generalized for other simple patches.
+For example, a patch that either adds a boolean field in the new version,
+or fixes incorrect setting of the field in the old version. In both cases,
+we run the new version and discover dynamic invariant relationships between
+the value of the concerned boolean field and other objects in the heap. We
+use this discovered predicate to set the new field's value with the
+following state transformer:
+
+\begin{center}
+\begin{minipage}{0.53\textwidth}
+\begin{lstlisting}[frame=single]
+for all objects x of class D < C:
+    if heap-pred(x):
+        x.boolean_field = true
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+\subsection{Invariants discovered from real fixes}
+We applied this methodology to three real fixes and present the
+automatic state transformers we obtained. Two of them are similar, and are for
+the memory leaks fixed in jEdit by SVN revisions 5178 and 14027, mentioned
+in Table~\ref{tab:bugfixes}. The other patch is from the Bittorent client
+Azureus. The new version adds a boolean field {\tt isExpanded} for a GUI
+element.
+
+\paragraph{jEdit fixes in SVN revision 5178 and 14027}
+Figure~\ref{fig:r14027} shows the patch and transformer for the leaky field
+{\tt tokenHandler}. For this version, we discover that the following heap
+predicate distinguishes leaky objects from the non-leaky ones:
+{\tt (o.tokenHandler != null)}.
+% \begin{center}
+% \begin{minipage}{0.58\textwidth}
+% \begin{lstlisting}[frame=single]
+% (o.tokenHandler != null)
+% \end{lstlisting}
+% \end{minipage}
+% \end{center}
+This predicate validates our transformer in Figure~\ref{fig:r14027}~(b),
+which sets all leaky fields to {\tt null}.
+
+\paragraph{Adding a new boolean field in Azureus}
+The version number of the fix is {\tt a04dc20b6b} in our Git repository of
+Azureus' CVS repository. This bugfix corresponds to commits made around
+2010/02/14. The new version adds a field {\tt isExpanded} to class {\tt
+BaseMdiEntry}. The GUI element corresponds to a tree that displays data,
+and the {\tt isExpanded} field specifies the state of a particular node in
+the tree. For this update, the default transformer generated by our
+\acf{UPT} would set the boolean field to {\tt false}. However,
+a dynamic analysis on the new version of the application produces
+the following invariants among objects of type {\tt BaseMdiEntry}:
+
+\begin{center}
+\begin{minipage}{0.8\textwidth}
+\begin{lstlisting}[frame=single]
+this.iconBarEnabler.visible == this.sidebar.visible
+this.isExpanded == this.soParent.paintListenerHooked
+\end{lstlisting}
+\end{minipage}
+\end{center}
+
+The second invariant set the value of the {\tt isExpanded} field
+in the object transformer. Stephen Magill collaborated on studying this
+fix, ran it through Daikon, and discovered the
+above heap predicate.
+
+% Here we summarize our results.  Talk about this working for leaks that
+% requiring nulling fields, leaks that are fixed by function calls, and
+% other bugs (initialization errors).
+%
+% We also need to talk about our other technique, if that's going into
+% the paper.  What is the story there?

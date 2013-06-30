@@ -1,0 +1,53 @@
+\subsection{Semantics of state transformers}
+% \USD transforms a running program from one version to a newer version on
+% the fly.
+% A key component of the update procedure is a {\em state transformer
+% function}.
+The state of a running process consists of values of local and
+global variables, heap data, and one or more \PCs indicating the current
+execution point of all running application threads. A state transformer
+maps state from the old version of a program to state as expected
+by the new version. The semantics of the update is as intimately tied to
+the definition of the state transformer function, as it is to the
+definition of the old and new program versions themselves.
+
+For instance, a state transformer that initializes all variables to the
+value ``unknown'' and the \PC to the start address of the new version, is
+equivalent to stopping the old version of the program and restarting the
+new one. Such a transformer would not be very useful and would defeat
+the purpose of \USD. A useful and meaningful transformer has to come with
+an understanding of semantics, both of the application and the update.
+There might be updates where it is impossible to have a meaningful state
+transformer.  Currently, \USD systems rely on the programmer to provide
+such a state transformer function.
+
+As an example,
+consider a bugfix where a programmer used a 32-bit counter in
+an older version and changed it to a 64-bit counter in a newer version,
+presumably because the 32-bit counter was insufficient to represent
+real-world values of the counter. The best any state transformer can hope
+to do in this scenario is to copy the old counter value into the new
+version and pad the higher order bits with zeros. If the counter had indeed
+wrapped around in the old version, there would be no way for the
+transformer to be aware of this fact and know what the higher order bits
+should be. Leaving the higher order bits as zeros might or might not affect useful
+execution of the updated version. What is acceptable
+totally depends on the application and update semantics and the
+expectations of the developers and users.
+
+As another simple example, consider an application that stores points with
+x and y co-ordinates in a 2-dimensional space. A feature of a newer version
+might be that the application now supports a 3-dimensional space with
+points having a z co-ordinate as well. In this case as well, a state
+transformer function cannot hope to obtain an accurate representation of
+the new version's state. Setting the z co-ordinates to zero of existing
+points in the application might in fact work. It also seems intuitive that
+setting z co-ordinates to values other than zero might cause the
+application to work improperly. Such an inference has to come from the
+developer with an understanding of the real-world semantics of the
+application.
+
+In this work, we assume that a correct and safe state transformer does
+indeed exist, and ask what safety guarantees such as update correctness,
+type safety, transaction safety, and representation consistency that a \USD
+system can provide.

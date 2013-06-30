@@ -1,0 +1,47 @@
+This is BibTeX, Version 0.99c (Web2C 7.5.7)
+The top-level auxiliary file: paper-pldi12.aux
+The style file: abbrvnat.bst
+Database file #1: biblio.bib
+Warning--empty year in javarebel
+You've used 16 entries,
+            2767 wiz_defined-function locations,
+            695 strings with 6748 characters,
+and the built_in function-call counts, 6542 in all, are:
+= -- 537
+> -- 395
+< -- 12
++ -- 133
+- -- 117
+* -- 431
+:= -- 1009
+add.period$ -- 48
+call.type$ -- 16
+change.case$ -- 71
+chr.to.int$ -- 16
+cite$ -- 33
+duplicate$ -- 341
+empty$ -- 614
+format.name$ -- 153
+if$ -- 1407
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 15
+newline$ -- 88
+num.names$ -- 64
+pop$ -- 228
+preamble$ -- 1
+purify$ -- 55
+quote$ -- 0
+skip$ -- 235
+stack$ -- 0
+substring$ -- 63
+swap$ -- 31
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 176
+warning$ -- 1
+while$ -- 50
+width$ -- 0
+write$ -- 200
+(There was 1 warning)

@@ -1,0 +1,90 @@
+% Updating code
+%   Function indirection
+%   trampolines
+%   on-stack replacement
+%   stack transformers
+
+\section{Updating Code}
+
+The most primitive functionality any dynamic updating system must support is
+the ability to call new versions of updated methods.  Dynamic updating
+systems in all types of contexts, be it in a compiled language like C, or
+in a managed language runtime, or in a distributed computation framework,
+resort to some form of indirection to call the new version of a
+function.
+
+% \paragraph{Function Indirection}
+Systems for C/C++ such as Ginseng \cite{neamtiu06dsu}
+and K42 \cite{K42reconfig} use indirection for each function call. Each
+function call goes through a table that points to the latest version of the
+function. At update time, the DSU system updates table entries to point
+to new method versions. As a result, all future calls to a method invoke
+its latest version. All systems using this approach pay an additional
+overhead for all method calls during normal execution.
+
+KSplice \cite{ksplice}, a dynamic updating system for the Linux kernel uses
+trampolines to achieve indirection. In the absence of an update, kernel
+execution happens normally. At update time, Ksplice overwrites the first few
+instructions of an updated method with a call instruction to the new
+version of a method. Future function calls to an updated method call the
+old body, which transfers execution to the newest version. With this
+approach, Ksplice pays almost zero execution time overhead.
+
+Function indirection in managed languages usually comes for free. To make a
+function call in an interpreted language, the interpreter gets the method
+body by looking it up by name in a dictionary. Dynamic updating systems
+that work in the context of an interpreter only have to update this
+dictionary to point to the new method versions.
+
+In a managed language Virtual Machine that compiles code down to machine
+code, all non-inlined calls typically go through either a \VMT for virtual
+calls, or a global table for calls to static methods. These tables point to
+the latest compiled version of each method. When the VM compiles a method
+at a higher level of optimization because the method is executed
+frequently, it updates the table to point to the new version.
+\JV extends this functionality for dynamic updating, by rewriting table
+entries to point to the new method version. If the compiler has previously
+inlined a changed method into an unchanged calling method, \JV also
+rewrites the table entries of these calling methods containing an inlined
+changed method. We are aware of no other system that handles inlining.
+
+% \subsection{Updates to active methods}
+% Supporting updates to active methods in their full generality makes it impossible
+% to guarantee even non-semantic safety properties such as type-safety or
+% correct execution that respects the language specification. However, actual
+% changes to real applications drive DSU systems to support some changes to
+% active methods. Systems lie on various points in the spectrum from no
+% support at all to more general support for arbitrary code changes.
+% 
+% Systems that enforce activeness safety, do not support updates to active
+% methods. As mentioned in Section~\ref{sec:safety}, these systems are
+% type-safe but very restrictive. They do support a simple
+% update that changes a version number string printed by the main method of
+% the application, since the main method is always active. Systems that
+% enforce con-freeness safety, for instance Ginseng~\cite{neamtiu06dsu}, support
+% such updates by allowing existing methods to run the old version, while
+% executing newer versions for future invocations.
+% 
+% When talking about changes to methods, it is important to mention the level
+% of abstraction at which we compare method versions. In systems that compile
+% source code to machine code, either statically in the case of C or
+% dynamically in the case of Java, the source code may be the same across
+% versions while the compiled machine codes is different, as explained in
+% Section~\ref{sec:dsu-view-of-changes}. When DSU systems refer to changes,
+% they usually do so at the compiled code level. \JV enforces activeness
+% safety at the bytecode level, i.e., only methods with unchanged bytecodes
+% can be active at update time. At the machine code level, \JV performs \OSR.
+% \JV recompiles the method to generate machine code that conforms to the new
+% version of the application and switches execution of an active method to
+% this new code.
+% 
+% \paragraph{Stack extraction} In order to support arbitrary changes to
+% active methods, a DSU system must extract an active method's stack state,
+% transform it to satisfy the new version of the method, and transfer
+% execution to the right instruction in the new method's body.
+% Upstare~\cite{upstare}, a DSU system for C server applications, supports
+% updates to active methods. Programmers write a stack transformer function
+% that takes takes the old version's stack and returns a new one. Upstare's
+% \emph{stack extraction} support takes the old version's stack, applies the
+% programmer specified transformer and resumes execution after the update.
+% This model relies heavily on developer expertise and testing.

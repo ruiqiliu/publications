@@ -1,0 +1,42 @@
+
+\begin{abstract}
+ 
+  Dynamic software updating (DSU) systems eliminate costly downtime by
+  dynamically fixing bugs and adding features in the code and data of
+  executing programs.  Given a static \emph{code} patch, most systems
+  can construct a corresponding run-time code change completely
+  automatically.  However, a dynamic update must also specify how to
+  change the running program's execution \emph{state}, e.g., its stack
+  and heap, to be compatible with the new code.  Constructing such
+  \emph{state transformations} correctly and automatically remains an
+  open problem.
+
+  This paper presents a solution to this problem called \TOSAcronym.
+  \TOS works by running the same tests on the old and new program
+  versions separately, observing the program state at relevant points.
+  Given pairs of corresponding states, \TOS infers functions that
+  produce new-version objects given their old-version counterparts.
+  This two-part process consists of (1) \emph{matching} corresponding
+  objects between the two versions, and (2) \emph{synthesizing} the
+  simplest-possible function that transforms the old version of each
+  matched object to its corresponding new version.  Synthesis infers
+  simple functions, such as copying and arithmetic operations,
+%(new.f =  old.g + old.h)
+  and more complex functions, such as partitioning
+  strings,
+%(new.s = prefix(k, old.s)), 
+  partitioning collections, and filtering objects from a
+  collection to fix leaks. 
+
+  We show the efficacy of \TOS by inferring updates for X versions of
+  Y different programs from open source repositories.  This experience
+  shows that \TOS handles many updates that occur in practice and can
+  thereby further reduce programmer effort when preparing a dynamic
+  update.
+
+\end{abstract}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 

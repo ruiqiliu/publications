@@ -1,0 +1,47 @@
+\begin{figure}[p]
+\lstset{frame=single}
+\BC
+\begin{minipage}{0.78\textwidth}
+\begin{lstlisting}[title={(a) Object is reachable, but never accessed by
+the application}]
+public void foo() {
+  List<String> ll = new LinkedList<String>();
+  // populate the list
+  while (...) {
+    ll.add(...);
+  }
+  if (...) {
+    // some long running loop
+    while (...) {
+      // read elements from ll
+    }
+  } else {
+    // another long running loop
+    while (...) {
+      // never use ll
+    }
+  }
+}
+\end{lstlisting}
+\end{minipage} \\[1ex]
+\begin{minipage}{0.78\textwidth}
+\begin{lstlisting}[title={(b) Failing to remove objects from a collection}]
+public void process(HashSet hs, Order order) {
+  hs.add(order);
+  if (...) {
+    if (order.processed) {
+      ...
+      // forgets to remove order from hs
+    }
+  } else {
+    hs.remove(order);
+  }
+}
+\end{lstlisting}
+\end{minipage}
+\hangcaption{Examples of ``memory leaks'' in Java
+\label{fig:leaks-definition}}
+\EC
+\lstset{frame=none}
+\VspaceFixForHangcaption
+\end{figure}

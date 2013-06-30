@@ -1,0 +1,41 @@
+newgraph X 5.2 Y 2.85
+xaxis
+    size 4 min 0 max 4 hash 0 mhash 0
+    hash_labels hjc fontsize 11 font Times-Roman
+    hash_label at 1.15 : Jikes RVM       
+    hash_label at 2.15 : Jvolve          
+    hash_label at 3.15 : Jvolve (updated)
+    label fontsize 13 font Times-Roman : Configuration
+
+yaxis
+    size 2.3 min 121 max 124
+    label fontsize 13 font Times-Roman : Throughput (MB/s)
+
+legend defaults
+    x 2.5 y 123.5 hjl vjc font Times-Roman fontsize 13
+
+newcurve
+    y_epts 0.95 122.4372 121.4396 123.3216
+           1.95 121.3080 121.1209 121.4138
+           2.95 121.2424 121.0900 121.2894
+    linetype none
+    marktype circle fill 1.0
+    label : Throughput
+
+newgraph
+xaxis
+    size 4 min 0 max 4 nodraw
+yaxis
+    size 2.3 min 0.3 max 0.5 draw_at 4 hash_scale +1.0 shash 0.5
+    label fontsize 13 font Times-Roman : Latency (ms)
+
+legend defaults
+    x 2.5 y 0.45 hjl vjc font Times-Roman fontsize 13
+
+newcurve
+    y_epts 1.05 0.442 0.394 0.496
+           2.05 0.349 0.341 0.351
+           3.05 0.345 0.341 0.349
+    linetype none
+    marktype box
+    label : Latency

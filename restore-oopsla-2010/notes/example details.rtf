@@ -1,0 +1,180 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf350
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 Courier;\f2\fnil\fcharset0 LucidaGrande;
+\f3\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red127\green0\blue85;\red63\green127\blue95;\red0\green0\blue192;
+}
+\margl1440\margr1440\vieww14720\viewh13060\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\fs28 \cf0 \ul \ulc0 jEdit leak-1 (r14026 to r14027)\ulnone \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b \cf0 categories
+\b0 : pointer update, leak\
+\
+
+\b change
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0   class TokenMarker \{\
+\'a0\'a0  markTokens() \{\
+\'a0\'a0\'a0\'a0  \'a0\'a0\'a0...\
+\'a0\'a0\'a0\'a0\'a0\'a0  \'a0tokenHandler.setLineContext(context);\
+\
+  \'a0\'a0\'a0\'a0\'a0\'a0\'a0/* for GC. */\
+  + \'a0\'a0\'a0\'a0\'a0\'a0this.tokenHandler = null;\
+  \'a0\'a0\'a0\'a0\'a0\'a0\'a0this.line = null;\
+\
+\'a0\'a0  \'a0\'a0\'a0\'a0\'a0return context;\
+  \'a0\'a0\'a0\}\
+  \}\
+
+\f0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 fix
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0   tokenHandler = null;
+\f0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 inferred fix
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0   tokenHandler = null;
+\f0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 inference input
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0   standard snapshots\
+  org.gjt.sp.jedit.syntax.TokenMarker (class name)\
+  tokenHandler (field)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 Description
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0 The leak is in the function TokenMarker.markTokens() more precisely,\
+public LineContext markTokens(LineContext prevContext, TokenHandler tokenHandler, Segment line)\
+\
+The leaky field is TokenMarker.tokenHandler of type TokenMarker. \'a0This\
+field is set at the start of the function markTokens. In the correct\
+implementation (r14027), the reference is null-ed at the end of the\
+function. Not setting this field to null is the memory leak.\
+\
+To cause a leak, we need multiple TokenMarker objects. TokenMarker objects\
+are pointed to by field Mode.marker in class Mode. A Mode object is created\
+for each file mode (corresponding to syntax) such as c, java, verilog, xml,\
+etc. We can create multiple Mode objects, and correspondingly TokenMarker\
+objects, by opening buffers of various syntax types.\
+\
+Calling TokenMarker.markTokens() would leave in place reachable, but dead\
+references to TokenHandler objects. There is a call to markTokens() in\
+TextUtilities.findMatchingBracket(). This function is called even as you\
+move the cursor around a Java file. Moving the cursor next to a bracket\
+character calls markTokens().\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\fs28 \cf0 \ul Azureus leak-1 (cc61212e65f7a3e7252c4fce36c064a8b4d90965)
+\f2\fs24 \ulnone \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs28 \cf0 categories
+\b0 : pointer update, leak, conditional\
+\
+
+\b change
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f3\fs24 \cf2   public\cf0  \cf2 class\cf0  PEPeerControlImpl\
+         \cf2 implements\cf0  	PEPeerControl, ParameterListener\
+  \{\
+    \cf2 public\cf0  \cf2 void\cf0  stopAll() \{\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f1 \cf0       ...\
+\pard\pardeftab720\ql\qnatural
+
+\f3 \cf0       \cf3 //3. Stop the server\cf0 \
+      \cf4 _server\cf0 .stopServer();\
+\
+      \cf4 _server\cf0 .clearServerAdapter();\
+      ...\
+    \}\
+  \}\
+\
+\cf2   public\cf0  \cf2 class\cf0  PESharedPortServerImpl\
+	    \cf2 implements\cf0  PEPeerServerHelper\
+  \{\
+    \cf2 public\cf0  \cf2 void\cf0 \
+    clearServerAdapter()\
+    \{\
+	  \cf4 adapter\cf0 	= \cf2 null\cf0 ;\
+    \}\
+  \}\
+\pard\pardeftab720\ql\qnatural
+
+\f0 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 fix
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0   if(!_bContinue) _server.clearServerAdapter();
+\f0 \
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 inferred fix
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f1\fs24 \cf0   if(_bContinue == false)\
+    _server.adapter = null;\
+  else\
+    _server.adapter = _server_old.adapter;\
+
+\f0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 inference input
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\fs24 \cf0   standard snapshots\
+  org.gudy.azureus2.core3.peer.impl.control.PEPeerControlImpl (class name)\
+  _server.adapter (field)\
+\pard\pardeftab720\ql\qnatural
+\cf0 \
+
+\b\fs28 oddity
+\b0\fs24 :\
+  inferring an update for class\
+    org.gudy.azureus2.core3.peer.impl.transport.sharedport.PESharedPortServerImpl\
+  and field\
+    adapter\
+  also works, but infers the update "adapter = adapter_old" which seems wrong (it should still be a conditional update).\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\b\fs28 \cf0 Description
+\b0 :\
+\pard\pardeftab720\ql\qnatural
+
+\f2\fs24 \cf0 This fix nulls out a field in the main server class for torrent connections.  When the server is stopped, the server instance is actually kept around for when the torrent resumes.  Nulling out this field allows part of the server object to be garbage collected.}

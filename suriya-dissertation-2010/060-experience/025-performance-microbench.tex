@@ -1,0 +1,70 @@
+
+\subsection{Microbenchmark performance}
+\label{subsec:microbench}
+
+The two dominant factors that determine \JV update time are the time to
+perform a GC, determined by the number of objects, and the time to run
+object transformers, determined by the fraction of objects being updated.
+To measure each cost, we devised a simple microbenchmark that
+creates an array of objects and transforms a specified fraction of these
+objects when a dynamic software update is triggered. The microbenchmark has
+two simple classes, \texttt{Change} and \texttt{NoChange}. Both contain
+three integer fields, and three reference fields that are always {\tt
+null}. The update adds an integer field to {\tt Change}. The user-provided
+object transformation function copies the existing fields and initializes
+the new field to zero.
+% The benchmark contains two arrays, one for \texttt{Change} objects and
+% one for \texttt{NoChange} objects.
+We measure the cost of performing an update while varying the total number
+of objects and the fraction of objects of each type. The number of objects
+is the maximum that can fit in heap sizes 32, 64, 128 and 256 MB\@.  Note
+that \RVM's heap includes \VM data structures as well. We measure the
+running time in a generous heap, five times the minimum required size, such
+that the only collections are those DSU triggers. We report the median of
+21 runs.
+
+\input{100-floats/experience/microbench-table}
+\input{100-floats/experience/microbench-graph}
+
+Table~\ref{tab:microbench} shows the elapsed time while varying the number
+of total objects and the fraction of the objects that are updated.  The
+variance was insignificant, so we do not report it.  The first group of
+rows reports garbage collection time, the second group reports the time to
+transform all updated objects, and the final group reports the total update
+time. While the total time includes the time to load and install the
+updated classes, synchronize running threads, and find a DSU safe point, it
+is roughly equal to the sum of GC time and transformation time.  The first
+column of the table shows the number of objects in the test, and the second
+column the heap size, which is five times the minimum heap size to run the
+microbenchmark. Columns 4 though 14 show pause times for varying fractions
+(from 0\% to 100\%) of updated objects. 
+
+To shed light on the results in the table, Figure~\ref{fig:microbench}
+plots collection time, transformer time, and total update time for the
+microbenchmark with 3.67 million objects in a 1280 MB heap.  The figure
+shows that the costs of garbage collection and transformation increase  as
+a function of the number of changed objects.  The slope of the ``GC time''
+line illustrates the cost to deal with one object of the update type.  This
+cost includes creating an additional copy of the transformed object;
+creating an update log entry with a pointer to the old and new copy; and
+caching a pointer to the old copy from the new copy. The slope of the
+``Running transformers'' line illustrates the cost of accessing the update
+log and actually running the transformer for one object.  This extra
+processing to handle transforming objects increases the total pause time
+with all objects updated by roughly four times compared to the pause time
+with no object updated.  The ``Running Transformers'' line is steeper than
+the ``GC time'' line, revealing that the cost of running transformers is
+higher than the extra copying cost incurred during GC\@.
+
+Transformations are more expensive than standard copying GC. The GC uses a
+highly optimized {\tt memcopy} like code, whereas our transformer functions
+use reflection to look up the \texttt{jvolveObject} function of the right
+type, and this function copies one field at a time. One optimization would
+be to eliminate the log by copying the old and new objects to their own
+space and walking through and transforming each object.  The cost of
+reflection could be reduced by caching the lookup, but even then a
+na\"ively compiled field-by-field copy is much slower than the collector's
+highly-optimized copying loop.  % Another possible optimization is to
+% specially compile transformers to replace idiomatic use of copying
+% assignments to contiguous fields by a \texttt{memcopy} over the
+% corresponding range.

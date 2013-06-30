@@ -1,0 +1,43 @@
+\section{Performance}
+\label{sec:performance}
+
+\JV's impact on performance can be divided into the following. 1) the
+steady state impact of implementing dynamic updating support, 2) the pause
+in application execution to perform the update, and 3) the cost of
+recompiling updated and invalidated methods upon resuming execution. The
+latter is very hard to measure and can be grouped with the steady state
+performance impact. Our experiments show that
+the main performance impact of \JV is the pause time while applying an update. Once
+updated, the application eventually runs without further overhead.  To
+confirm this claim, we measured the throughput and latency of two 
+Jetty versions while running on
+stock \RVM and on \JV after dynamically updating to the next version.
+Section~\ref{subsec:jetty-webserver-performance} shows that the performance of these
+configurations is essentially identical.
+
+% We report
+% on this experiment in Section~\ref{subsec:jetty-perf}.
+
+The cost of applying an update is the time to load any new classes, invoke
+a full heap garbage collection, and apply the transformation methods on
+objects belonging to updated classes.  Roughly, the time to suspend threads
+and check that the application is at a safe-point is less than a
+millisecond, and classloading time is usually less than 20ms.
+The update disruption time is primarily due to the GC and
+object transformers, and is proportional to the size of the heap and the
+fraction of objects being transformed.  We wrote a simple microbenchmark to
+measure these overheads.  The results reported in
+Section~\ref{subsec:microbench} show that object transformation
+is the dominant cost.
+
+We conducted all our experiments on an Intel Core 2 Quad machine running at
+2.4 GHz machine with 2 GB of RAM.  The machine ran Ubuntu 7.10 on Linux
+kernel version 2.6.22. We implemented \JV on top of \RVMversion and built a
+FullAdaptiveSemiSpace configuration of the \VM. The FullAdaptive
+configuration means that the \VM's code is compiled at the highest level of
+optimization while creating the \VM's boot image (Full) and the application
+code is compiled adaptively adaptively (Adaptive)~\cite{AAB+:00}. In
+adaptive compilation, the \VM baseline compiles an application method the
+first time it is executed, and recompiles the method at increasing levels
+of optimization as it gets invoked more often.  The SemiSpace configuration
+refers to \RVM's semi-space garbage collector.

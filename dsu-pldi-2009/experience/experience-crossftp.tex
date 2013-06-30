@@ -1,0 +1,41 @@
+\begin{table}[t]
+\begin{footnotesize}
+\begin{center}
+\begin{tabular}{|l||c|c||c|c|c|r|c|c|} \hline \T
+Ver.   & \multicolumn{2}{c||}{\# classes} &    \multicolumn{6}{c|}{\# changed}             \\
+       & add & del & classes & \multicolumn{3}{c|}{methods} & \multicolumn{2}{c|}{fields}  \\
+       &     &     &         & add & del & chg   & add & del                               \\ \hline \hline \T
+1.06   & 4   & 1   & 1       & 0   & 0   & 3/0   & 1   & 0                                 \\
+1.07   & 0   & 0   & 3       & 4   & 0   & 14/0  & 5   & 0                                 \\
+1.08   & 0   & 1   & 3       & 2   & 0   & 10/0  & 0   & 2                                 \\ \hline
+\end{tabular}
+\end{center}
+\end{footnotesize}
+\caption{Summary of updates to CrossFTP server}
+\label{tab:crossftp-changes}
+\end{table}
+
+\subsection{CrossFTP server}
+\label{subsec:crossftp}
+CrossFTP server is an easily configurable, security-enabled FTP server.
+CrossFTP allows simple configuration through a GUI and more advanced
+customization using configuration files. We did not use the GUI interface
+and therefore do not consider changes to that part of the program.  We
+looked at 4 versions--- 1.05 through 1.08, details shown in Table~\ref{tab:crossftp-changes}---spanning a duration of more
+than a year. Version 1.08 contains about 18,000 lines of code spread across
+161 classes. \DSU{} successfully applies all three updates to this
+application.  Note that since all updates either add or delete fields,
+simple method body updating support on its own would be insufficient.
+
+\DSU{} could only apply the update from version 1.07 to 1.08 when the
+server was relatively idle.
+%MWH: I added relatively here, since the update should work when there
+%is one connection, by our explanation: i.e., one thread running
+%RequestHandler.run() will hit its return barrier and the update takes
+%place.  Maybe two connections too, if you get lucky, etc.
+The server runs a new {\tt RequestHandler} thread to process each FTP
+session, and the \texttt{RequestHandler.run()} method was changed by
+the update.   \DSU{} installs a return barrier on this method,
+but with many active sessions, this method is essentially always on stack,
+preventing the update.  Future work could address this problem using scheduler support
+for coordinating updates among active threads~\cite{neamtiu09stump}.

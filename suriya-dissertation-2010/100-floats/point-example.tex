@@ -1,0 +1,37 @@
+\begin{figure}[t]
+\lstset{frame=single}
+\begin{tabular}{@{}m{0.5\textwidth}@{}m{0.5\textwidth}@{}}
+\BC \begin{minipage}{0.25\textwidth}
+\begin{lstlisting}
+class Point {
+  double x, y;
+}
+\end{lstlisting}
+\end{minipage} \EC &
+\BC \begin{minipage}{0.29\textwidth}
+\begin{lstlisting}
+class Point {
+  double x, y, z;
+}
+\end{lstlisting}
+\end{minipage} \EC \\[-2ex]
+\BC (a) Old version \EC &
+\BC (b) New version \EC \\[-2ex]
+\end{tabular}
+\centering\begin{minipage}{0.55\textwidth}
+\begin{lstlisting}
+class JvolveTransformers {
+  public static void jvolveObject(
+    Point to, old_Point from) {
+    to.x = from.x;
+    to.y = from.y;
+    to.z = 0.0;
+  }
+}
+\end{lstlisting}
+(c) Default UPT-generated object transformer
+\end{minipage}
+\caption{Example of a simple class and the default object transformer}
+\label{fig:point}
+\lstset{frame=none}
+\end{figure}

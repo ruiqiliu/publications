@@ -1,0 +1,46 @@
+{
+\begin{frame}[fragile]{\DSU{} Garbage collector}%{A Sub-title is optional}
+\setbeamercovered{invisible}
+\begin{center}
+\begin{tikzpicture}
+  % objects
+                  \node[field] (root) at \objectRoot {root};
+                  \oldSpaceObject{A}{\objectA}
+                  \oldSpaceObject{B}{\objectB}
+\uncover<-1>{     \dsuOldSpaceVersionZeroObject{C}{\objectC}                  }
+                  \oldSpaceObject{D}{\objectD}
+                  \oldSpaceObject{E}{\objectE}
+\uncover<-1>{     \dsuOldSpaceVersionZeroObject{F}{\objectF}                  }
+                  \oldSpaceObject{G}{\objectG}
+
+                  \dsuOldSpaceVersionOneObject{C}{\objectCVersionOne}
+                  \dsuOldSpaceVersionOneObject{F}{\objectFVersionOne}
+
+                  % pointer arrows
+                  \path[regular]     (root.east)  to [out=330,in=120]     (A.140);
+                  \path[regular]     (A 0.center) to                      (B.90);
+                  \path[regular]     (A 1.center) to                      (C v1.190);
+                  \path[regular]     (B 0.center) to                      (D.135);
+                  \path[regular]     (B 1.center) to                      (E.90);
+\uncover<-1>{     \path[regular]     (C 0.center) to [out=180,in=90]      (F v1.north west);
+                  \path[regular]     (C 1.center) to                      (G.90);
+                  \path[regular]     (F 0.center) to                      (A);                       }
+
+\uncover<2-2>{    \path[regular]     (C v1 0.center) to [out=180,in=120]  (F v1.north west);
+                  \path[regular]     (C v1 1.center) to                   (G.60);
+                  \path[regular]     (F v1 0.center) to                   (A);                       }
+
+  \draw[draw,thin] (-4,-3.5) rectangle (4,0.5);
+\end{tikzpicture}
+\begin{block}{}
+\begin{itemize}
+\item No field can point to an ``old version'' object
+\item ``new version'' objects are all empty
+\item Run transformation functions after GC to fill in fields
+\end{itemize}
+\end{block}
+\end{center}
+\end{frame}
+}
+
+% vim:tw=0:nospell

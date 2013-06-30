@@ -1,0 +1,37 @@
+{
+\begin{frame}[fragile]{Revisiting transformation functions}%{A Sub-title is optional}
+\setbeamercovered{invisible}
+\begin{center}
+\begin{tikzpicture}
+  % objects
+  \node[field] (root) at \objectRoot {root};
+  \oldSpaceObject{A}{\objectA}
+  \oldSpaceObject{B}{\objectB}
+  \dsuOldSpaceVersionZeroObject{C}{\objectC}
+  \oldSpaceObject{D}{\objectD}
+  \oldSpaceObject{E}{\objectE}
+  \dsuOldSpaceVersionZeroObject{F}{\objectF}
+  \oldSpaceObject{G}{\objectG}
+  \dsuOldSpaceVersionOneObject{C}{\objectCVersionOne}
+  \dsuOldSpaceVersionOneObject{F}{\objectFVersionOne}
+
+  % pointer arrows
+  \path[regular]     (root.east)  to [out=330,in=120]     (A.140);
+  \path[regular]     (A 0.center) to                      (B.90);
+  \path[regular]     (A 1.center) to                      (C v1.190);
+  \path[regular]     (B 0.center) to                      (D.135);
+  \path[regular]     (B 1.center) to                      (E.90);
+  \path[regular]     (C 0.center) to [out=180,in=90]      (F v1.north west);
+  \path[regular]     (C 1.center) to                      (G.90);
+  \path[regular]     (F 0.center) to                      (A);
+
+  \draw[draw,thin] (-4,-3.5) rectangle (4,0.5);
+\end{tikzpicture}
+\begin{block}{We have an ordering problem}
+\texttt{(C $v_0$).field0.field0} might be uninitialized
+\end{block}
+\end{center}
+\end{frame}
+}
+
+% vim:tw=0:nospell

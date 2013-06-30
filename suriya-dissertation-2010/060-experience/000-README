@@ -1,0 +1,4 @@
+Too many levels of includes are getting hairy to deal with. For the
+experience section there will be a file experience/main.tex That will
+include all other files. And files will be numbered so that we know the
+order in which they are included.

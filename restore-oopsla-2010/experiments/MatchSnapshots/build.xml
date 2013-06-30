@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<project name="MatchSnapshots" default="build" basedir=".">
+        <mkdir dir="bin"/>
+    <target name="build">
+        <javac srcdir="src" includes="**/*.java" destdir="bin" debug="true" />
+    </target>
+<jar destfile="MatchSnapshots.jar" basedir="bin">
+    <manifest>
+        <attribute name="Main-Class" value="edu.umd.MatchSnapshots.Main"/>
+    </manifest>
+</jar>
+</project>

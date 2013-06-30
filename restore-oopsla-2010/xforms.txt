@@ -1,0 +1,34 @@
+Here are examples of transformers that needed some "intelligence".
+
+1. Jetty. Update to version 5.1.3. The updated version adds two new boolean
+fields "logLatency" and "logCookies". The value of these fields come from a
+configuration file. The developer has to set these fields to true/false
+based on what they intend to do (or by knowing what value is in the
+configuration file). Setting to the default value (false) is fine. We do no
+logging after the update.
+
+2. Jetty. Update to version 5.1.3 (same version as above).  Class Pool
+which manages a pool of threads to handle HTTP requests adjusts the number
+of threads based on system load, added a private Ô¨Åeld _lastShrink to store
+the time the number of threads were last shrunk. Jetty uses this Ô¨Åeld to
+prevent shrinking available threads frequently. Setting this Ô¨Åeld to the
+default value of zero did not pose any major problems because this Ô¨Åeld
+will have the correct time the next time the pool is shrunk. (The value of
+this field changes often, depends on the time the program is executed, and
+we will not be infer its value from our heap snapshots).
+
+3. Jetty. Update to version 5.1.6. The type of two *static* fields
+"_systemClasses" and "_serverClasses" changed from List in the old version
+to String[] in the new. The new field values come from the declaration
+(possible, since they are static fields of type String[]). The old version
+did not have a declaration and the values were initialized explicitly by
+the programmer.
+
+The update developer has to make a decision, 1) Go with the default
+transformer that would set the field to null, or 2) Go with the values from
+the new version's initializer, or 3) Go with values from the old version's
+heap, i.e. convert the List to a String[].
+
+We went with option 3.
+
+4. JavaEmailServer. Our well-known String[] -> EmailAddress[] example.

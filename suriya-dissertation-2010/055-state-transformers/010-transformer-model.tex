@@ -1,0 +1,422 @@
+
+\section{Object Transformation Model}
+\label{sec:transformer-model}
+
+% \todo{Fix this}
+% This section explains \JV's object transformation model and discusses its
+% limitations and alternatives. We first go over an example of a simple
+% update, how intuitive transformers express this update, and how they lead to
+% our chosen model. We then revisit our singly-linked to doubly-linked
+% example introduced in Section~\ref{sec:xformers}.
+
+This section explains \JV's object transformation model and compares it to
+other alternatives by revisiting the singly-linked to doubly-linked example
+introduced in Section~\ref{sec:xformers}.
+
+% \JV provides to the
+% user and our rationale. We go over the simple change in
+% Figure~\ref{fig:two-classes-change} and argue that developers will find
+% this model intuitive.
+
+Any dynamic updating system must convert old process state at
+the time of the update to the one expected by the new version at the point it
+resumes execution. The system must convert state maintained in global
+static data, method stack variables, and heap data as required for the new
+version. Even ignoring semantics of the application, at the very least, the
+system needs to represent data correctly in the form expected by the new
+version.
+
+In an object-oriented programming language like Java, data is primarily
+stored as objects in the heap. An object is statically-typed\footnote{In
+contrast, dynamically-typed languages such as Python may change fields
+and methods of an object over time, and objects of the same class
+need not be consistent.}, and is an instance of a particular {\tt class}.
+A dynamic updating system for Java should convert heap objects to the new version in a
+class-specific manner, leading to class or type-specific
+object transformation functions \cite{neamtiu06dsu, K42reconfig}.
+% In \JV's case, are \JO functions.
+Such a type-specific transformation function specifies how to obtain an
+object of the new version's type given an object of the old one. As
+explained in Section~\ref{sec:updating-data}, there exist two main design
+choices on when to execute these transformation functions. One design is to
+lazily transform objects. In a lazy approach, objects are transformed when
+they are first accessed by the application after the update. A lazy
+approach requires that application code be instrumented to check the state
+of an object and transform it if necessary. The other design alternative is
+to eagerly identify and transform all objects at once. For \JV, we followed
+the eager approach because we did not want to incur the steady-state
+performance overhead that comes with instrumenting code and because we
+could efficiently transform the entire heap by piggybacking on garbage collection. We
+first discuss design choices with the eager transformation model and then
+present the lazy transformation model and how one might implement it in
+\JV.
+
+\subsection{Eager transformation models}
+
+For the rest of this discussion, we assume that the interface to specify
+object transformers is the \JO function. This function accepts two
+parameters: an object corresponding to the old version called \FROM and an
+object for the new version called \TO. The programmer specifies how to
+initialize the \TO object with data from the \FROM object.  The
+interesting question in this and other models is,
+what the types of the \FROM and \TO parameters
+should be. We require access to the both the old and new version's
+definition, yet we must not break Java's type system in order to utilize
+the strong type-safety guarantees provided by the language. The definitions
+of the \FROM and \TO objects depend on what view of the heap
+the developer uses during transformation time and vice versa. In one, the
+programmer has access to the old version's code and any pointer dereference
+will return an object that is consistent with the old version.  We call
+this model the ``old world'' model. In the ``new world'' model, the programmer has access to
+the new version's code and any pointer dereference will return an object of
+the new version. The old world model
+has some natural advantages over the new world model. Since the old world
+model presents the well-formed old heap from before the update, any code or
+data access on this heap will be safe. The new world model exposes the
+transformation function to a heap that is yet to be populated.  Dereferencing
+pointers to objects whose contents are yet filled can result in
+incorrect data values or null pointer exceptions. Before transformer
+code can access an object, the programmer or the compiler has to ensure
+that its contents are correctly filled in. In \JV we implemented the new
+world model because it integrated naturally with our VM implementation.
+
+\input{100-floats/two-classes-change-only-diff}
+% \input{100-floats/two-classes-change}
+
+Figure~\ref{fig:two-classes-change-only-diff} shows an example of an update
+with two classes {\tt X} and {\tt Y}.  Class {\tt X} has a field {\tt y}
+pointing to an object of type {\tt Y}.  The update adds an additional field
+each to classes {\tt X} and {\tt Y}.
+Figure~\ref{fig:two-classes-change-transformers} shows the object
+transformers for classes {\tt X} and {\tt Y} in the old and new world
+models. In the old world model, the \FROM parameters are of the old types
+{\tt X} and {\tt Y}. The types of the \TO parameters are artificially
+constructed stub classes that correspond to the definition of the new
+versions of {\tt X} and {\tt Y}. Note that fields of the \nX and \nY
+classes, specifically, {\tt \nX.y} refers to an old version object, thus
+maintaining the old world invariant. Conversely, in the new world model the \TO
+parameters are of the new version's types while the \FROM parameters are
+stub classes that correspond to the definition of the old version. The
+field {\tt \oX.y} refers to a new version object.
+
+\input{100-floats/two-classes-change-transformers}
+
+In the new world model, the stub classes
+\oX and \oY have the same fields (both
+types and names) as defined in the old version and provide access to the
+fields of old-version objects in a type-safe manner. These stub classes are
+used by the Java-to-bytecode compiler to compile object transformer
+functions. However, as explained in Section~\ref{sec:loading}, \JV
+does not load these classes. It merely renames the old version of the class
+that is already loaded by the application to the names of these stubs. This
+renaming eliminates the naming conflict between old and new class names. In
+the old world model, the runtime replaces stub classes \nX and \nY used while transforming
+objects with the new versions of {\tt X} and {\tt Y} before the
+application resumes execution.
+
+% Now that we have established sensible type declarations for the \FROM and
+% \TO parameters, let us delve a little bit deeper into what the definition
+% of \oX and \oY should actually be. The \oY's definition is straightforward.
+% It has a single integer field as shown in
+% Figure~\ref{fig:two-classes-change}~(c). \oX's definition is a bit more
+% involved. The question is whether field {\tt y} should be of type {\tt Y},
+% or should it be of type \oY? Do we want it to refer to refer to an object
+% of the old version or the object of the new version? Both solutions seem
+% reasonable.
+
+
+
+% As described in Chapter~\ref{chap:related}, Boyapati et
+% al.~\cite{boyapati03lazy} have references to old-version objects. In such a
+% system, the programmer has access to the old version's state
+% 
+% while and
+% others~\cite{k42usenix,neamtiu06dsu,neamtiu09stump,upstare} refer to new
+% objects. In \JV, we chose the latter approach for the following reason.
+
+\input{100-floats/old-world-new-world/old-world-heap}
+
+The simplest meaningful transformer functions possible are those that copy
+fields from the old-version object to the new one. In both models, the
+programmer can copy both primitive and reference fields. In the old world view,
+reference fields point to old version objects, while in the new world view
+they point to new version objects. In the old world view, the dynamic
+updating system changes every reference to an old version object to its
+corresponding new one, before the application resumes execution.
+
+% With \JV we wanted
+% to allow the programmer to effortlessly copy fields with a simple
+% assignment such as {\tt to.y = from.y}. This choice forces {\tt \oX.y} to be of
+% the same type as {\tt X.y} which in this case happens to be the new
+% version's {\tt Y}. If {\tt \oX.y} were pointing to an old-version object,
+% the programmer would have to explicitly call a special \VM function that would
+% pretend that the types were compatible and force the assignment. The
+% system would also have to point to new-version objects as required by the
+% new version, before resuming execution.  This conflict motivates our choice
+% that the types of these
+% fields should be of the new-version, we now consider the
+% nature of objects referred to by these fields.  Since these are new-version
+% objects and types, the question arises as to whether these objects have
+% their contents filled in or not at the time a transformer runs.
+
+% \JV's implementation does not
+% % currently
+% guarantee at the time {\tt X}'s transformer is invoked whether the
+% field {\tt y} points to an object waiting to be transformed (and is therefore
+% empty), or whether it points to an object that is transformed and has its
+% contents filled in. Enforcing an ordering can get tricky especially in the
+% presence of circular references. Moreover, {\tt y}'s state is important
+% only if the programmer were to dereference the field. It does not matter if
+% the transformer merely copies the field {\tt y}. While not the most elegant
+% solution, \JV forces the programmer to specify that {\tt y} be transformed
+% on-demand, if the transformer needs to dereference the field.
+% 
+% In summary, \JV updates program state by allowing \UPT or the programmer
+% to specify per type transformation functions. These functions receive as
+% parameters an object of the old version's type and an object of the new
+% version's type. The fields of the old-version object are of the
+% new-version type and point to new-version objects. The objects pointed to
+% by these fields may or may not be have been transformed when the
+% transformer function for the object containing these fields is invoked. The
+% programmer can on-demand force these fields to be transformed.
+
+% \todo{Talk about semantics?} With this model, what are our pitfalls now?
+% 1) Transformer code may depends on application semantics.  2) Transformer
+% code may depends on where we are, in the application.
+
+% \todo{This might look out of place}
+
+\input{100-floats/old-world-new-world/old-world-transformer}
+
+\paragraph{Updating from a singly-linked list to a doubly-linked list}
+
+We revisit the singly-linked to doubly-linked example from
+Figure~\ref{fig:singly-doubly} to explain transformers in the old world and
+new world models.  As mentioned in Section~\ref{sec:xformers}, it is
+straightforward to set the {\tt head} pointer of the doubly-linked list.
+Setting the {\tt tail} pointer to the last node involves traversing the
+linked list. In the old world model, the list is well-formed and the
+transformer code obtains the last node with a simple traversal of the list.
+The new world model requires special handling since it involves traversing
+a list whose nodes are yet to be populated.
+% Whereas, in the new world model, special care is required
+
+We first present the old world model. Figure~\ref{fig:old-world-heap} shows
+the heap before and after running object transformers. The heap
+is logically divided into objects of the old version and those of the new
+version. All pointers refer to objects of the old version. The object
+transformer functions given in Figure~\ref{fig:old-world-transformer}
+populate the empty new version objects. The code to set the {\tt tail}
+field of the list involves a simple list traversal. After transforming all
+objects the dynamic updating system scans the heap and converts all
+pointers to refer to the new version objects and the application can resume
+execution. After this phase, the heap is identical to the new world heap
+after transformation shown in Figure~\ref{fig:new-world-heap}~(b).
+
+Converting the singly-linked list to a doubly-linked list in the new world
+model is a bit more involved. Figure~\ref{fig:new-world-heap} shows a view
+of the heap before and after running object transformers in the new world
+model. All pointers refer to objects of the new version. The heap is ready
+to be used by the application immediately after running the transformers.
+
+\input{100-floats/old-world-new-world/new-world-heap}
+\input{100-floats/setting-tail-field}
+
+In order to set the {\tt tail} of the list to point to the last node, the
+transformer code needs to traverse the list to get to the end. At the time
+we traverse the list, not all nodes might have been transformed, because we
+cannot always control the order in which objects are transformed. There are two
+ways to support this update. One is to allow the programmer to access old
+version objects from the new world view by making a request to the runtime.
+The other is to provide a way for the programmer to request that an object
+be transformed on-demand as the programmer traverses the list to retrieve
+the {\tt tail} element of the list.
+% Section~\ref{sec:discussion} explores this example in more detail and
+% presents alternative models to transform objects.
+
+
+\paragraph{1. Explicitly traversing old and new-version objects.}
+We could traverse the list using both objects of the old version and
+objects of the new version. It is important to note that, the system we
+currently have ensures type-safety. All reference fields, in the old and
+new objects, point to objects of the right type. The issue though is that
+fields in new objects might be \NULL because these objects have not
+been transformed yet.  The \VM could use meta-data in object headers to provide an \API that allows a
+programmer to get the old-version object corresponding to a new-version
+object and vice versa. % The \VM could use meta-data in object headers to
+% provide this facility.
+The programmer should carefully traverse the list,
+getting the old-version object of a new-version object, and following the
+{\tt next} field of the old-version object.
+Figure~\ref{fig:setting-tail-field}~(a) shows the object transformer in
+this model.
+
+\paragraph{2. Explicitly transforming new-version objects.}
+Another approach would be to traverse the linked list, while ensuring that
+the nodes are transformed before we dereference them.
+Figure~\ref{fig:setting-tail-field}~(b) shows the object transformer in
+this model.  The inherent issue we face is that we want to
+enforce an order in which objects are transformed. \JV provides an \API
+that allows the programmer to transform a particular object on demand. The
+programmer could invoke this function {\tt ensure\_transformed} for each
+node as they traverse the list. Note that, this VM function calls {\tt
+jvolveObject}, the object transformer if an object is not yet transformed.
+This mechanism could potentially lead to a cyclic dependency, i.e., transforming an
+object might require that the same object already be transformed.
+Currently, we do not
+address this problem and leave it to the programmer to guarantee
+acyclicity.
+We could imagine a more sophisticated approach that analyzes
+transformation functions and automatically chooses the order in which they
+are invoked. Alternatively, we could automatically instrument the
+transformer function to make the required \API calls.
+% Like the previous solution, this is inelegant and relies on the
+% programmer to get the ordering correct.
+
+% \todo{This was there from the paper. How do we integrate this paragraph
+% cleanly?} In our example, the \JO function only copies the contents of the
+% old \User object's fields.  More generally, our update model allows old
+% object fields to be dereferenced in transformer functions so long as the
+% fields point to transformed objects.  If some object $o$ is dereferenced
+% while running $p$'s transformer method, but $o$ has not yet been
+% transformed, we must find $o$ and pass it and its uninitialized new version
+% to the \JO method to initialize it.  Since $p$ points to the new version of
+% $o$, we could scan the remainder of the update log to find the old version.
+% To avoid this cost, we instead cache a pointer to the old version in the
+% new version during the collection.  We take care that \JO functions invoked
+% recursively in this manner do not loop infinitely, which would constitute
+% one or more ill-defined transformer functions. We detect cycles with a
+% simple check, and abort the update.  In our current implementation, the
+% programmer uses a special VM function to force a field's referenced object
+% to be transformed.  We should be able to handle this case automatically,
+% through a read barrier or a simple analysis of the \JO bytecode. 
+
+\subsection{Discussion}
+%MWH: moved this. Makes more sense in 2.3
+% %MWH: leaving this here, but probably it belongs in 2.3 instead...
+% In our update model, if a transformer dereferences an object reference
+% which also refers to a transformed object, it refers to the new
+% version.  Our experience and that of others%
+% ~\cite{k42usenix,neamtiu06dsu,neamtiu09stump,upstare}
+% indicate that this model expresses many updates well.  Boyapati et
+% al.~\cite{boyapati03lazy} also forbid cycles, but in their model,
+% transformers only reference old objects. We explain their model in
+% more detail in Section~\ref{sec:related}. We leave to future work a
+% detailed investigation of the semantics and expressiveness of both models.
+
+While the object transformer functions written for the old world and new
+world models indicate that the old world model provides a simpler logical
+model for object transformation, we implemented
+the new world model for simplicity of implementation and efficiency. The old world model requires
+two traversals of the heap --- one pass to identify objects that need to be
+transformed, and another pass to scan and convert all pointers that refer
+to old version objects to point to new version ones. The old version model
+also requires two steps to load classes of the new version. A first step to
+load stub classes to run transformers and another step to load the real
+classes of the new version after the update. The new world model on the
+other head integrates cleanly with our VM implementation. \JV renames old
+classes to stub classes and loads new version classes in a single step.
+\JV's modified garbage collector walks through the heap, identifies objects
+that need to be updated, creates additional copies for such objects while
+ensuring that all references point to these new copies. After invoking
+object transformers on all updated objects, the application can resume
+execution in the new version.
+
+Our implementation of object transformers uses an extra copy of all updated
+objects and adds temporary memory pressure.  We  could copy the old
+versions to a special block of memory and reclaim it when the collection
+completes. We could avoid extra copies altogether by invoking
+object transformer functions during collection.  This approach is more
+complicated because our transformer model requires recursively invoking the
+collector from the transformer if a dereferenced field has not yet been
+processed.  We also would need to use a  GC-time read barrier to follow
+forwarding pointers before dereferencing an object in order to determine
+whether an object has been transformed.
+
+% In addition, to provide access to the fields 
+% of changed objects in transformer functions, we can customize the
+% collector to completely process the children first using a postorder
+% traversal.  This traversal order would guarantee that any object
+% reachable from the object transformer function is sure already initialized.
+% Other programming 
+% interfaces are possible, too.  For example, Boyapati et al.~\cite{boyapati03lazy}
+% take advantage of encapsulation information to allow transformer code
+% to access the old versions of pointed-to objects.  Our approach allows
+% programs to only see the new versions of objects within transformers,
+% similar to the \emph{representation consistency} invariant proposed by
+% Stoyle et al.~\cite{StoyleHBSN06}.  We will let future experience
+% guide our understanding of which programming interfaces are most
+% useful.
+
+% These disadvantages have not proved problematic in practice.  Very often the
+% default transformer is sufficient, in which case there is no extra copying.
+% The custom object transformer functions we have written are similar to the
+% one in Figure~\ref{fig:example-xform}.  By and large, they copy fields
+% (either base types or pointers) from the old object to the new one.
+% Transformers also tend to allocate new objects for changed or added fields,
+% and these new objects may, once again, refer to objects directly pointed to
+% by the old object.  In the figure, the new {\tt EmailAddress} objects
+% point to the {\tt String}s that used to serve as e-mail addresses in the
+% old object.
+
+\subsection{Lazy transformation model}
+We use a stop-the-world garbage collection-based approach that requires the
+application to pause for the duration of a full heap GC in order to perform
+the update. An alternative to this model is applying object transformers
+lazily~\cite{ritzau00dynamic,Mala00a,boyapati03lazy,neamtiu06dsu,chen:icse07}.
+In a lazy model, the system instruments the application to check, at each
+dereference, whether an accessed object is up-to-date and invoke its object
+transformer if necessary. The main drawback of this approach is that it
+adds overhead during steady state execution. However, the lazy approach is
+useful in application contexts that cannot tolerate the pause caused by a
+full heap GC.
+
+\input{100-floats/read-barrier}
+
+The lazy approach can be implemented in \JV by performing the following
+steps. 1) At update time, invoke object transformers on all stack local
+variables. 2) Maintain the invariant that any object accessed by the
+application is up-to-date. We can maintain this invariant by adding
+read-barrier code to all object dereferences. An object can be dereferenced
+in Java only using one of the following three opcodes: {\tt getfield} that
+returns a field from an object; {\tt getstatic} that returns the value of a
+global variable; and {\tt aaload} that return an array element. The
+read-barrier code to check whether or not an object is transformed can use
+the same forwarding pointer mechanism used by the garbage collector while
+scanning the heap.  Figure~\ref{fig:read-barrier} shows the code that
+implements this functionality.  The first time an object is accessed after
+the update, it will be transformed leaving a forwarding pointer in its
+place. Future accesses to the object that go through the forwarding pointer
+return the transformed object and update the corresponding reference. The
+forwarding pointer will be garbage collected away when no field refers to
+it.
+
+While the lazy transformation model reduces pause time, it is not as
+flexible as the stop-the-world eager transformation model. When using the
+lazy transformation model, the programmer must take special care to ensure
+that application correctness is not affected by when objects are
+transformed.  For example, in the update that goes from a singly to
+doubly-linked list, an object's {\tt prev} field is set by its previous
+object's transformer and not by itself. No general mechanism for obtaining
+the previous object exists without eagerly transforming the list.
+When the application accesses an
+object's {\tt prev} field and the field is {\tt null}, there is no way to
+know if it is actually {\tt null} or whether it is yet to have its value set.
+Thus, lazy transformation limits the types of updates a dynamic updating
+system can support.
+
+% This pause time could be mitigated by
+% piggybacking on top of a concurrent
+% collector.  We could also consider applying object and 
+% class transformers lazily, as they are
+% needed~\cite{ritzau00dynamic,Mala00a,boyapati03lazy,neamtiu06dsu,chen:icse07}.  The
+% main drawback here is efficiency. The VM would need to insert code to check, at each
+% dereference, whether the object is up-to-date, imposing extra overhead
+% on steady-state execution.  Moreover, stateful actions by the program after
+% an update may invalidate assumptions made by object transformer
+% functions. It is possible that a hybrid solution could be adopted,
+% similar to Chen et al.~\cite{chen:icse07}, which removes checking
+% code once the system updates all objects.  We leave
+% exploration of these ideas to future work.
+
+% vim:spell:ft=tex:

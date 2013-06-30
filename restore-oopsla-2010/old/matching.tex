@@ -1,0 +1,187 @@
+%In effect, we are attempting to infer some semantic information that is not present in the text of the program.  We do this by running the code repeatedly and examining the objects produced. 
+
+\section{Snapshots}
+
+\stephencomment{This section is largely redundant with the new Overview section.}
+
+We first describe the concept of heap snapshots, timing of snapshots, and the connection between heap snapshotting and dynamic software updates.
+
+A snapshot is a complete dump of the program's heap at a single point in time.  Our goal with this work is to infer state transformation functions, and so we are interested in the state of the heap at designated update points.  Suppose we have a program with a single update point.  Given snapshots from two runs of this program---one at the old version and one at the new---we can compare these snapshots and use this comparison to generate the proper state transformation.  However, the comparison is only valid if the snapshots both occur at the update point.  This is because the update point is the point at which the transformation is applied during a dynamic update.  It is also where execution at the old version ends and where execution at the new version picks up.
+
+\stephencomment{The following two paragraphs are unique.  They could perhaps go in an implementation section.}
+The Oracle JVM supports heap snapshotting via the \texttt{agentlib:hprof} command line option.  This option enables the heap profiler, which has support for sending the current snapshot over the network.  We wrote a small network server that accepts heap snapshot requests, initiates the snapshot, and saves the result to a file.  This allows snapshots to be requested programmatically by an application.
+\footnote{A simpler approach to heap dumping is to use the command line tool \texttt{jmap}, which is provided with the Oracle Java VM.  However, we were unable to get \texttt{jmap} to include string constants in the heap dump, forcing the use of the alternative approach described above.}
+
+We produced a small helper class that can be linked into a program for which we want to infer state update functions.  This class has a static method that can be called in order to mark an update point.  In a dynamic update scenario, this call would trigger a change in the running version of the program.  In our update inference scenario, this call triggers a snapshot and continues executing the program at the current version.  This allows snapshots to be collected at all possible update points in a single-version execution.
+
+The final requirement on snapshots is that any snapshots taken at version 2 must represent the same high-level state as the corresponding snapshot at version 1---at least for the portion of the state for which we are inferring transformation code.  For example, if we are updating an FTP server, we might specify a single update point at the top of the loop that processes client commands.  To ensure that snapshots at two versions match, we would want to always run the program with the same sequence of commands.  If the first snapshot at version 1 occurs after an upload of file \texttt{fname1.txt} then the first snapshot at version 2 will also occur after that upload and will reflect the same high-level server state as the version 1 snapshot.  It is also important that the initial state always be the same.  So if \texttt{fname1.txt} was not present on the server's file system when running version 1, it should not be present when running version 2.
+
+Note that while the above discussion referring to executions of a program at different versions, we can record a similar sequence of corresponding snapshots for same-version executions.  We simply run version 1 twice starting from the same initial state and providing the same inputs.  Such \emph{v1-v1} snapshot sequences will be useful during our inference procedure.
+
+\section{Update Functions}
+
+\begin{figure}
+\small
+\[
+\begin{array}{lrcl}
+\text{Updates} & \delta & \bnfas & \lambda \oldvar.\ \lambda \newvar.\ g_1;\ \ldots;\ g_n\\
+\text{Field Updates} & g & \bnfas & n.p := d \\
+\text{Field Path} & p & \bnfas & \epsilon \mid p.f \\
+\text{Conditional} & d & \bnfas & \casestart e_1 \carrow c_1, \ldots, e_n \carrow c_n \caseend \\
+\text{Constructor} & c & \bnfas & k \mid \oldvar.p \mid \sconcat(\se_1,\ldots,\se_n) \\
+& & & \mid \filtermap(e,\lambda o.\ d, o.p) \\
+\text{Integer Constant} & i & \in & \mathbb{Z} \\
+\text{Constant} & k & \bnfas & i \mid \texttt{null} \mid \delim \\
+\text{Delimiter} & \delim & \bnfas & \texttt{\textbackslash} \mid \texttt{/} \mid \texttt{\#} \mid \texttt{@} \mid \texttt{:} \\
+\text{String Expression} & \se & \bnfas & \delim \mid \substr(o.p,i)\\
+\text{Boolean Expression} & e & \bnfas & o.p_1 \op o.p_2 \mid o.p \op k \\
+\text{Operator} & \op & \bnfas & \mathord{=} \mid \mathord{\neq} \mid \ldots
+\end{array}
+\]
+\caption{\label{fig:language}The language over which we perform synthesis.}
+\end{figure}
+
+Figure \ref{fig:language} gives the language over which we perform synthesis.  $\delta_C$ gives a transformer for objects of class $C$.  This consists of a transformer $g_f$ for each field $f$.  Transformers are super-scripted with the variables that reference the old and new objects (\texttt{oldObj} and \texttt{newObj} in the body of $\delta_C$).  Each object transformer consists of a series of field updates ($g_f^{o,n}$).  These field updates consist of a top-level conditional where each branch produces some value to be assigned to the field.  We write $\delta_C(o)$ to denote the transformation of object $o$ according to the function $\delta_C$.
+
+We keep the value constructors high-level both for clarity of exposition and ease of synthesis.  However, high-level transformers such as $\textit{filtermap}(b,\delta_C)$, which filters out the elements of a collection satisfying $b$ and then transforms the remaining elements using $\delta_C$, can be easily converted to Java code.  For string updates, we use a construct $\textit{substr}_i(o.f)$, which partitions a string at locations where a delimiter appears and then selects the $i^\text{th}$ partition.  For example, $\textit{substr}_2(\text{foo@bar.com})$ returns ``bar'' since `\@' and `.' are both delimiters.  This technique of treating delimiters specially when constructing string updates was used in the work of Gulwani~\cite{gulwani-strings}.  Our language of string updates supports a concatenation of substrings and this has been sufficient for the examples we considered.  If a more robust string transformation language were needed, the approach taken in \cite{gulwani-strings} could be used here without modification.
+
+Note that what we have defined is a language of \emph{class-based} transformers.  That is, a separate update function $\delta_C$ is defined for each class and applied independently to each object of that class.  An alternative would be to transform the heap by walking the entire object graph.  \stephencomment{Doing some work in another thread to see if this is feasible.  If so, the text below would change.}
+
+Another restriction of our language is that each field is transformed independently.  We produce one field update $g_f^{o,n}$ for each field $f$ in the target class.  However, $g_f^{o,n}$ does have access to the full contents of the old-version object $o$.  Thus, the new-version value for a field can depend on multiple old-version fields.  Transformers that are ruled out by this setup include those that base updates for field $f$ on the updated value for field $f'$ as well as those that pass values down the object graph, e.g. using the value in field $f_1$ when updating field $f_2.f_3$.
+
+While at first it may seem that the use of class-based transformers implies that all objects of a given class must be transformed in the same way, this is not the case.  There are two methods of treating distinct objects differently at transformation time.
+ The first approach involves the use of a conditional update function.  An update function can branch on properties of object fields and treat different classes of objects differently even though they have the same type.  
+The second approach involves transforming an object via its parent in the reachability graph.  
+The example from Figure \ref{fig:leak-1-state-update} illustrates both these concepts.  The transformation function assigns \texttt{null} to \texttt{new.\_server.adapter}, but only if \texttt{old.\_server.\_bContinue} is true.  This function could not be produced by starting with \texttt{\_server.adapter}.  It is critical that the synthesis code had access to the \texttt{\_server.\_bContinue} field.
+
+\deleted{
+Suppose object $o$ of class $C$ has a field $f$ of type $C'$.  When transforming $o$, we can apply transformation code to the object at $o.f$.  This transformation may be different from the one defined for objects of type $C'$.  In our current system, we ask for a transformer for a single class.  So in this example we would either request a transformer for class $C'$ or a transformer for class $C$ (which then may transform the object at field $f$ and thus modify some objects of type $C'$).  We leave to future work a method for choosing between different transformers when there are multiple ways of reaching an object.
+}
+
+\subsection{Stable Fields}
+
+In addition to the restrictions imposed by the language in Figure \ref{fig:language}, there is a restriction imposed by our approach.  As mentioned in Section \ref{sec:overview}, we use heap snapshots produced by two separate runs of the program to construct the input / output examples for synthesis.  As a result, we can only synthesize updates for fields that have consistent values across runs.  We use the term \emph{stable field} to refer to those fields that are the same for corresponding objects from different program runs.  An example would be the filename field for an object representing an in-progress download.
+Fields whose values may vary across distinct program runs are referred to as \emph{non-stable}.  An example would be the time a download was initiated.  Our algorithm generates update functions for stable fields only.  Non-stable fields may have well-defined updates--for example the time field could be changed from seconds since 1970 to milliseconds since 1970.  However inferring such updates requires an understanding of the semantics of the field that is currently outside the capabilities of our system.
+
+\section{Matching Algorithm}
+
+The first component of our update synthesis algorithm involves choosing a class $C$ and matching old-version objects $o_1$ with new-version objects $o_2$ (both of class $C$) such that $(o_1,o_2)$ gives an input-output pair for the desired update function $\delta_C$.  We call such pairs \emph{examples} and refer to the process of generating examples as \emph{matching}.  We then require that the update function $\delta_C$ be consistent with all examples generated by the matching process.  That is, $\delta_C$ should satisfy $o_2 = \delta_C(o_1)$ for each example pair $(o_1,o_2)$.
+
+We have implemented two approaches to matching.  Together, these two algorithms can handle all the examples we have seen.  In the first approach, we search for \emph{key-fields}, which are object fields that serve as natural keys and help us track objects across runs of the program.  In the second approach, we use the synthesis algorithm itself to guide the matching.  Both these matching techniques, as well as the synthesis algorithm that we apply afterward, apply only to stable fields.  As such, the first step is to identify the stable fields.
+
+\subsection{Finding Stable Fields}
+
+A stable field is one which has the same value for identical objects from differing program runs at the same version.  Two runs at the same version can easily be produced by running the program twice with the same input script, or by running the same test case.  The next task we face is then to discover which objects from the two traces conceptually correspond to the same object.  For example, consider a \texttt{Connection} class from a network file server application.  An instance of \texttt{Connection} represents a connection to another machine and thus two \texttt{Connection} objects might correspond if they refer to the same IP and port number.  Once we have discovered that IP and port number uniquely identify \texttt{Connection} objects, we can then compare matching objects from the two program executions and 
+
+\subsection{Key-Field Approach}
+
+When attempting to synthesize an update function, the first matching approach that our algorithm tries is based on identifying \emph{key-fields}.  These are fields that uniquely identify objects across runs of the program.  Examples are IP addresses in an object representing a connection, or file names in a program for transferring files over the network.  We have found that for objects with several fields, one of these fields is likely to be a key-field.  To handle more cases, we consider field paths, which are chains of object field dereferences---so if object $o$ contains field $f$ and $o.f$ contains field $f'$, we call $f.f'$ a field path (of depth 2) and when applied to $o$ this path denotes the value $o.f.f'$.  Even when an object has only one or two fields, it may have many field paths of some depth, in which case one of these paths often serves as a key.  In our experiments, we use a field path depth of 2.
+
+
+
+That is, we first find $o_1, o_2$ such that $o_2 = f(o_1)$ and then synthesize an $f$ that is consistent with this example.
+
+Consider the following equality relation on objects.
+\begin{defn}
+$o_1 \eqfv{f}{v} o_2$ if and only if $o_1.f = v$ and $o_2.f = v$.
+\end{defn}
+
+This defines an equivalence class consisting of those objects which all contain value $v$ in field $f$.
+\begin{defn}
+Let $\eqfvclass{f}{v} = \{o \mid o.f = v\}$.
+\end{defn}
+For all $f, v, o_1, o_2$ we have $o_1, o_2 \in \eqfvclass{f}{v}$ implies $o_1 \eqfv{f}{v} o_2$.
+
+We can similarly define an equality relation that equates objects that agree on the value of some designated field $f$.
+\begin{defn}
+$o_1 \eqf{f} o_2$ if and only if $o_1.f = o_2.f$.
+\end{defn}
+We then have, for any $f,v,o_1,o_2$, that $o_1 \eqfv{f}{v} o_2$ implies $o_1 \eqf{f} o_2$.
+
+We can also use objects as representatives for equivalence classes.
+\begin{defn}
+Let $\eqfclass{f}{o} = \{o' \mid o \eqf{f} o'\}$.
+\end{defn}
+
+We can extend this to sets in a straightforward way.
+\begin{defn}
+$o_1 \eqf{\fset} o_2$ if and only if $\A[f \in \fset] o_1 \eqf{f} o_2$.
+\end{defn}
+\begin{defn}
+$\eqfclass{\fset}{o} = \{o' \mid o \eqf{\fset} o'\}$.
+\end{defn}
+
+
+
+The relation $\eqf{\fset}$ is defined for all objects.  In performing our matching, we will be interested in restrictions of this relation to smaller sets of objects.
+\begin{defn}
+Let $\fset$ be a set of fields.
+Let $n_1 = \setsize{\eqfclass{\fset} \cap \objset_1}$
+The \defemph{coverage} of $\eqf{\fset}$ with respect to object sets $\objset_1, \objset_2$ is $\setsize{\{o_1 \mid o_1 \in \objset_1 \wedge \E[o_2 \in \objset_2] o_1 \eqf{\fset} o_2\}}$.  That is, the coverage is the size of the subset of $\objset_1$ whose members are all $\eqf{\fset}$-related to objects in $\objset_2$.
+\end{defn}
+\begin{defn}
+Let $n_1 = \max_{o_1 \in \objset_1}\setsize{\{o_2 \mid o_2 \in \objset_2 \wedge o_1\ R\ o_2\}}$.  That is, $n_1$ is the size of the largest subset of $\objset_2$ that is related by $\eqf{\fset}$ to some single element in $\objset_1$.  Let $n_2 = \max_{o_2 \in \objset_2}\setsize{\{o_1 \mid o_1 \in \objset_1 \wedge o_1\ R\ o_2\}}$.  That is, $n_2$ is the corresponding duplication measure for the elements in $\objset_2$.
+The \defemph{duplication factor} of $\eqf{\fset}$ with respect to object sets $\objset_1, \objset_2$ is then $\max(n_1,n_2)$.  That is, the duplication factor is the size of the largest set of objects that is related by $\eqf{\fset}$ to a single object in either $\objset_1$ or $\objset_2$.
+\end{defn}
+
+The \emph{matching problem} is then defined as follows.
+\newtheorem*{mprob}{Matching Problem}
+\begin{mprob}
+Given two sets of objects $\objset_1, \objset_2$, find the set of fields $\fset$ such that $\eqf{\fset}$ has maximal coverage and minimal duplication factor with respect to $\objset_1, \objset_2$.
+\end{mprob}
+
+The optimal matching is one that relates each object in $\objset_1$ to a single distinct object in $\objset_2$.  This is not always possible.  For example, if $\setsize{\objset_1} > \setsize{\objset_2}$ then we must accept either non-optimal coverage or non-optimal duplication factor.
+The following theorems help guide us toward a matching.
+
+\begin{thm}
+If 
+\end{thm}
+
+Our matching heuristic takes as input three equal-length lists.  We will decorate variables representing new-version objects with a hat.  So $\no$ is a new-version object, $\nobjset$ is a new-version set of objects, and $\nL$ below is a list of new-version object sets.
+\[
+\begin{array}{lcl}
+L &=& \objset_1, \objset_2, \ldots, \objset_n \\
+L' &=& \objset_1', \objset_2', \ldots, \objset_n \\
+\nL &=& \nobjset_1, \nobjset_2, \ldots, \nobjset_n
+\end{array}
+\]
+We write $L(i)$ to refer to the $i^{\text{th}}$ set of objects in list $L$.
+
+\stephencomment{The following is from a previous iteration.  Left in here so we don't forget to talk about it.}
+
+\subsection{Special Classes}
+
+Here we talk about any special handling we introduce for strings, arrays, and collections.
+
+\subsection{Detecting Failure}
+
+Matching is based on a heuristic and synthesis is based on matching.
+Both of these work on a limited set of data that arises from some
+number of executions of the program, but may not be representative of
+all executions.  For these reasons, it is crucial that we have good
+techniques for detecting when our heuristics are failing or when there
+is not enough data to inspire confidence in the synthesis result.
+
+Some properties that help with this.
+\begin{enumerate}
+\item Matching should be 1-to-1.
+\item We only produce a result if synthesis succeeds (if it fails, it
+  doesn't matter that we may have had a bad matching---at least we
+  won't have screwed anything up).
+\item ``key fields'' identified should also be single-version key fields.
+\item Synthesis should produce a ``simple'' program.  By this I mean
+  that if synthesis says the only way to fit the data is with a giant
+  switch statement with 37 cases, all of which a assign a set of
+  constants to the new fields, then we probably have failed to find
+  the desired transformation function.
+
+  This is basically the problem of over-fitting in machine learning.
+  We don't want to over-fit.  In order to detect over-fitting, a
+  common technique is to split the data into \emph{training data} and
+  \emph{testing data}.  We could do the same thing.  Perform matching,
+  then take half the input-output pairs and use them to perform
+  synthesis.  Then check that this function also works for the other
+  half.  This would only work in cases where we have lots of
+  input-output examples though.
+\end{enumerate}
+

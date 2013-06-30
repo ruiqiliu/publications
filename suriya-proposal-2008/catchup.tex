@@ -1,0 +1,119 @@
+
+% Arguments are
+% 1. Description of refactoring
+% 2. Old code
+% 3. New code
+% 4. How much do we support it.
+% \newcommand{\CatchupTableRow}[4]{%
+% \multirow{2}{*}{\begin{minipage}{0.25\textwidth}%
+% % Description of refactoring
+% #1%
+% \end{minipage}} &%
+% \begin{minipage}{0.3\textwidth}%
+% % Old code
+% #2
+% \end{minipage} &
+% \multirow{2}{*}{
+% % How much do we support it
+% #4
+% } \\ \cline{2-2}
+% % New code
+% & \begin{minipage}{20ex}
+% #3
+% \end{minipage} & \\ \hline%
+% }
+
+\newcommand{\LeftColumnWidth}{0.35\textwidth}
+\newcommand{\MiddleColumnWidth}{0.35\textwidth}
+\newcommand{\RightColumnWidth}{0.23\textwidth}
+
+% \setlength{\extrarowheight}{8pt}
+\begin{table}
+\begin{center}
+\begin{tabular}[t]{@{}l|l|l@{}}
+{\bf Refactoring} & {\bf Code} & {\bf How it is supported} \\ \hline
+
+% Rename type
+\begin{minipage}[t]{\LeftColumnWidth}
+{\bf Rename type} \\
+Rename a class or an interface
+\end{minipage} &
+% Old code
+\begin{minipage}[t]{\MiddleColumnWidth}
+\begin{verbatim}
+public class Old { ... }
+public class New { ... }
+\end{verbatim}
+\end{minipage} &
+\begin{minipage}[t]{\RightColumnWidth}
+\DSU{} considers this a class update. The new class file is loaded and all
+objects of the old class are converted to the new class. Does not allow
+active methods of the class on stack. OSR support may help remove this
+restriction.
+\end{minipage} \\ \hline
+
+% Moving Java Elements
+\begin{minipage}[t]{\LeftColumnWidth}
+{\bf Moving Java Elements} \\
+Move a Java type from a package to another package or into a class
+\end{minipage} &
+% Old code
+\begin{minipage}[t]{\MiddleColumnWidth}
+\begin{verbatim}
+package package1;
+public class Foo { ... }
+
+package package2;
+public class Foo { ... }
+\end{verbatim}
+\end{minipage} & \\ \hline
+
+% Move static member
+\begin{minipage}[t]{\LeftColumnWidth}
+{\bf Move static member} \\
+Move type, method, or field from one type to another
+\end{minipage} &
+% Old code
+\begin{minipage}[t]{\MiddleColumnWidth}
+\begin{verbatim}
+public class Foo1 {
+ public static boolean DEBUG;
+}
+public class Foo2 {
+}
+
+public class Foo1 {
+}
+public class Foo2 {
+ public static boolean DEBUG;
+}
+\end{verbatim}
+\end{minipage} & \\ \hline
+
+% Change method signature
+\begin{minipage}[t]{\LeftColumnWidth}
+{\bf Change method signature} \\
+Change method name, return type, visibility \\
+Add, remove, rename parameters \\
+Add/remove exception types
+\end{minipage} &
+% Old code
+\begin{minipage}[t]{\MiddleColumnWidth}
+\begin{verbatim}
+public class Foo {
+ public void method(int x) {}
+}
+
+public class Foo {
+ public void method(int x,
+                    int y) {}
+}
+\end{verbatim}
+\end{minipage} & \\ \hline
+
+\end{tabular}
+\caption{Common refactorings and how \DSU{} supports them\label{tab:catchup}}
+\end{center}
+\end{table}
+
+% vim:spell

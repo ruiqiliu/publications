@@ -1,0 +1,305 @@
+===========================================================================
+Summary of reviews.
+
+Review 1
+* Questioning motivation/justification for DSU; "Real" mission critical
+  systems already have failover and redundancy.
+* Developer's work is not easy. Writing transformation functions,
+  establishing that the update is safe is not-trivial.
+* Applications are not representative.
+* Active methods on stack.
+* "supports the following dynamic updates". What are they.
+* Some suggestion about object serialization, that I only partly
+  understand. Seems like a nice idea though.
+* Disk I/O for classloading.
+* Stopping threads on one processor is easy.
+
+Review 2
+* Might take a long time for threads to reach a safe point.
+* Can approach automatically detect cases where safe-point cannot be
+  reached?
+
+Review 3
+* How do we support Java's exception model in light of this? Absolutely no
+  idea. I have not thought about this.
+* Extra copy of old-object might result in out-of-memory.
+* Should transformer functions be within the new class? Can they be in a
+  separate "transformer library"? How do we support changes to 3rd party
+  libraries that do not provide source code?
+* How powerful/expressive are transformers? How hard are they to write?
+* Some clarifications regarding reaching a safe-point.
+* Used only one virtual processor. What about SMPs?
+* Question about Jikes performance, is there greater GC frequency after
+  update? How often did normal GC occur before the update (can show
+  indicators on the graph).
+* Performance for Jetty 5.1.5 not shown. Did not want to clutter graph.
+* Does not buy non-linear argument.
+* This is just Hicks for Java.
+* Implementation available? Not yet.
+
+=========================================================================
+
+===============================================================================
+First Review
+
+          >>> Summary of the submission <<<
+
+The paper describes the Jvolve VM which supports dynamic software updates. By
+halting the execution of a running program the Jvolve VM can apply certain
+categories of update by replacing classes, compiled code and the existing
+instances of those classes. This is done by utilizing existing VM services to
+achieve the update in a fairly economical manner without introducing overheads
+when updates are not being applied.
+
+
+          >>> Evaluation <<<
+
+This is a well written and well presented paper. I like the way the authors
+have clearly defined the scope of their work. They seem to understand where the
+work fits in terms of related work; and they seem to know its strengths and
+weaknesses, its limitations and some areas that can be looked at in the future.
+Overall this is a nice system and the paper describes it well.
+
+I do question however the claim of "significantly improve[d] software
+availability". There is an issue with positioning this work in terms of its
+applicability to serious software systems. While the authors mention "mission
+critical" and "business" systems, they also comment on DSU not requiring "extra
+nor redundant hardware". I find these to be at odds. Serious systems that
+demand high availability also have other demands. They tend need failover and
+redundancy to maintain overall reliability - and therefore they already have an
+environment where dynamic update is simply not needed. Further, "real" systems
+do not deploy updates on running servers - that is a recipe for disaster. Real
+deployments involve running the new software in a controlled environment,
+testing it, evaluating it and gradually rolling it out into production. These
+environments do not need dynamic update.
+
+A second issue with dynamic update is the impact on the application developer.
+The developer must not only update the application but they have to determine
+how the application will behave if dynamically updated. This is non-trivial in
+the general case. Further, having done this work of writing transformers etc,
+the developer must now test the application of the update to a running system -
+but how do they do that? How do they establish that it is safe/correct to apply
+the update while the application might be in different stages of execution? And
+how do they then convince the deployers of the application that they have
+established this? 
+
+The two running examples are not representative of serious business or
+mission-critical applications. They are small and have a very regular execution
+pattern. The updates that were applied to them were also small. They serve as
+useful demonstrators, but not as validators that DSU in Jvolve can successfully
+be applied to much larger systems.
+
+That said, there may well be some "medium" size systems that are significant
+enough not to want downtime for updates, yet "insignificant" enough not to be
+able to have the additional hardware and redundancy that would preclude the
+need for dynamic updating.
+
+The limitation regarding updates to active methods is a very significant one.
+While all the approaches generally share this limitation, it would seem to be
+large stumbling block for DSU systems. OSR may well assist in this area, but
+the main issue is semantics - replacing a method in the middle of execution
+seem rather daunting to contemplate.
+
+In 2.2 the authors state that Jvolve "supports the following dynamic updates"
+and list two. Are there others?
+
+Section 2.3: just an observation that the replacement process seems similar to
+the object replacement that can occur with object serialization. Which reminds
+me that I seem to recall a system that essentially wrote out the object graph
+to disk; loaded the new classes; then deserialized the object graph
+transforming instances as needed. The dynamics are somewhat different to
+Jvolve, but it's an interesting approach.
+
+Minor nit: Table 2 appears a page later than it should - it should be on the
+same page as Section 4.3.
+
+Section 5: I was surprised that the authors stated that the cost of loading new
+classes was both negligible and hard to measure. Disk I/O is rarely negligible,
+and class loading overheads are frequently measured.
+
+I was also surprised at the use of a single processor configuration for the
+benchmarks. It isn't hard to stop-the-world when only one thread can be active.
+The cost of stopping significantly more threads can have a significant impact
+on the overhead of doing the update.
+
+===============================================================================
+Second review
+
+          >>> Summary of the submission <<<
+
+This paper present an approach to support dynamic software updating without
+stopping and restarting existing programs. This approach supports to adding and
+replacing fields and methods anywhere within a class hierarchy.
+This is accomplished by 1) determining the changed and transitively-affected
+classes for a given release, 2) stopping threads at safe points where none of
+the changed or transitively-affected methods are on the stack, and 3) updating
+the classes and objects during a GC at the safe points.
+The author implemented this approach and presents experimental results. This
+approach supports 17 of 19 updates for two server programs, and introduces no
+execution time overhead for the updated software.
+
+
+
+
+          >>> Evaluation <<<
+
+This paper addresses the practical problem regarding dynamic software updating
+without stopping and restarting existing programs. It frequently happens in the
+server program.
+
+In favour
+This approach, which determines the changed and transitively-affected classes,
+stops threads at safe points, and updates classes and objects during a GC, is
+simple, clear, and effective. It is implemented well, and the experimental
+results are good.
+This paper is also written well.
+
+Against
+In Section 3.2, I have a concern regarding the overhead of stopping all of the
+threads at the appropriate safe points. Based on this approach, it may be
+necessary to give up and try again many times. It could take a long time to
+stop all of the threads at safe points. In particular, since the server
+programs execute many threads, I am worry about this time.
+
+Comment:
+In Section 4.1, there is one case where it cannot apply an update. This is
+because that program is never able to reach a safe point. Can this approach
+automatically detect such case?
+
+===============================================================================
+Third review
+
+          >>> Summary of the submission <<<
+
+The goal is to allow Java programs to update themselves in a type-safe
+manner while running, without impacting performance during the normal
+case. To this end, they modified the JVM. To apply an update, the world is
+stopped at a safe point (a point where no code is directly/indirectly
+affected by the update), classes are updated, and then old objects are
+transformed as part of a full GC pass, whereby user-written transformer
+objects convert old versions of objects to newer versions. All affected
+methods are marked to be re-JITed. Since the update happens transparently
+while the world is stopped, no proxies or additional barriers are required.
+
+
+
+
+          >>> Evaluation <<<
+
+[++] Real system, and they evaluated documented changes on real, open-source
+ apps (45 KLOC and 5KLOC, 10 versions each)
+[++] No performance overhead except during updates, fully leverages and
+ interoperates with JIT
+[++] Techniques/algorithms cover all corner cases, appears to be ready for
+ production
+[+ ] Almost any type of updates allowed (i.e. can't reverse subclassing
+ relationships), but can't be applied if unsafe methods are on call stack
+ (method explicitly or indirectly related to changes)
+[ - - ] How to handle exceptions thrown by object transformers? [one of
+ targets was safety critical apps -- can we roll back to the old version
+ while in mid-update if update fails?]
+[ - ] Ability to update under memory pressure, due to extra copy of old
+ object during transform? [this may increase likely of OutOfMemory exception
+ and exacerbate the above challenge]
+[ - ] Confused if source code is required to generate transformers: section
+ 2.1 says the Jvolve change detector requires the source tree, but then
+ section 3.1 says it uses jclasslib, which operates over bytecode; if source
+ code is required, what about 3rd party libraries that change? if source is
+ not required, could the 3rd party provide a 'transformer library' to be
+ used to 'plugin' to your update process?
+[ - ] There is some ambiguity in how object transformers are applied for
+ "deep" objects that contain other objects that have also changed. They
+ briefly mention the programmer can specify whether to transform the parent
+ or the child first, but it's unclear how often they had to deal with this
+ in practice in their case studies, and whether any updates in particular
+ made it difficult to write the transformers (e.g. how long did it take to
+ write the transformers? hours? days?)
+
+==== Detailed Comments (public) ====
+
+* As you read the paper, there are some conflicting statements about how it
+reaches an unsafe point. Sec 2.1 -- 'VM waits for all threads to stop at a
+DSU safe point'. Sec 3.2 -- "it gives up" if any methods unsafe -- after a
+period of time, or instantly? Second to last paragraph in section 3.2
+confirms the latter possibility. Seems quite simplistic. How many times did
+you try to apply and update and have to retry?
+
+* Section 3.4, par 5, last sentence. It's not clear why caching a pointer to
+the old version from its new version avoids multiple scans of the update
+log. How does this relate to knowing if references accessed in transformers
+point to updated objects or old objects (using a pointer in the old object
+to point to the new seems more intuitive). Would appreciate more detail
+here, there is probably something interesting for us to learn here.
+
+* Section 5 mentioned that the VM was configured with only one virtual
+processor. Does your implementation break if there are multiple virtual
+processors? Are there some difficult problems making it work on SMP (if so,
+for the benefit of the community, would be interested in more details in the
+paper)
+
+* Figure 5 -- really wanted to see Jikes performance on this graph also, to
+understand how its throughput looked over time. Also from the graph the
+updated software was always slightly lower, making one think there are
+perhaps some lingering effects on performance. (i.e. did the update result
+in a greater GC frequency later on?)
+
+* Section 5.1 -- how often did the normal GC have to interrupt the app
+during the benchmark? Would have liked to see indicators on the graph
+showing where normal GC points occurred.
+
+* Section 5.1 and Table 4: Why did you not show performance of Jikes on
+5.1.5? (you certainly had the space) My intuition says it's probably very
+similar, but since it's missing it does make one wonder.
+
+* I'm not sure I buy your comment that the time to run object
+transformations was non-linear because of caching effects without more
+data. What was the total heap size (never mentioned)? How much of that heap
+was used when 100,000 objects were active? Instead of caching effects,
+perhaps your heap was getting so large you had to start using virtual memory
+paging in the underlying OS, and that's why it suddenly spiked? (but then it
+seems that GC pause times should have increased markedly also). Some
+additional data and intuition on why you think caching effects caused the
+non-linear jump is in order.
+
+* Abstract: '...that occurred over more nearly...' should be '...that
+occurred over more than nearly...'
+
+* Sec 6.2, par 2: 'Both VMs' ... 'Both prior VMs'
+
+==== Reason for Recommendation (public) ====
+
+The problem they address is relevant and timely. Although their techniques
+are not surprising and follow naturally from the design requirements, no one
+has done it in this way before, or in such a way that similar benefits are
+achieved within this context. They do discuss some of the more subtle
+complications that are of broader interest (e.g. interaction with metadata
+and JIT, ensuring methods that reference public fields are unsafe, etc.),
+although some need more explanation (how to avoid conflicts in transformers
+when deep objects and the objects they contain change also). There are some
+more minor points that need addressing, mentioned above in detailed
+comments. Their implementation is sufficiently robust to handle complex,
+meaningful applications. Their evaluation appears to be the most extensive
+to date for DSUs within JVMs, although there are a few quirks in the data
+that aren't sufficiently explained (i.e. non-linearity of time to execute
+transformational objects blamed on 'caching effects' without further
+explanation), and it's not clear if there are hidden limitations, such as
+the inability to run with more than one virtual processor. The related work
+section compares their work to the most significant prior work that I am
+aware of. In summary, this work demonstratively provides both greater
+flexibility and performance vs prior work, although its dependence on
+transformers may make it less safe unless there is the ability to 'roll
+back' a failed partial update.
+
+---- Review #2 ---
+
+This is a well written paper that describes a system that appears
+useable. There is nothing particularly novel about the approach, basically
+it is an implementation of dynamic software update for C (by Hicks ea) in a
+type safe language. Type safety and the presence of a modern virtual machine
+helps a lot. (For instance, the VM already tracks inlining decision to
+support OSR, this can be used for defining safe points.)
+
+There is value in showing that DSU can be done efficiently in Java, but the
+results are not really surprising.
+
+* Is your implementation available?

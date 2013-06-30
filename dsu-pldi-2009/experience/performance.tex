@@ -1,0 +1,42 @@
+\input{experience/performance-jetty-table}
+\input{experience/performance-microbench-table}
+
+\subsection{Performance}
+\label{subsec:performance}
+
+The main performance impact of \DSU{} is the cost of applying an update;
+once updated, the application eventually runs without further overhead.  To confirm
+%MWH: added "eventually" here because of the cost of recompilation.
+%We don't actually measure this though.  Is that a problem?
+this claim, we measured the throughput and latency of two Jetty versions while running on
+stock \JikesRVM{} and on \DSU{} after dynamically updating to the next version. The performance of these configurations is
+essentially identical.
+
+% We report
+% on this experiment in Section~\ref{subsec:jetty-perf}.
+
+The cost of applying an update is the time to load any new classes, invoke a
+full heap garbage collection, and to apply the transformation methods on
+objects belonging to updated classes.
+Roughly,
+the time to suspend threads and check
+that the application is in a safe-point is less than a millisecond, and classloading
+time is usually less than 20ms.
+% (Classloading could occur in parallel with normal execution.) 
+Therefore the update disruption time is primarily
+due to the GC and object transformers, and is proportional
+to the size of the heap and the fraction of objects being transformed.  We
+wrote a simple microbenchmark to measure these overheads.
+% Section~\ref{subsec:microbench}
+This experiment shows that object
+transformation is the dominant cost.
+
+We conducted all our experiments on an Intel Core 2 Quad machine running at 2.4 GHz machine with 2 GB of RAM.
+The machine ran Ubuntu 7.10 on Linux kernel version 2.6.22. We implemented
+\DSU{} on top of \JRVMVersion{}.
+
+% We also have microbenchmarks where we compare the
+% overhead added as a result of running the transformer function.
+
+\input{experience/performance-jetty}
+\input{experience/performance-microbench}

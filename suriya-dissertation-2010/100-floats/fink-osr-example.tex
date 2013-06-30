@@ -1,0 +1,72 @@
+\begin{figure}[p]
+\begin{tabular}{@{}l@{\hspace{10ex}}l@{}}
+\begin{minipage}{0.53\textwidth}
+\begin{lstlisting}[xleftmargin=3ex]
+class C {
+  static int sum(int c) {
+    int y = 0;
+    for (int i = 0; i < c; i++) {
+      y += i;
+    }
+    return y;
+  }
+}
+\end{lstlisting}
+(a) A simple example showing method {\tt sum}
+\end{minipage} &
+\begin{minipage}{0.3\textwidth}
+\begin{lstlisting}[xleftmargin=3ex]
+0 iconst_0 
+1 istore_1 
+2 iconst_0 
+3 istore_2 
+4 goto 14 
+7 iload_1 
+8 iload_2 
+9 iadd 
+10 istore_1 
+11 iinc 2 1 
+14 iload_2 
+15 iload_0 
+16 if_icmplt 7 
+19 iload_1 
+20 ireturn 
+\end{lstlisting}
+(b) bytecode for {\tt sum}
+\end{minipage} \\ \\ \\
+\begin{minipage}{0.53\textwidth}
+Running thread: MainThread  \\
+Frame Pointer: 0xSomeAddress  \\
+Program Counter: 16  \\
+Local variables: \\
+\hspace*{5ex} L0 (c) = 100;\\
+\hspace*{5ex} L1 (y) = 1225;\\
+\hspace*{5ex} L2 (i) = 50;  \\
+Stack expressions:\\
+\hspace*{5ex} S0 = 50;\\
+\hspace*{5ex} S1 = 100;  \\
+(c) State extracted from the stack frame
+\end{minipage} &
+\begin{minipage}{0.3\textwidth}
+\begin{lstlisting}[xleftmargin=3ex]
+ldc 100 
+istore_0 
+ldc 1225 
+istore_1 
+ldc 50 
+istore_2 
+ldc 50 
+ldc 100 
+goto 16 
+0 iconst_0 
+... 
+16 if_icmplt 7 
+... 
+20 ireturn 
+\end{lstlisting}
+(d) Version of {\tt sum} with specialized prologue
+\end{minipage} \\
+\end{tabular}
+\caption{Example of \RVM's \OSR
+mechanism \cite{osr}\label{fig:fink-osr-example}}
+\end{figure}

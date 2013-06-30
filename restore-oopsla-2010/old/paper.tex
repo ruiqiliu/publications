@@ -1,0 +1,127 @@
+\documentclass[natbib]{sigplanconf}
+
+\usepackage{color}
+\usepackage{mathptmx}
+\usepackage[scaled=.92]{helvet} % see www.ctan.org/get/macros/latex/required/psnfss/psnfss2e.pdf
+\usepackage{graphicx}
+\usepackage{xspace}
+\usepackage{listings}
+\lstset{language=Java,basicstyle=\small\sffamily,columns=flexible,numberstyle=\em\scriptsize,frame=none,mathescape=true}
+\newcommand{\code}[1]{\lstinline|#1|\xspace}
+\newcommand{\javac}{javac\xspace} % This package lets you punctuate \javac normally and get good spacing, e.g., \javac.  gives you: javac.
+\usepackage{url}  % particularly useful for URLs in bib entries
+\input{smagill-base}
+
+\newcommand{\TOSAcronym}{\emph Targeted Object Synthesis (TOS)\xspace} 
+\newcommand{\TOS}{TOS\xspace} 
+
+\newcommand{\stephen}[1]{\textcolor{blue}{Stephen: #1}}
+\newcommand{\sbm}[1]{\textcolor{blue}{Stephen: #1}}
+\newcommand{\suriya}[1]{\textcolor{blue}{Suriya: #1}}
+\newcommand{\kathryn}[1]{\textcolor{blue}{Kathryn: #1}}
+\newcommand{\mike}[1]{\textcolor{blue}{Mike: #1}}
+
+\begin{document}
+
+\conferenceinfo{Mystery'11,} {January 1, 2011, Paris, TX.}
+\CopyrightYear{2011}
+\copyrightdata{2011}
+
+
+\title{Automating Object Transformations for Dynamic Software Updating
+%   \thanks{COMMENT OUT FOR SUBMISSION, UNCOMMENT FOR final version. Some of these may or may not apply to your work.  Make Kathryn check.
+%     This work is supported by NSF SHF-0910818, NSF CSR-0917191, NSF
+%     CCF-0811524, NSF CNS-0719966, NSF CCF-0429859, Intel, IBM, CISCO,
+%     Google, and Microsoft.  Any opinions, findings and conclusions
+%     expressed herein are the authors' and do not necessarily reflect
+%     those of the sponsors.}
+    }
+
+% 2008: NSF EIA-0303609, DARPA F33615-03-C-4106,
+
+
+\authorinfo{Anonymous}{}{}
+%% \authorinfo{Stephen Magill, Michael Hicks}
+%%            {University of Maryland, College Park}
+%%            {smagill@cs.umd.edu}
+
+%% \authorinfo{Suriya Subramanian}
+%%            {Intel Corporation}
+%%            {suriya@gmail.com}
+
+%% \authorinfo{Kathryn S. McKinley}
+%%            {Microsoft Research}
+%%            {mckinley@cs.utexas.edu}
+
+\maketitle
+
+\input{abstract}
+
+% {\scriptsize
+% \category{D.3.4}{Programming Languages}{Processors}[Memory management (garbage collection); Optimization] 
+% \terms
+% Experimentation, Languages, Performance, Measurement
+% \keywords
+% Heap
+% }
+
+\input{defs.tex}
+
+\input intro
+
+\input overview
+
+\input related
+
+\section{Example}
+
+\input matching
+
+\section{Synthesis Language}
+
+\section{Using Synthesis to Guide Matching}
+
+This is something Mike and I talked about at POPL.  It seems like a
+good idea that could help us match objects even when there is not a
+clear set of ``key fields''.  The issue is complexity.  Suppose we
+have $M$ old-version objects and $N$ new-version objects (both of the
+same class).  There are $M \times N$ possible pairings.  Of course we
+are already doing $M \times N$ edit distance computations in the
+matching phase, but these comparisons are likely much faster than
+synthesis will be.
+
+One hybrid approach would be to use edit-distance-based matching and
+then use synthesis to fine-tune the matching in cases that are not
+clear-cut.  So if $o_1$ is edit distance 4 from $o_2$ and edit
+distance 5 from $o_3$, then maybe use synthesis to help determine
+which pairing should be chosen.
+
+We could also use synthesis to check whether it is a good idea to
+introduce a key field.  If there are no natural key fields, but we
+think that allocation order might be a good matching heuristic, we
+could try it and see if synthesis succeeds.
+
+It seems that when using synthesis as a ``sanity check'' for the
+matching step, it is better to be doing synthesis for a less
+expressive language.  The more expressive the language is, the less
+likely synthesis is to fail, making it less useful as a filter for
+matching.  This is just intuition though and could be totally wrong.
+
+\input{experiments}
+
+% \input{beef}
+% \input{results.tex}
+
+\input{conclusion.tex}
+
+
+\bibliographystyle{abbrvnat}
+% \renewcommand{\bibfont}{\footnotesize} % <--- change bib font size here
+% \setlength{\bibsep}{0.5ex}             % <--- change space between bib entries here
+\bibliography{paper}
+
+\input oldtext 
+
+\input conflicts
+
+\end{document}

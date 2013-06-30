@@ -1,0 +1,67 @@
+\input{100-floats/experience/changes-to-jes}
+
+\subsection{JavaEmailServer}
+\label{subsec:jes}
+
+For JavaEmailServer, we considered 10 versions---1.2.1 through
+1.4---spanning a duration of about two years.  Version 1.4 consists of 20
+classes and about 2500 \SLOC.  Table~\ref{tab:jes-changes} shows the
+release date, source lines of code and summary of updates to each new
+version.
+
+Figure~\ref{fig:jes-code} shows the
+high-level structure of JavaEmailServer's code. The application creates
+multiple \POP and \SMTP protocol handler threads. The number of threads can
+be configured by the user. Each thread listens on its respective port (110
+for \POP and 25 for \SMTP), waiting for new client connections. Upon
+receiving a client request, the server thread communicates with the client,
+services the client's command, and goes back to listening again. The
+main loop of \POP and \SMTP servers are in {\tt Pop3Processor.run()} and
+{\tt SMTPProcessor.run()} respectively. The \POP server authenticates
+users, reads their e-mail messages from the filesystem and sends them to
+the client through the network. The \SMTP server reads in e-mail messages
+from the network and writes them to the filesystem. These messages may be meant
+to be delivered to local users or relayed to other servers on the internet.
+Message delivery is handled by a single {\tt SMTPSender} thread, which
+polls the filesystem for new messages and writes them into user mailboxes,
+or relays them to other servers. The number of threads and therefore the
+maximum number of clients that can simultaneously be serviced is fixed and
+known when the application starts. The server will ignore clients that try
+to connect when all server threads are responding to requests. At any
+moment, the {\tt run()} methods of all threads and based on server load,
+additional methods to handle the \POP and \SMTP protocols and methods to
+deliver messages are active on stack.
+
+\input{100-floats/jes-code}
+
+\subsubsection{Updates to JavaEmailServer}
+Approaches that only support updates to method bodies will be able to
+handle only four of the updates shown in Table~\ref{tab:jes-changes}.  We
+could successfully construct updates for all versions we examined and we
+could successfully apply all of them except the update to version 1.3. For
+all updates but the one from 1.3.1 to 1.3.2 (shown in
+Figure~\ref{fig:jes-string-emailaddress-example}), default transformers were
+sufficient.
+
+
+Version 1.3 has 20\% fewer \SLOC than its prior version because the update
+reworked the entire
+configuration framework of the server. Among other things, this version
+removes a GUI tool for user administration and adds several new classes
+that implement a file-based configuration system. As a result, many
+classes are modified to point to a new configuration object.  Among these
+classes are threads with infinite processing loops that accept POP and SMTP
+requests.  Because these threads are always active, the safety condition
+can never be met and thus the update cannot be applied.
+
+The update from 1.3.1 to 1.3.2 indirectly changes the
+\SMTPSenderrun
+and \texttt{Pop3Processor.run()} methods.  These
+methods contain processing loops run by several threads.  Though these
+methods are always running, \JV applies \OSR and the update succeeds.  \JV
+also uses OSR for the update from 1.3.2 to 1.3.3.
+%MWH: suriya says this statement just isn't true.  Updates fine.  A method
+%used to process connections was also changed, and this method is
+%frequently active when the server is under load.  (A similar method was
+%changed in the update to version 1.3.3.)  A return barrier installed on
+%this method permits the update to take effect.  

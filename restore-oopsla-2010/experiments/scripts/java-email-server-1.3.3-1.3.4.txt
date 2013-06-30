@@ -1,0 +1,2605 @@
+synthField = deliveryAttemptThreshold
+Loading heap snapshots...
+Loading old snapshot 1...
+Dump file created Wed Jul 18 09:56:17 EDT 2012
+WARNING: Class name not found for 0x50000c90
+WARNING: Class name not found for 0x50000e3f
+WARNING: Class name not found for 0x50000e42
+WARNING: Class name not found for 0x5000105e
+WARNING: Class name not found for 0x50001081
+WARNING: Class name not found for 0x5000116d
+WARNING: Class name not found for 0x50001768
+WARNING: Class name not found for 0x50001796
+WARNING: Class name not found for 0x50001922
+WARNING: Class name not found for 0x50001931
+WARNING: Class name not found for 0x50001a42
+WARNING: Class name not found for 0x50001b67
+WARNING: Class name not found for 0x50001e5a
+WARNING: Class name not found for 0x50002154
+WARNING: Class name not found for 0x500021a4
+WARNING: Class name not found for 0x500021ec
+WARNING: Class name not found for 0x50002237
+WARNING: Class name not found for 0x50002239
+WARNING: Class name not found for 0x5000227f
+WARNING: Class name not found for 0x5000238c
+WARNING: Class name not found for 0x5000242d
+WARNING: Class name not found for 0x50004953
+WARNING: Class name not found for 0x5000495a
+WARNING: Class name not found for 0x50004c14
+WARNING: Class name not found for 0x50004c7c
+WARNING: Class name not found for 0x50004c95
+WARNING: Class name not found for 0x50004f89
+WARNING: Class name not found for 0x50006198
+WARNING: Class name not found for 0x50006f83
+WARNING: Class name not found for 0x50007c1f
+WARNING: Class name not found for 0x50007d74
+WARNING: Class name not found for 0x500082ca
+WARNING: Class name not found for 0x50008342
+WARNING: Class name not found for 0x500083ab
+Resolving 38500 objects...
+Chasing references, expect 7 dots.......
+Eliminating duplicate references.......
+Loading old snapshot 2...
+Dump file created Wed Jul 18 11:26:34 EDT 2012
+WARNING: Class name not found for 0x50000c90
+WARNING: Class name not found for 0x50000e3f
+WARNING: Class name not found for 0x50000e42
+WARNING: Class name not found for 0x5000105e
+WARNING: Class name not found for 0x50001081
+WARNING: Class name not found for 0x5000116d
+WARNING: Class name not found for 0x50001768
+WARNING: Class name not found for 0x50001796
+WARNING: Class name not found for 0x50001922
+WARNING: Class name not found for 0x50001931
+WARNING: Class name not found for 0x50001a42
+WARNING: Class name not found for 0x50001b67
+WARNING: Class name not found for 0x50001e5a
+WARNING: Class name not found for 0x50002154
+WARNING: Class name not found for 0x500021a4
+WARNING: Class name not found for 0x500021ec
+WARNING: Class name not found for 0x50002237
+WARNING: Class name not found for 0x50002239
+WARNING: Class name not found for 0x5000227f
+WARNING: Class name not found for 0x5000238c
+WARNING: Class name not found for 0x5000242d
+WARNING: Class name not found for 0x50004953
+WARNING: Class name not found for 0x5000495a
+WARNING: Class name not found for 0x50004c14
+WARNING: Class name not found for 0x50004c7c
+WARNING: Class name not found for 0x50004c95
+WARNING: Class name not found for 0x50004f89
+WARNING: Class name not found for 0x50006198
+WARNING: Class name not found for 0x50006f83
+WARNING: Class name not found for 0x50007c10
+WARNING: Class name not found for 0x50007d74
+WARNING: Class name not found for 0x500082ca
+WARNING: Class name not found for 0x50008342
+WARNING: Class name not found for 0x500083ab
+Resolving 38500 objects...
+Chasing references, expect 7 dots.......
+Eliminating duplicate references.......
+Loading new snapshot...
+Dump file created Wed Jul 18 11:27:33 EDT 2012
+WARNING: Class name not found for 0x50000c90
+WARNING: Class name not found for 0x50000e3f
+WARNING: Class name not found for 0x50000e42
+WARNING: Class name not found for 0x5000105e
+WARNING: Class name not found for 0x50001081
+WARNING: Class name not found for 0x5000116d
+WARNING: Class name not found for 0x50001768
+WARNING: Class name not found for 0x50001796
+WARNING: Class name not found for 0x50001922
+WARNING: Class name not found for 0x50001931
+WARNING: Class name not found for 0x50001a42
+WARNING: Class name not found for 0x50001b67
+WARNING: Class name not found for 0x50001e5a
+WARNING: Class name not found for 0x50002154
+WARNING: Class name not found for 0x500021a4
+WARNING: Class name not found for 0x500021ec
+WARNING: Class name not found for 0x50002237
+WARNING: Class name not found for 0x50002239
+WARNING: Class name not found for 0x5000227f
+WARNING: Class name not found for 0x5000238c
+WARNING: Class name not found for 0x5000242d
+WARNING: Class name not found for 0x50004953
+WARNING: Class name not found for 0x5000495a
+WARNING: Class name not found for 0x50004c14
+WARNING: Class name not found for 0x50004c7c
+WARNING: Class name not found for 0x50004c95
+WARNING: Class name not found for 0x50004f89
+WARNING: Class name not found for 0x50006198
+WARNING: Class name not found for 0x50006f83
+WARNING: Class name not found for 0x50007c26
+WARNING: Class name not found for 0x50007df8
+WARNING: Class name not found for 0x5000833a
+WARNING: Class name not found for 0x500083b2
+WARNING: Class name not found for 0x5000842f
+Resolving 38634 objects...
+Chasing references, expect 7 dots.......
+Eliminating duplicate references.......
+i = 0
+cl = boolean[]
+cl = byte[]
+cl = char[]
+cl = com.apple.java.AppleSystemLog
+cl = com.apple.java.Application
+cl = com.apple.java.Application$1
+cl = com.apple.java.BackwardsCompatibility
+cl = com.apple.java.Usage
+cl = com.apple.java.Usage$1
+cl = com.apple.java.Usage$2
+cl = com.apple.java.Usage$3
+cl = com.ericdaugherty.mail.server.Mail
+cl = com.ericdaugherty.mail.server.ShutdownService
+cl = com.ericdaugherty.mail.server.configuration.ConfigurationManager
+cl = com.ericdaugherty.mail.server.configuration.ConfigurationManager$ConfigurationFileWatcher
+cl = com.ericdaugherty.mail.server.configuration.ConfigurationParameterContants
+cl = com.ericdaugherty.mail.server.errors.InvalidAddressException
+cl = com.ericdaugherty.mail.server.errors.NotFoundException
+cl = com.ericdaugherty.mail.server.info.EmailAddress
+cl = com.ericdaugherty.mail.server.info.User
+cl = com.ericdaugherty.mail.server.services.general.ConnectionProcessor
+cl = com.ericdaugherty.mail.server.services.general.ServiceListener
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+cl = com.ericdaugherty.mail.server.services.pop3.Pop3Processor
+cl = com.ericdaugherty.mail.server.services.smtp.SMTPMessage
+cl = com.ericdaugherty.mail.server.services.smtp.SMTPProcessor
+cl = com.ericdaugherty.mail.server.services.smtp.SMTPSender
+cl = com.sun.beans.AppContext
+cl = com.sun.beans.WeakCache
+cl = com.sun.demo.jvmti.hprof.Tracker
+cl = double[]
+cl = edu.umd.objdump.HeapSnapshot
+cl = float[]
+cl = int[]
+cl = java.beans.BeanDescriptor
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.beans.BeanInfo
+cl = java.beans.EventSetDescriptor
+cl = java.beans.FeatureDescriptor
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.beans.GenericBeanInfo
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.beans.IndexedPropertyDescriptor
+cl = java.beans.IntrospectionException
+cl = java.beans.Introspector
+cl = java.beans.MethodDescriptor
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.beans.PropertyDescriptor
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.beans.PropertyVetoException
+cl = java.beans.SimpleBeanInfo
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.io.BufferedInputStream
+cl = java.io.BufferedOutputStream
+cl = java.io.BufferedReader
+cl = java.io.BufferedWriter
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.ByteArrayInputStream
+cl = java.io.ByteArrayOutputStream
+cl = java.io.Closeable
+cl = java.io.DataInput
+cl = java.io.DataInputStream
+cl = java.io.DataOutput
+cl = java.io.DataOutputStream
+cl = java.io.ExpiringCache
+cl = java.io.ExpiringCache$1
+cl = java.io.ExpiringCache$Entry
+cl = java.io.File
+cl = java.io.File$1
+cl = java.io.FileDescriptor
+cl = java.io.FileDescriptor$1
+cl = java.io.FileInputStream
+cl = java.io.FileNotFoundException
+cl = java.io.FileOutputStream
+cl = java.io.FilePermission
+cl = java.io.FilePermission$1
+cl = java.io.FilePermissionCollection
+cl = java.io.FileReader
+cl = java.io.FileSystem
+Unhandled type encountered.
+/
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+:
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.FileWriter
+cl = java.io.File[]
+cl = java.io.FilterInputStream
+cl = java.io.FilterOutputStream
+cl = java.io.FilterWriter
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.Flushable
+cl = java.io.IOException
+cl = java.io.InputStream
+cl = java.io.InputStreamReader
+cl = java.io.InterruptedIOException
+cl = java.io.ObjectStreamClass
+cl = java.io.ObjectStreamField
+Unhandled type encountered.
+class long[]
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.io.ObjectStreamField[]
+Unhandled type encountered.
+class long[]
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.io.OutputStream
+cl = java.io.OutputStreamWriter
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.PrintStream
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.PrintWriter
+cl = java.io.PushbackInputStream
+cl = java.io.Reader
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.Serializable
+cl = java.io.Serializable[]
+cl = java.io.StringWriter
+cl = java.io.UnixFileSystem
+Unhandled type encountered.
+/
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+:
+class com.sun.tools.hat.internal.model.JavaChar
+cl = java.io.UnsupportedEncodingException
+cl = java.io.Writer
+cl = java.lang.AbstractStringBuilder
+cl = java.lang.Appendable
+cl = java.lang.ApplicationShutdownHooks
+cl = java.lang.ApplicationShutdownHooks$1
+cl = java.lang.ArithmeticException
+cl = java.lang.ArrayStoreException
+cl = java.lang.AssertionStatusDirectives
+cl = java.lang.Boolean
+cl = java.lang.Byte
+cl = java.lang.CharSequence
+cl = java.lang.CharSequence[]
+cl = java.lang.Character
+cl = java.lang.CharacterDataLatin1
+cl = java.lang.Class
+Unhandled type encountered.
+class java.net.SocketOutputStream
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.Class$1
+cl = java.lang.Class$3
+cl = java.lang.Class$MethodArray
+cl = java.lang.ClassCastException
+cl = java.lang.ClassFormatError
+cl = java.lang.ClassLoader
+cl = java.lang.ClassLoader$3
+cl = java.lang.ClassLoader$NativeLibrary
+Unhandled type encountered.
+class java.lang.System
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.ClassNotFoundException
+cl = java.lang.Class[]
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.Cloneable
+cl = java.lang.Comparable
+cl = java.lang.Comparable[]
+cl = java.lang.Compiler
+cl = java.lang.Compiler$1
+cl = java.lang.Double
+cl = java.lang.Enum
+cl = java.lang.Error
+cl = java.lang.Error[]
+cl = java.lang.Exception
+cl = java.lang.Float
+cl = java.lang.IllegalAccessException
+cl = java.lang.IllegalArgumentException
+cl = java.lang.IllegalMonitorStateException
+cl = java.lang.IllegalStateException
+cl = java.lang.IncompatibleClassChangeError
+cl = java.lang.InheritableThreadLocal
+cl = java.lang.Integer
+cl = java.lang.Integer$IntegerCache
+cl = java.lang.InterruptedException
+cl = java.lang.Iterable
+cl = java.lang.LinkageError
+cl = java.lang.Long
+cl = java.lang.Long$LongCache
+cl = java.lang.Math
+cl = java.lang.NoClassDefFoundError
+cl = java.lang.NoSuchMethodError
+cl = java.lang.NoSuchMethodException
+cl = java.lang.NullPointerException
+cl = java.lang.Number
+cl = java.lang.NumberFormatException
+cl = java.lang.Object[]
+cl = java.lang.OutOfMemoryError
+cl = java.lang.OutOfMemoryError[]
+cl = java.lang.Package
+cl = java.lang.Package[]
+cl = java.lang.ProcessEnvironment
+cl = java.lang.ProcessEnvironment$ExternalData
+cl = java.lang.ProcessEnvironment$StringEnvironment
+cl = java.lang.ProcessEnvironment$Value
+cl = java.lang.ProcessEnvironment$Variable
+cl = java.lang.Readable
+cl = java.lang.Runnable
+cl = java.lang.Runnable[]
+cl = java.lang.Runtime
+cl = java.lang.RuntimeException
+cl = java.lang.RuntimePermission
+cl = java.lang.SecurityException
+cl = java.lang.Short
+cl = java.lang.Shutdown
+cl = java.lang.Shutdown$Lock
+cl = java.lang.StackOverflowError
+cl = java.lang.StackTraceElement
+cl = java.lang.StackTraceElement[]
+cl = java.lang.StrictMath
+cl = java.lang.String
+cl = java.lang.String$CaseInsensitiveComparator
+cl = java.lang.StringBuffer
+cl = java.lang.StringBuilder
+cl = java.lang.StringCoding
+cl = java.lang.StringCoding$StringDecoder
+cl = java.lang.StringCoding$StringEncoder
+cl = java.lang.StringValue
+cl = java.lang.String[]
+cl = java.lang.System
+cl = java.lang.System$2
+cl = java.lang.SystemClassLoaderAction
+cl = java.lang.Terminator
+cl = java.lang.Terminator$1
+cl = java.lang.Thread
+cl = java.lang.Thread$State
+cl = java.lang.Thread$UncaughtExceptionHandler
+cl = java.lang.Thread$UncaughtExceptionHandler[]
+cl = java.lang.ThreadDeath
+cl = java.lang.ThreadGroup
+cl = java.lang.ThreadGroup[]
+cl = java.lang.ThreadLocal
+cl = java.lang.ThreadLocal$ThreadLocalMap
+cl = java.lang.ThreadLocal$ThreadLocalMap$Entry
+cl = java.lang.ThreadLocal$ThreadLocalMap$Entry[]
+cl = java.lang.Thread[]
+cl = java.lang.Throwable
+cl = java.lang.Throwable[]
+cl = java.lang.VirtualMachineError
+cl = java.lang.VirtualMachineError[]
+cl = java.lang.Void
+cl = java.lang.management.ManagementFactory
+cl = java.lang.management.ManagementPermission
+cl = java.lang.management.RuntimeMXBean
+cl = java.lang.ref.FinalReference
+Unhandled type encountered.
+class java.lang.System
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.ref.Finalizer
+Unhandled type encountered.
+class java.lang.System
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.ref.Finalizer$FinalizerThread
+cl = java.lang.ref.PhantomReference
+cl = java.lang.ref.Reference
+cl = java.lang.ref.Reference$Lock
+cl = java.lang.ref.Reference$ReferenceHandler
+cl = java.lang.ref.ReferenceQueue
+cl = java.lang.ref.ReferenceQueue$Lock
+cl = java.lang.ref.ReferenceQueue$Null
+cl = java.lang.ref.Reference[]
+cl = java.lang.ref.SoftReference
+cl = java.lang.ref.WeakReference
+cl = java.lang.ref.WeakReference[]
+cl = java.lang.reflect.AccessibleObject
+Unhandled type encountered.
+class javax.security.auth.x500.X500Principal
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class sun.security.x509.X500Name
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.reflect.AccessibleObject[]
+cl = java.lang.reflect.AnnotatedElement
+cl = java.lang.reflect.AnnotatedElement[]
+cl = java.lang.reflect.Array
+cl = java.lang.reflect.Constructor
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.reflect.Constructor[]
+cl = java.lang.reflect.Field
+Unhandled type encountered.
+class javax.security.auth.x500.X500Principal
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class sun.security.x509.X500Name
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.reflect.Field[]
+cl = java.lang.reflect.GenericDeclaration
+cl = java.lang.reflect.GenericDeclaration[]
+cl = java.lang.reflect.InvocationTargetException
+cl = java.lang.reflect.Member
+cl = java.lang.reflect.Member[]
+cl = java.lang.reflect.Method
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggingEvent
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.reflect.Method[]
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.lang.reflect.Modifier
+cl = java.lang.reflect.ReflectAccess
+cl = java.lang.reflect.ReflectPermission
+cl = java.lang.reflect.Type
+cl = java.lang.reflect.Type[]
+cl = java.math.BigInteger
+cl = java.math.MutableBigInteger
+cl = java.math.SignedMutableBigInteger
+cl = java.net.ContentHandler
+cl = java.net.Inet4Address
+cl = java.net.Inet4AddressImpl
+cl = java.net.Inet6Address
+cl = java.net.Inet6AddressImpl
+cl = java.net.InetAddress
+cl = java.net.InetAddress$1
+cl = java.net.InetAddress$Cache
+cl = java.net.InetAddress$Cache$Type
+cl = java.net.InetAddress$CacheEntry
+cl = java.net.InetAddressImpl
+cl = java.net.InetAddressImplFactory
+cl = java.net.InetSocketAddress
+cl = java.net.MalformedURLException
+cl = java.net.Parts
+cl = java.net.PlainSocketImpl
+cl = java.net.Proxy
+cl = java.net.Proxy$Type
+cl = java.net.ProxySelector
+cl = java.net.ServerSocket
+cl = java.net.Socket
+cl = java.net.Socket$2
+cl = java.net.Socket$3
+cl = java.net.SocketAddress
+cl = java.net.SocketException
+cl = java.net.SocketImpl
+cl = java.net.SocketInputStream
+cl = java.net.SocketOptions
+cl = java.net.SocketOutputStream
+cl = java.net.SocketTimeoutException
+cl = java.net.SocksConsts
+cl = java.net.SocksSocketImpl
+cl = java.net.SocksSocketImpl$5
+cl = java.net.URI
+cl = java.net.URI$Parser
+cl = java.net.URL
+cl = java.net.URLClassLoader
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.Mail
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Configurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyConfigurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerRepository
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FileWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.DefaultCategoryFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.LogManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.AppenderAttachable
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Category
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Logger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RootCategory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RendererSupport
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Hierarchy
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Priority
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Level
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.RendererMap
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.ObjectRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.DefaultRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.DefaultRepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OptionConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.Loader
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.LogLog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Appender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.OptionHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.ErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OnlyOnceErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PatternLayout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$NamedPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$CategoryPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$ClassNamePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AbsoluteTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.ISO8601DateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.DateTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$DatePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LocationPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$BasicPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$MDCPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LiteralPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FormattingInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetterException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggingEvent
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.QuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AppenderAttachableImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.FileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.RollingFileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.CountingQuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Filter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.CategoryKey
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ProvisionNode
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogConfigurationException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$3
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$2
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.Log
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LocationInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationParameterContants
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.InvalidAddressException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.EmailAddress
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.User
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager$ConfigurationFileWatcher
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ServiceListener
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ConnectionProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.pop3.Pop3Processor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPSender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.NotFoundException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.ShutdownService
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPMessage
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class edu.umd.objdump.HeapSnapshot
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.net.URLClassLoader$1
+cl = java.net.URLClassLoader$2
+cl = java.net.URLClassLoader$7
+cl = java.net.URLConnection
+cl = java.net.URLStreamHandler
+cl = java.net.URLStreamHandlerFactory
+cl = java.net.URL[]
+cl = java.net.UnknownContentHandler
+cl = java.net.UnknownHostException
+cl = java.nio.Bits
+cl = java.nio.Bits$1
+cl = java.nio.Buffer
+cl = java.nio.ByteBuffer
+cl = java.nio.ByteOrder
+cl = java.nio.CharBuffer
+cl = java.nio.HeapByteBuffer
+cl = java.nio.HeapCharBuffer
+cl = java.nio.charset.Charset
+cl = java.nio.charset.CharsetDecoder
+cl = java.nio.charset.CharsetEncoder
+cl = java.nio.charset.CoderResult
+cl = java.nio.charset.CoderResult$1
+cl = java.nio.charset.CoderResult$2
+cl = java.nio.charset.CoderResult$Cache
+cl = java.nio.charset.CodingErrorAction
+cl = java.nio.charset.spi.CharsetProvider
+cl = java.security.AccessControlContext
+cl = java.security.AccessControlContext$1
+cl = java.security.AccessController
+cl = java.security.AlgorithmParameters
+Unhandled type encountered.
+1.6
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = java.security.AlgorithmParametersSpi
+cl = java.security.AllPermission
+cl = java.security.BasicPermission
+cl = java.security.BasicPermissionCollection
+Unhandled type encountered.
+class java.lang.RuntimePermission
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.security.CodeSigner
+cl = java.security.CodeSource
+cl = java.security.GeneralSecurityException
+cl = java.security.Guard
+cl = java.security.Key
+cl = java.security.KeyFactory
+cl = java.security.KeyFactorySpi
+cl = java.security.MessageDigest
+cl = java.security.MessageDigest$Delegate
+cl = java.security.MessageDigestSpi
+cl = java.security.NoSuchAlgorithmException
+cl = java.security.Permission
+cl = java.security.PermissionCollection
+Unhandled type encountered.
+class java.lang.RuntimePermission
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.security.Permissions
+cl = java.security.Policy
+cl = java.security.Policy$UnsupportedEmptyCollection
+cl = java.security.Principal
+cl = java.security.PrivateKey
+cl = java.security.PrivilegedAction
+cl = java.security.PrivilegedActionException
+cl = java.security.PrivilegedExceptionAction
+cl = java.security.ProtectionDomain
+cl = java.security.ProtectionDomain$2
+cl = java.security.ProtectionDomain$Key
+cl = java.security.Provider
+Unhandled type encountered.
+1.6
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = java.security.Provider$EngineDescription
+cl = java.security.Provider$Service
+Unhandled type encountered.
+1.6
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = java.security.Provider$ServiceKey
+cl = java.security.Provider$UString
+cl = java.security.PublicKey
+cl = java.security.SecureClassLoader
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.Mail
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Configurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyConfigurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerRepository
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FileWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.DefaultCategoryFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.LogManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.AppenderAttachable
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Category
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Logger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RootCategory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RendererSupport
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Hierarchy
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Priority
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Level
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.RendererMap
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.ObjectRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.DefaultRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.DefaultRepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OptionConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.Loader
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.LogLog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Appender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.OptionHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.ErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OnlyOnceErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PatternLayout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$NamedPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$CategoryPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$ClassNamePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AbsoluteTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.ISO8601DateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.DateTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$DatePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LocationPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$BasicPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$MDCPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LiteralPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FormattingInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetterException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggingEvent
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.QuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AppenderAttachableImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.FileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.RollingFileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.CountingQuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Filter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.CategoryKey
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ProvisionNode
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogConfigurationException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$3
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$2
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.Log
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LocationInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationParameterContants
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.InvalidAddressException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.EmailAddress
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.User
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager$ConfigurationFileWatcher
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ServiceListener
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ConnectionProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.pop3.Pop3Processor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPSender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.NotFoundException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.ShutdownService
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPMessage
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class edu.umd.objdump.HeapSnapshot
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.security.SecureRandomSpi
+cl = java.security.Security
+cl = java.security.Security$1
+cl = java.security.Signature
+cl = java.security.Signature$Delegate
+cl = java.security.SignatureSpi
+cl = java.security.UnresolvedPermission
+cl = java.security.cert.CertPath
+cl = java.security.cert.Certificate
+cl = java.security.cert.CertificateFactory
+cl = java.security.cert.CertificateFactorySpi
+cl = java.security.cert.Certificate[]
+cl = java.security.cert.X509Certificate
+cl = java.security.cert.X509Extension
+cl = java.security.interfaces.DSAKey
+cl = java.security.interfaces.DSAParams
+cl = java.security.interfaces.DSAPrivateKey
+cl = java.security.interfaces.DSAPublicKey
+cl = java.security.spec.AlgorithmParameterSpec
+cl = java.security.spec.DSAParameterSpec
+cl = java.security.spec.DSAPublicKeySpec
+cl = java.security.spec.EncodedKeySpec
+cl = java.security.spec.KeySpec
+cl = java.security.spec.X509EncodedKeySpec
+cl = java.text.DateFormat
+cl = java.text.DontCareFieldPosition
+cl = java.text.DontCareFieldPosition$1
+cl = java.text.FieldPosition
+cl = java.text.Format
+cl = java.text.Format$FieldDelegate
+cl = java.text.Normalizer
+cl = java.text.Normalizer$Form
+cl = java.text.SimpleDateFormat
+cl = java.util.AbstractCollection
+cl = java.util.AbstractList
+cl = java.util.AbstractList$Itr
+cl = java.util.AbstractList$ListItr
+cl = java.util.AbstractMap
+cl = java.util.AbstractSequentialList
+cl = java.util.AbstractSet
+cl = java.util.ArrayList
+cl = java.util.Arrays
+cl = java.util.Arrays$ArrayList
+cl = java.util.BitSet
+cl = java.util.Calendar
+cl = java.util.Collection
+cl = java.util.Collections
+cl = java.util.Collections$EmptyList
+cl = java.util.Collections$EmptyMap
+cl = java.util.Collections$EmptySet
+cl = java.util.Collections$ReverseComparator
+cl = java.util.Collections$SynchronizedMap
+cl = java.util.Collections$UnmodifiableCollection
+cl = java.util.Collections$UnmodifiableCollection$1
+cl = java.util.Collections$UnmodifiableList
+cl = java.util.Collections$UnmodifiableMap
+cl = java.util.Collections$UnmodifiableRandomAccessList
+cl = java.util.Comparator
+cl = java.util.Date
+cl = java.util.Deque
+cl = java.util.Dictionary
+cl = java.util.Enumeration
+cl = java.util.EventListener
+cl = java.util.GregorianCalendar
+cl = java.util.HashMap
+cl = java.util.HashMap$Entry
+cl = java.util.HashMap$EntryIterator
+cl = java.util.HashMap$EntrySet
+cl = java.util.HashMap$Entry[]
+cl = java.util.HashMap$HashIterator
+cl = java.util.HashMap$KeySet
+cl = java.util.HashMap$ValueIterator
+cl = java.util.HashMap$Values
+cl = java.util.HashSet
+cl = java.util.Hashtable
+cl = java.util.Hashtable$EmptyEnumerator
+cl = java.util.Hashtable$EmptyIterator
+cl = java.util.Hashtable$Entry
+cl = java.util.Hashtable$Entry[]
+cl = java.util.Hashtable$Enumerator
+cl = java.util.IdentityHashMap
+cl = java.util.Iterator
+cl = java.util.LinkedHashMap
+cl = java.util.LinkedHashMap$Entry
+cl = java.util.LinkedHashMap$EntryIterator
+cl = java.util.LinkedHashMap$KeyIterator
+cl = java.util.LinkedHashMap$LinkedHashIterator
+cl = java.util.LinkedList
+cl = java.util.LinkedList$Entry
+cl = java.util.LinkedList$ListItr
+cl = java.util.List
+cl = java.util.ListIterator
+cl = java.util.Locale
+cl = java.util.Map
+cl = java.util.Map$Entry
+cl = java.util.Map$Entry[]
+cl = java.util.MissingResourceException
+cl = java.util.NavigableMap
+cl = java.util.Properties
+cl = java.util.Properties$LineReader
+cl = java.util.Queue
+cl = java.util.Random
+cl = java.util.RandomAccess
+cl = java.util.RandomAccessSubList
+cl = java.util.ResourceBundle
+cl = java.util.ResourceBundle$1
+cl = java.util.ResourceBundle$BundleReference
+cl = java.util.ResourceBundle$CacheKey
+cl = java.util.ResourceBundle$CacheKeyReference
+cl = java.util.ResourceBundle$Control
+cl = java.util.ResourceBundle$LoaderReference
+cl = java.util.ResourceBundle$RBClassLoader
+cl = java.util.ResourceBundle$RBClassLoader$1
+cl = java.util.ResourceBundle$SingleFormatControl
+cl = java.util.Set
+cl = java.util.SortedMap
+cl = java.util.Stack
+cl = java.util.StringTokenizer
+cl = java.util.SubList
+cl = java.util.SubList$1
+cl = java.util.TimeZone
+cl = java.util.TimeZone$1
+cl = java.util.TreeMap
+cl = java.util.TreeMap$Entry
+cl = java.util.TreeMap$PrivateEntryIterator
+cl = java.util.TreeMap$ValueIterator
+cl = java.util.TreeMap$Values
+cl = java.util.Vector
+cl = java.util.WeakHashMap
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PatternLayout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.FileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.util.WeakHashMap$Entry
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.util.concurrent.ConcurrentHashMap
+cl = java.util.concurrent.ConcurrentHashMap$HashEntry
+cl = java.util.concurrent.ConcurrentHashMap$HashEntry[]
+cl = java.util.concurrent.ConcurrentHashMap$Segment
+cl = java.util.concurrent.ConcurrentHashMap$Segment[]
+cl = java.util.concurrent.ConcurrentMap
+cl = java.util.concurrent.atomic.AtomicInteger
+cl = java.util.concurrent.atomic.AtomicReferenceFieldUpdater
+Unhandled type encountered.
+class java.io.BufferedInputStream
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class byte[]
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.util.concurrent.atomic.AtomicReferenceFieldUpdater$AtomicReferenceFieldUpdaterImpl
+Unhandled type encountered.
+class java.io.BufferedInputStream
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class byte[]
+class com.sun.tools.hat.internal.model.JavaClass
+cl = java.util.concurrent.locks.AbstractOwnableSynchronizer
+cl = java.util.concurrent.locks.AbstractQueuedSynchronizer
+cl = java.util.concurrent.locks.AbstractQueuedSynchronizer$Node
+cl = java.util.concurrent.locks.Lock
+cl = java.util.concurrent.locks.Lock[]
+cl = java.util.concurrent.locks.ReentrantLock
+cl = java.util.concurrent.locks.ReentrantLock$NonfairSync
+cl = java.util.concurrent.locks.ReentrantLock$Sync
+cl = java.util.concurrent.locks.ReentrantLock[]
+cl = java.util.jar.Attributes
+cl = java.util.jar.Attributes$Name
+cl = java.util.jar.JarEntry
+cl = java.util.jar.JarFile
+cl = java.util.jar.JarFile$JarFileEntry
+cl = java.util.jar.JarVerifier
+cl = java.util.jar.JarVerifier$3
+cl = java.util.jar.JarVerifier$VerifierStream
+cl = java.util.jar.JavaUtilJarAccessImpl
+cl = java.util.jar.Manifest
+cl = java.util.jar.Manifest$FastInputStream
+cl = java.util.regex.MatchResult
+cl = java.util.regex.Matcher
+cl = java.util.regex.Pattern
+cl = java.util.regex.Pattern$5
+cl = java.util.regex.Pattern$Begin
+cl = java.util.regex.Pattern$BmpCharProperty
+cl = java.util.regex.Pattern$CharProperty
+cl = java.util.regex.Pattern$First
+cl = java.util.regex.Pattern$GroupHead
+cl = java.util.regex.Pattern$LastNode
+cl = java.util.regex.Pattern$Node
+cl = java.util.regex.Pattern$Single
+cl = java.util.regex.Pattern$Slice
+cl = java.util.regex.Pattern$SliceNode
+cl = java.util.regex.Pattern$Start
+cl = java.util.regex.Pattern$TreeInfo
+cl = java.util.zip.Inflater
+cl = java.util.zip.InflaterInputStream
+cl = java.util.zip.ZStreamRef
+cl = java.util.zip.ZipConstants
+cl = java.util.zip.ZipEntry
+cl = java.util.zip.ZipException
+cl = java.util.zip.ZipFile
+cl = java.util.zip.ZipFile$1
+cl = java.util.zip.ZipFile$ZipFileInputStream
+cl = javax.management.MBeanServerConnection
+cl = javax.security.auth.x500.X500Principal
+cl = long[]
+cl = org.apache.commons.logging.Log
+cl = org.apache.commons.logging.LogConfigurationException
+cl = org.apache.commons.logging.LogFactory
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory
+class com.sun.tools.hat.internal.model.JavaClass
+cl = org.apache.commons.logging.LogFactory$1
+cl = org.apache.commons.logging.LogFactory$2
+cl = org.apache.commons.logging.LogFactory$3
+cl = org.apache.commons.logging.impl.Log4JLogger
+cl = org.apache.commons.logging.impl.LogFactoryImpl
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory
+class com.sun.tools.hat.internal.model.JavaClass
+cl = org.apache.commons.logging.impl.LogFactoryImpl$1
+cl = org.apache.log4j.Appender
+cl = org.apache.log4j.AppenderSkeleton
+cl = org.apache.log4j.Category
+cl = org.apache.log4j.CategoryKey
+cl = org.apache.log4j.ConsoleAppender
+cl = org.apache.log4j.DefaultCategoryFactory
+cl = org.apache.log4j.FileAppender
+cl = org.apache.log4j.Hierarchy
+cl = org.apache.log4j.Layout
+cl = org.apache.log4j.Level
+cl = org.apache.log4j.LogManager
+cl = org.apache.log4j.Logger
+cl = org.apache.log4j.PatternLayout
+cl = org.apache.log4j.Priority
+cl = org.apache.log4j.PropertyConfigurator
+cl = org.apache.log4j.PropertyWatchdog
+cl = org.apache.log4j.ProvisionNode
+cl = org.apache.log4j.RollingFileAppender
+cl = org.apache.log4j.WriterAppender
+cl = org.apache.log4j.config.PropertySetter
+cl = org.apache.log4j.config.PropertySetterException
+cl = org.apache.log4j.helpers.AbsoluteTimeDateFormat
+cl = org.apache.log4j.helpers.AppenderAttachableImpl
+cl = org.apache.log4j.helpers.CountingQuietWriter
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = org.apache.log4j.helpers.DateTimeDateFormat
+cl = org.apache.log4j.helpers.FileWatchdog
+cl = org.apache.log4j.helpers.FormattingInfo
+cl = org.apache.log4j.helpers.ISO8601DateFormat
+cl = org.apache.log4j.helpers.Loader
+cl = org.apache.log4j.helpers.LogLog
+cl = org.apache.log4j.helpers.OnlyOnceErrorHandler
+cl = org.apache.log4j.helpers.OptionConverter
+cl = org.apache.log4j.helpers.PatternConverter
+cl = org.apache.log4j.helpers.PatternParser
+cl = org.apache.log4j.helpers.PatternParser$BasicPatternConverter
+cl = org.apache.log4j.helpers.PatternParser$CategoryPatternConverter
+cl = org.apache.log4j.helpers.PatternParser$ClassNamePatternConverter
+cl = org.apache.log4j.helpers.PatternParser$DatePatternConverter
+cl = org.apache.log4j.helpers.PatternParser$LiteralPatternConverter
+cl = org.apache.log4j.helpers.PatternParser$LocationPatternConverter
+cl = org.apache.log4j.helpers.PatternParser$MDCPatternConverter
+cl = org.apache.log4j.helpers.PatternParser$NamedPatternConverter
+cl = org.apache.log4j.helpers.QuietWriter
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = org.apache.log4j.or.DefaultRenderer
+cl = org.apache.log4j.or.ObjectRenderer
+cl = org.apache.log4j.or.RendererMap
+cl = org.apache.log4j.spi.AppenderAttachable
+cl = org.apache.log4j.spi.Configurator
+cl = org.apache.log4j.spi.DefaultRepositorySelector
+cl = org.apache.log4j.spi.ErrorHandler
+cl = org.apache.log4j.spi.Filter
+cl = org.apache.log4j.spi.LocationInfo
+cl = org.apache.log4j.spi.LoggerFactory
+cl = org.apache.log4j.spi.LoggerRepository
+cl = org.apache.log4j.spi.LoggingEvent
+cl = org.apache.log4j.spi.OptionHandler
+cl = org.apache.log4j.spi.RendererSupport
+cl = org.apache.log4j.spi.RepositorySelector
+cl = org.apache.log4j.spi.RootCategory
+cl = short[]
+cl = sun.jkernel.DownloadManager
+cl = sun.jkernel.DownloadManager$1
+cl = sun.jkernel.DownloadManager$2
+cl = sun.management.ManagementFactory
+cl = sun.management.RuntimeImpl
+cl = sun.management.VMManagement
+cl = sun.management.VMManagementImpl
+cl = sun.misc.ASCIICaseInsensitiveComparator
+cl = sun.misc.AtomicLong
+cl = sun.misc.AtomicLongCSImpl
+cl = sun.misc.BASE64Decoder
+cl = sun.misc.CEStreamExhausted
+cl = sun.misc.CharacterDecoder
+cl = sun.misc.ExtensionDependency
+cl = sun.misc.FileURLMapper
+cl = sun.misc.FloatingDecimal
+cl = sun.misc.FloatingDecimal$1
+cl = sun.misc.FpUtils
+cl = sun.misc.IOUtils
+cl = sun.misc.JarIndex
+cl = sun.misc.JavaIOFileAccess
+cl = sun.misc.JavaIOFileDescriptorAccess
+cl = sun.misc.JavaLangAccess
+cl = sun.misc.JavaNetAccess
+cl = sun.misc.JavaNioAccess
+cl = sun.misc.JavaSecurityAccess
+cl = sun.misc.JavaSecurityProtectionDomainAccess
+cl = sun.misc.JavaUtilJarAccess
+cl = sun.misc.Launcher
+cl = sun.misc.Launcher$1
+cl = sun.misc.Launcher$2
+cl = sun.misc.Launcher$AppClassLoader
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.Mail
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Configurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyConfigurator
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggerRepository
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FileWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PropertyWatchdog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.DefaultCategoryFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.LogManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.AppenderAttachable
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Category
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Logger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RootCategory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.RendererSupport
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Hierarchy
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Priority
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Level
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.RendererMap
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.ObjectRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.or.DefaultRenderer
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.DefaultRepositorySelector
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OptionConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.Loader
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.LogLog
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Appender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.OptionHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.ErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.OnlyOnceErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PatternLayout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$NamedPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$CategoryPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$ClassNamePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AbsoluteTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.ISO8601DateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.DateTimeDateFormat
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$DatePatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LocationPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$BasicPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$MDCPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.PatternParser$LiteralPatternConverter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.FormattingInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.config.PropertySetterException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LoggingEvent
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.QuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.AppenderAttachableImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.FileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.RollingFileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.helpers.CountingQuietWriter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Filter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.CategoryKey
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ProvisionNode
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogConfigurationException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$3
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.LogFactory$2
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.LogFactoryImpl$1
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.Log
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.commons.logging.impl.Log4JLogger
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.LocationInfo
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationParameterContants
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.InvalidAddressException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.EmailAddress
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.info.User
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.configuration.ConfigurationManager$ConfigurationFileWatcher
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ServiceListener
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.general.ConnectionProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.pop3.Pop3Processor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPProcessor
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPSender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.errors.NotFoundException
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.ShutdownService
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class com.ericdaugherty.mail.server.services.smtp.SMTPMessage
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class edu.umd.objdump.HeapSnapshot
+class com.sun.tools.hat.internal.model.JavaClass
+cl = sun.misc.Launcher$AppClassLoader$1
+cl = sun.misc.Launcher$ExtClassLoader
+cl = sun.misc.Launcher$ExtClassLoader$1
+cl = sun.misc.Launcher$Factory
+cl = sun.misc.MetaIndex
+cl = sun.misc.NativeSignalHandler
+cl = sun.misc.OSEnvironment
+cl = sun.misc.RegexpNode
+Unhandled type encountered.
+.
+class com.sun.tools.hat.internal.model.JavaChar
+cl = sun.misc.RegexpPool
+Unhandled type encountered.
+#
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+1
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+#
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+6
+class com.sun.tools.hat.internal.model.JavaChar
+cl = sun.misc.Resource
+cl = sun.misc.SharedSecrets
+cl = sun.misc.Signal
+cl = sun.misc.SignalHandler
+cl = sun.misc.SoftCache
+cl = sun.misc.URLClassPath
+cl = sun.misc.URLClassPath$3
+cl = sun.misc.URLClassPath$FileLoader
+cl = sun.misc.URLClassPath$FileLoader$1
+cl = sun.misc.URLClassPath$JarLoader
+cl = sun.misc.URLClassPath$JarLoader$1
+cl = sun.misc.URLClassPath$JarLoader$2
+cl = sun.misc.URLClassPath$Loader
+cl = sun.misc.Unsafe
+cl = sun.misc.VM
+cl = sun.misc.Version
+cl = sun.net.DefaultProgressMeteringPolicy
+cl = sun.net.InetAddressCachePolicy
+cl = sun.net.InetAddressCachePolicy$1
+cl = sun.net.InetAddressCachePolicy$2
+cl = sun.net.NetProperties
+cl = sun.net.NetProperties$1
+cl = sun.net.ProgressMeteringPolicy
+cl = sun.net.ProgressMonitor
+cl = sun.net.spi.DefaultProxySelector
+cl = sun.net.spi.DefaultProxySelector$1
+cl = sun.net.spi.nameservice.NameService
+cl = sun.net.util.URLUtil
+cl = sun.net.www.MessageHeader
+cl = sun.net.www.ParseUtil
+cl = sun.net.www.URLConnection
+cl = sun.net.www.protocol.file.FileURLConnection
+cl = sun.net.www.protocol.file.Handler
+cl = sun.net.www.protocol.jar.Handler
+cl = sun.nio.ByteBuffered
+cl = sun.nio.cs.FastCharsetProvider
+cl = sun.nio.cs.HistoricallyNamedCharset
+cl = sun.nio.cs.MacRoman
+cl = sun.nio.cs.MacRoman$Decoder
+cl = sun.nio.cs.MacRoman$Encoder
+cl = sun.nio.cs.SingleByteDecoder
+cl = sun.nio.cs.SingleByteEncoder
+cl = sun.nio.cs.StandardCharsets
+cl = sun.nio.cs.StandardCharsets$Aliases
+cl = sun.nio.cs.StandardCharsets$Cache
+cl = sun.nio.cs.StandardCharsets$Classes
+cl = sun.nio.cs.StreamDecoder
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = sun.nio.cs.StreamEncoder
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+Unhandled type encountered.
+ 
+class com.sun.tools.hat.internal.model.JavaChar
+cl = sun.nio.cs.Surrogate
+cl = sun.nio.cs.Surrogate$Parser
+cl = sun.nio.cs.US_ASCII
+cl = sun.nio.cs.US_ASCII$Decoder
+cl = sun.nio.cs.UTF_8
+cl = sun.nio.cs.UTF_8$Decoder
+cl = sun.nio.cs.UTF_8$Encoder
+cl = sun.nio.cs.Unicode
+cl = sun.reflect.AccessorGenerator
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+cl = sun.reflect.ByteVector
+cl = sun.reflect.ByteVectorFactory
+cl = sun.reflect.ByteVectorImpl
+cl = sun.reflect.ClassDefiner
+cl = sun.reflect.ClassDefiner$1
+cl = sun.reflect.ClassFileAssembler
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+cl = sun.reflect.ClassFileConstants
+cl = sun.reflect.ConstantPool
+cl = sun.reflect.ConstructorAccessor
+cl = sun.reflect.ConstructorAccessorImpl
+cl = sun.reflect.DelegatingClassLoader
+Unhandled type encountered.
+class sun.reflect.GeneratedMethodAccessor1
+class com.sun.tools.hat.internal.model.JavaClass
+cl = sun.reflect.DelegatingConstructorAccessorImpl
+cl = sun.reflect.DelegatingMethodAccessorImpl
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+cl = sun.reflect.FieldAccessor
+cl = sun.reflect.FieldAccessorImpl
+cl = sun.reflect.GeneratedMethodAccessor1
+cl = sun.reflect.Label
+cl = sun.reflect.Label$PatchInfo
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+cl = sun.reflect.LangReflectAccess
+cl = sun.reflect.MagicAccessorImpl
+cl = sun.reflect.MethodAccessor
+cl = sun.reflect.MethodAccessorGenerator
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+Unhandled type encountered.
+0
+class com.sun.tools.hat.internal.model.JavaShort
+cl = sun.reflect.MethodAccessorGenerator$1
+cl = sun.reflect.MethodAccessorImpl
+cl = sun.reflect.NativeConstructorAccessorImpl
+cl = sun.reflect.NativeMethodAccessorImpl
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Priority
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+cl = sun.reflect.Reflection
+cl = sun.reflect.ReflectionFactory
+cl = sun.reflect.ReflectionFactory$1
+cl = sun.reflect.ReflectionFactory$GetReflectionFactoryAction
+cl = sun.reflect.UTF8
+cl = sun.reflect.UnsafeFieldAccessorFactory
+cl = sun.reflect.UnsafeFieldAccessorImpl
+cl = sun.reflect.UnsafeStaticBooleanFieldAccessorImpl
+cl = sun.reflect.UnsafeStaticFieldAccessorImpl
+cl = sun.reflect.misc.ReflectUtil
+cl = sun.security.action.GetBooleanAction
+cl = sun.security.action.GetIntegerAction
+cl = sun.security.action.GetPropertyAction
+cl = sun.security.action.LoadLibraryAction
+cl = sun.security.jca.GetInstance
+cl = sun.security.jca.GetInstance$Instance
+cl = sun.security.jca.ProviderConfig
+cl = sun.security.jca.ProviderConfig$1
+cl = sun.security.jca.ProviderConfig$2
+cl = sun.security.jca.ProviderConfig$4
+cl = sun.security.jca.ProviderConfig$5
+cl = sun.security.jca.ProviderList
+cl = sun.security.jca.ProviderList$1
+Unhandled type encountered.
+1.0
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = sun.security.jca.ProviderList$2
+cl = sun.security.jca.ProviderList$3
+cl = sun.security.jca.ProviderList$ServiceList
+cl = sun.security.jca.ProviderList$ServiceList$1
+cl = sun.security.jca.Providers
+cl = sun.security.jca.ServiceId
+cl = sun.security.pkcs.ContentInfo
+cl = sun.security.pkcs.PKCS7
+cl = sun.security.pkcs.PKCS9Attribute
+cl = sun.security.pkcs.SignerInfo
+cl = sun.security.provider.ByteArrayAccess
+cl = sun.security.provider.DSA
+cl = sun.security.provider.DSA$SHA1withDSA
+cl = sun.security.provider.DSAKeyFactory
+cl = sun.security.provider.DSAParameters
+cl = sun.security.provider.DSAPublicKey
+cl = sun.security.provider.DSAPublicKeyImpl
+cl = sun.security.provider.DigestBase
+cl = sun.security.provider.NativePRNG
+cl = sun.security.provider.NativePRNG$1
+cl = sun.security.provider.NativePRNG$RandomIO
+cl = sun.security.provider.PolicyFile
+cl = sun.security.provider.SHA
+cl = sun.security.provider.Sun
+Unhandled type encountered.
+1.6
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = sun.security.provider.Sun$1
+cl = sun.security.provider.X509Factory
+cl = sun.security.provider.certpath.X509CertPath
+cl = sun.security.util.BitArray
+cl = sun.security.util.ByteArrayLexOrder
+cl = sun.security.util.ByteArrayTagOrder
+cl = sun.security.util.Cache
+cl = sun.security.util.Cache$EqualByteArray
+cl = sun.security.util.Debug
+cl = sun.security.util.DerEncoder
+cl = sun.security.util.DerIndefLenConverter
+cl = sun.security.util.DerInputBuffer
+cl = sun.security.util.DerInputStream
+cl = sun.security.util.DerOutputStream
+cl = sun.security.util.DerValue
+cl = sun.security.util.ManifestDigester
+cl = sun.security.util.ManifestDigester$Entry
+cl = sun.security.util.ManifestDigester$Position
+cl = sun.security.util.ManifestEntryVerifier
+cl = sun.security.util.ManifestEntryVerifier$SunProviderHolder
+cl = sun.security.util.MemoryCache
+cl = sun.security.util.MemoryCache$CacheEntry
+cl = sun.security.util.MemoryCache$SoftCacheEntry
+cl = sun.security.util.ObjectIdentifier
+cl = sun.security.util.PropertyExpander
+cl = sun.security.util.SignatureFileVerifier
+cl = sun.security.x509.AVA
+cl = sun.security.x509.AVAKeyword
+cl = sun.security.x509.AlgorithmId
+cl = sun.security.x509.AuthorityKeyIdentifierExtension
+cl = sun.security.x509.BasicConstraintsExtension
+cl = sun.security.x509.CertAttrSet
+cl = sun.security.x509.CertificateAlgorithmId
+cl = sun.security.x509.CertificateExtensions
+cl = sun.security.x509.CertificateIssuerName
+cl = sun.security.x509.CertificateSerialNumber
+cl = sun.security.x509.CertificateSubjectName
+cl = sun.security.x509.CertificateValidity
+cl = sun.security.x509.CertificateVersion
+cl = sun.security.x509.CertificateX509Key
+cl = sun.security.x509.Extension
+cl = sun.security.x509.GeneralName
+cl = sun.security.x509.GeneralNameInterface
+cl = sun.security.x509.GeneralNames
+cl = sun.security.x509.KeyIdentifier
+cl = sun.security.x509.KeyUsageExtension
+cl = sun.security.x509.NetscapeCertTypeExtension
+cl = sun.security.x509.NetscapeCertTypeExtension$MapEntry
+cl = sun.security.x509.OIDMap
+cl = sun.security.x509.OIDMap$OIDInfo
+cl = sun.security.x509.PKIXExtensions
+cl = sun.security.x509.RDN
+cl = sun.security.x509.RFC822Name
+cl = sun.security.x509.SerialNumber
+cl = sun.security.x509.SubjectAlternativeNameExtension
+cl = sun.security.x509.SubjectKeyIdentifierExtension
+cl = sun.security.x509.X500Name
+cl = sun.security.x509.X500Name$1
+cl = sun.security.x509.X509AttributeName
+cl = sun.security.x509.X509CertImpl
+cl = sun.security.x509.X509CertInfo
+cl = sun.security.x509.X509Key
+cl = sun.text.normalizer.NormalizerBase
+cl = sun.text.normalizer.NormalizerBase$1
+cl = sun.text.normalizer.NormalizerBase$Mode
+cl = sun.text.normalizer.NormalizerBase$NFCMode
+cl = sun.text.normalizer.NormalizerBase$NFDMode
+cl = sun.text.normalizer.NormalizerBase$NFKCMode
+cl = sun.text.normalizer.NormalizerBase$NFKDMode
+cl = sun.text.normalizer.NormalizerBase$QuickCheckResult
+cl = sun.util.LocaleDataMetaInfo
+cl = sun.util.PreHashedMap
+cl = sun.util.calendar.AbstractCalendar
+cl = sun.util.calendar.BaseCalendar
+cl = sun.util.calendar.BaseCalendar$Date
+cl = sun.util.calendar.CalendarDate
+cl = sun.util.calendar.CalendarSystem
+cl = sun.util.calendar.CalendarUtils
+cl = sun.util.calendar.Gregorian
+cl = sun.util.calendar.Gregorian$Date
+cl = sun.util.calendar.ZoneInfo
+cl = sun.util.calendar.ZoneInfoFile
+cl = sun.util.calendar.ZoneInfoFile$1
+cl = sun.util.calendar.ZoneInfoFile$2
+cl = sun.util.resources.CalendarData
+cl = sun.util.resources.CalendarData_en
+cl = sun.util.resources.LocaleData
+cl = sun.util.resources.LocaleData$1
+cl = sun.util.resources.LocaleData$LocaleDataResourceBundleControl
+cl = sun.util.resources.LocaleNamesBundle
+cl = sun.util.resources.OpenListResourceBundle
+cl = unknown-name@0x50000c90
+cl = unknown-name@0x50000e3f
+Unhandled type encountered.
+1.6
+class com.sun.tools.hat.internal.model.JavaDouble
+cl = unknown-name@0x50000e42
+cl = unknown-name@0x5000105e
+cl = unknown-name@0x50001081
+cl = unknown-name@0x5000116d
+cl = unknown-name@0x50001768
+cl = unknown-name@0x50001796
+cl = unknown-name@0x50001922
+cl = unknown-name@0x50001931
+cl = unknown-name@0x50001a42
+cl = unknown-name@0x50001b67
+cl = unknown-name@0x50001e5a
+cl = unknown-name@0x50002154
+cl = unknown-name@0x500021a4
+cl = unknown-name@0x500021ec
+cl = unknown-name@0x50002237
+cl = unknown-name@0x50002239
+cl = unknown-name@0x5000227f
+cl = unknown-name@0x5000238c
+cl = unknown-name@0x5000242d
+cl = unknown-name@0x50004953
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.PatternLayout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.FileAppender
+class com.sun.tools.hat.internal.model.JavaClass
+cl = unknown-name@0x5000495a
+cl = unknown-name@0x50004c14
+cl = unknown-name@0x50004c7c
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+cl = unknown-name@0x50004c95
+Unhandled type encountered.
+class java.lang.Object
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.Class
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.ErrorHandler
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Filter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.spi.Filter
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Layout
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.ConsoleAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.lang.String
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.AppenderSkeleton
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.Priority
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class org.apache.log4j.WriterAppender
+class com.sun.tools.hat.internal.model.JavaClass
+Unhandled type encountered.
+class java.io.Writer
+class com.sun.tools.hat.internal.model.JavaClass
+cl = unknown-name@0x50004f89
+cl = unknown-name@0x50006198
+cl = unknown-name@0x50006f83
+cl = unknown-name@0x50007c1f
+cl = unknown-name@0x50007d74
+cl = unknown-name@0x500082ca
+cl = unknown-name@0x50008342
+cl = unknown-name@0x500083ab
+---- Stats ----
+numSnapshots = 1
+numClasses = 902
+numObjects = 52210
+sameNumClasses = 589
+sameNumObjects = 12970
+avgFieldsPerSameNumObject = 17.137521222410864
+targetClass = com.ericdaugherty.mail.server.configuration.ConfigurationManager
+fieldsInTargetClass = 42
+objectsOfTargetClass = 1
+========= Finding instances of target class =========
+targetClass = com.ericdaugherty.mail.server.configuration.ConfigurationManager
+Snapshots containing instances of target class: 1
+First non-empty snapshot contains 1 instances.
+========= Searching for Key Fields =========
+-------- Performing N-to-N Matching ---------
+Removing different-sized snapshots...
+Snapshots left: 1
+Largest EQ class: 1
+Number of EQ classes: 1
+NtoN matching time: 0.0010
+Synthesizing update for field: deliveryAttemptThreshold
+Number of example pairs: 1
+Removing examples not containing field deliveryAttemptThreshold
+Number of example pairs: 1
+Example 0
+
+Constant
+Number of partitions: 1
+Synthesized function:
+type = class edu.umd.MatchSnapshots.Synthesis.SynthFuncs.SynthSwitch
+DEBUG: out_covered.size() = 0
+new_obj.deliveryAttemptThreshold = 10;
+
+Match time: 0.014
+Synth time: 0.0070

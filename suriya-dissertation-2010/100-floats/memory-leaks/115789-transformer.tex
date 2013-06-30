@@ -1,0 +1,21 @@
+\begin{figure}[t]
+\begin{center}
+\begin{minipage}{0.83\textwidth}
+\begin{lstlisting}[frame=single]
+public static void jvolveObject(NavigationHistory nh) {
+  for (Editor e : nh.editors)
+    e.refcount = 0;
+  for (History h : nh.history)
+    if (h.editor != null)
+      h.editor.refcount++;
+  for (Editor e : nh.editors)
+    if (e.refcount == 0)
+      nh.editors.remove(e);
+}
+\end{lstlisting}
+\end{minipage} \\
+\hangcaption{State transformer that fixes Eclipse IDE memory leak bug
+\#11\-5789\label{fig:115789-transformer}}
+\end{center}
+\VspaceFixForHangcaption
+\end{figure}

@@ -1,0 +1,166 @@
+\section{Safety of updates}
+\label{sec:safety}
+
+Supporting updates to code and data in a system should not compromise its
+safety. By safety, we mean that we want to make guarantees that a \USD
+system and the update are \emph{valid} and that the update and the
+application would not perform \emph{illegal} operations that are usually
+disallowed by normal execution semantics. For example, the update should
+not lead the new version to crash because it accessed an invalid memory
+location, or dereferenced a null pointer, or accessed an object of a
+different type than it expected.
+
+\paragraph{Update validity}
+
+One guarantee a dynamic updating system may want to make is that the update is
+\emph{valid}. Gupta \EA offer the following
+definition of update validity~\cite{Gupta96,gupta-thesis}. A process or a running program $P$ is a pair
+$(\Pi, s)$, where $\Pi$ refers to the program's code and $s$ to its state.
+The state as mentioned above comprises locals, globals, heap data, and the
+current \PC. An update to $P$ is a pair $(\Pi', S)$ where $\Pi'$ is the new
+version's code and $S$ is the state transformer function. Applying the
+update involves applying the state transformer function on the old state.
+The \PC value of the old state is called the {\em update point} and the
+resulting new state's \PC specifies the instruction at which to resume execution.
+The updated process is $(\Pi', s')$ where $s' = S(s)$. An update is valid
+if and only if the new program resuming execution at state $s'$ eventually
+goes to a {\em reachable} state $s''$. We call $s''$ to be reachable if the
+new program starting from its initial state on the same set of inputs at
+some point reaches state $s''$. Gupta \EA showed that the problem of
+deciding whether or not an update is valid for a state transformer in the
+general case is undecidable.
+
+Undecidability means that we cannot come up with a general purpose
+algorithm that, given $\Pi$, $\Pi'$, $S$ and $s$, can say whether or not an
+update is valid. However, they show that update validity can be verified
+formally by restricting at which points an update takes place and what code
+the state transformer can contain.  These restrictions are too
+conservative. They only admit simple changes to applications.  While
+it might be impossible to guarantee update validity, in general, we
+consider the following safety properties.
+
+\paragraph{Type safety}
+% \label{sec:type-safety}
+
+Type safety is a well-understood and highly desired property of real
+programming languages. A type-safe system guarantees that any data element
+accessed by code is of the right type expected by the code. A type-safe
+\USD system guarantees type-safety of transformer code and new program
+code that runs after the update.
+
+\USD systems that support realistic changes provide a way to update user
+defined types that change from the old to the new version. Each type $t$
+that has changed representation from type $\tau$ in the old to type $\tau'$ in the
+new version requires a {\em type transformer} function of type $\tau
+\rightarrow \tau'$. To keep update semantics intuitive, \USD systems
+enforce that at any given point of time, there is exactly one
+representation of a type $t$ and that is the newest representation, a
+property called {\em representation consistency}\index{representation
+consistency}. To provide type safety, a \USD system guarantees that
+no code is run, during or after the update, that expects a representation
+of an earlier version.
+
+\paragraph{Activeness safety}
+A simple way to support representation consistency
+and type safety is by not allowing any changed or deleted methods to be
+active on stack at an update point.  This restriction is called {\em
+activeness safety}~\cite{walton-thesis, ksplice, altekar05opus,
+baumann07reboots}.
+Activeness\index{activeness safety} can be
+checked with a simple and accurate dynamic test that walks all application
+stacks and looks for changed or deleted methods that are active at a
+potential update point. It can also be enforced with a conservative static
+analysis that examines the call graph of the old version. With either
+approach, activeness safety guarantees type safety as follows. Consider the
+set of all methods in the old and new version of the application. Some
+methods exist in the old version but not in the new, either because these
+methods are changed, or removed in the new version.
+Conversely, some methods exist in the new but not in the old version.
+Presumably, there are unchanged method bodies that are common to both the
+old and the new version. In a type-safe language, the old and the new
+program versions are independently type-safe. Activeness safety restricts
+active methods at an update point to the intersection between the old and new
+versions. At update time, type transformer functions convert all object
+representations to conform to the new version. After the update, the
+application can only execute the new version methods, which are type-safe by
+definition.
+\JV uses activeness safety because it is simple, guarantees type-safety,
+requires only a list of changed methods, and is very efficient to check at
+update time.
+
+Restricting modified methods to be not active at update time can be too
+constraining for multithreaded programs and for changes that affect methods
+high in the call chain. These limitations
+stand in the way of correctly dynamically updating more programs
+\cite{hicks-thesis, armstrong}. A
+system with activeness safety would never be able to update, for instance,
+an application that prints its version number at the start of its main
+method, because the main method would always be active. An
+alternative is to allow old methods to run to completion after the update,
+but invoke new version bodies for future method calls.
+
+\input{100-floats/con-freeness}
+
+\paragraph{Con-freeness safety}
+
+Stoyle \EA have defined a property called
+con-free\-ness\index{con-freeness} of an update that ensures type safety and
+have developed a static updatability analysis that answers whether or not
+an update point in the program would violate con-freeness~\cite{mutatis}. An update point
+$p$ is said to be con-free if code that comes after $p$ (which would run
+after the update) does not concretely access any updated type. Consider the
+simple function {\tt foo} shown in Figure~\ref{fig:con-freeness}. {\tt foo}
+concretely accesses objects of two different types {\tt t1} and {\tt t2}
+respectively. {\tt t1} is a type whose representation is changed in the new
+version, while {\tt t2}'s representation remains the same. The update
+process runs type transformers for all objects of type {\tt t1}. Let us
+look at con-freeness at update points corresponding to line numbers 2, 4,
+and 6. Line 2 is {\em not} con-free for the update because the function
+will expect a type {\tt t1} object of the old representation, but encounter
+a new version one. Line 4 is con-free for the update because {\tt t2}'s
+representation is unchanged between the old and new versions. Line 6, of
+course, is con-free as it is the end of the method with no unsafe access
+possible. Stoyle \EA test for con-freeness with a flow-sensitive backwards
+dataflow analysis. Con-freeness safety is less restrictive than activeness,
+but recent work shows that exploiting some of these additional update
+points can lead to incorrect updates in real applications~\cite{dsu-testing}.
+
+\paragraph{Transaction safety}
+
+\input{100-floats/transaction-safety}
+
+Transaction safety is a guarantee that a marked transaction fully obeys
+either the semantics of the old version or that of the new version.
+Consider the simple example in Figure~\ref{fig:transaction-safety}, where
+the programmer has marked a region of code as a transaction. Let as assume
+that code in the transaction is itself unchanged but methods {\tt foo},
+{\tt bar} and {\tt baz} might have changed. Line~2 is always a safe update
+point since the entire transaction will run the new code. Line~8 is also a
+safe update point since the entire transaction would have run the old code.
+If only one of the three called methods is updated, all program points in
+the transaction are update safe, i.e., if the program point occurs before
+the call to the changed method, the transaction will have the semantics of
+the new version, whereas if the program point occurs after the call to the
+changed method, the transaction will have the semantics of the old version.
+Now, consider that both {\tt foo} and {\tt baz} are changed in the new
+version. Line~4 and 6 are unsafe points because the transaction would run
+the old version of {\tt foo}, but run the new version of {\tt bar},
+violating transaction safety.
+
+\subsection{Assuring safety by testing}
+When program analyses fail to provide formal guarantees of correctness and
+safety, software developers use testing to develop confidence that their
+programs execute correctly.  The safety of Dynamic Software Updating should
+be informally assured the same way. Hayden \EA~\cite{dsu-testing} have
+devised a framework that exhaustively tests updating an application.  Their
+starting point is a set of regression tests that is already used on a daily
+basis to assure developers that the application runs correctly.  Testing
+that the program can be safely updated at all possible program points for
+each regression test is prohibitively expensive. However, they employ a novel dynamic
+analysis that minimizes the space of update points by grouping them into
+equivalence classes. Update points in an equivalence class all produce the
+same execution behavior for a particular program trace.  Update points
+that do not pass all regression tests should be marked as unsafe when
+updating a production system. Results from their work show that activeness
+safety and con-freeness safety very closely approximate update correctness,
+but are not sufficient to guarantee correct program execution.

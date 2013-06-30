@@ -1,0 +1,47 @@
+\begin{figure}[p]
+\BC
+\begin{minipage}{0.62\textwidth}
+\begin{lstlisting}[frame=single]
+// new_X.y refers to the old version
+// The new X and Y do not exist, yet
+class new_X { String s; Y y; }
+class new_Y { int i, j; }
+
+class JvolveTransformers {
+  public static void
+      jvolveObject(new_X to, X from) {
+    to.s = null; to.y = from.y;
+  }
+  public static void
+      jvolveObject(new_Y to, Y from) {
+    to.i = from.i; to.j = 0;
+  }
+}
+\end{lstlisting}
+\end{minipage} \\
+(a) Old World Model: Stub classes and transformers \\[2ex]
+\begin{minipage}{0.62\textwidth}
+\begin{lstlisting}[frame=single]
+// old_X.Y refers to the new version
+// The old X and Y do not exist now
+class old_X { public Y y; }
+class old_Y { public int i; }
+
+class JvolveTransformers {
+  public static void
+      jvolveObject(X to, old_X from) {
+    to.s = null; to.y = from.y;
+  }
+  public static void
+      jvolveObject(Y to, old_Y from) {
+    to.i = from.i; to.j = 0;
+  }
+}
+\end{lstlisting}
+\end{minipage} \\
+(b) New World Model: Stub classes and transformers \\[2ex]
+\hangcaption{Stub classes and transformers for the update in
+Figure~\ref{fig:two-classes-change-only-diff}\label{fig:two-classes-change-transformers}}
+\EC
+\VspaceFixForHangcaption
+\end{figure}

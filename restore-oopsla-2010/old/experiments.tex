@@ -1,0 +1,26 @@
+\section{Experiments}
+
+Examples we have:
+\begin{enumerate}
+\item Azureus (at least two leaks.  need to find some non-leak examples as well.)
+\item jEdit
+\item Jetty
+\item Derby
+\item could potentially look at Java version of BerkelyDB---though only major releases are available (no fine-grained SVN-level updates).
+\end{enumerate}
+
+For each of these, we can do a few experiments.
+
+\begin{enumerate}
+\item The simplest is just to find a change and check that we can
+  synthesize the transformer when presented with the versions on
+  either side (as given by SVN).  That is, the only thing that has
+  changed is the code that directly relates to the change we are
+  interested in.
+\item Next we can check that we still find this transformer when we
+  look at the major versions on either side of the targeted change.
+  So now more code has been modified.  We still give the matching tool
+  the name of the class we are targeting though.
+\item The highest goal would be to give the system two major versions
+  and see what percentage of classes we can synthesize updates for.
+\end{enumerate}

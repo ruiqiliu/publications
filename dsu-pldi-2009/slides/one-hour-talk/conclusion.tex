@@ -1,0 +1,124 @@
+\section{Future Work}
+\ShowTOC
+\begin{frame}{Looking ahead}%{A Sub-title is optional}
+\begin{center}
+\begin{Huge}
+What's in the path towards mainstream adoption?
+\end{Huge}
+\end{center}
+\end{frame}
+
+\begin{frame}{Safety}%{A Sub-title is optional}
+\begin{itemize}
+\item Currently, we guarantee type safety. Can we do more?
+\item Safe behavior in a general context is undecidable \cite{Gupta94}
+\item Divide program into transactions, ensure they are version consistent
+\cite{neamtiu08context}
+\item Exhaustively testing updates
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Flexibility}%{A Sub-title is optional}
+\begin{itemize}
+\item Supporting every possible update is not a goal
+\item Support most of the updates that occur in practice
+\item Large and complex applications and updates
+\item Understand update semantics from refactorings
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Efficiency}%{A Sub-title is optional}
+\begin{itemize}
+\item Update time roughly proportional to GC time
+\item Semi-space GC is not practical
+\item We have two requirements
+  \begin{itemize}
+  \item Copying objects
+  \item Full-heap collection
+  \end{itemize}
+\item Other collectors? Concurrent collectors?
+\end{itemize}
+\end{frame}
+
+\section{Conclusion}
+% \ShowTOC
+
+% \begin{frame}{Future work}%{A Sub-title is optional}
+% \begin{itemize}
+% \item Baby steps towards using static analysis towards asserting safety of
+% updates
+% \item Restricting update points based on semantics of the update
+% \item How can we show that these update points are indeed safe?
+% \end{itemize}
+% \end{frame}
+
+\begin{frame}{Conclusion}%{A Sub-title is optional}
+\begin{itemize}
+\item \DSU{}, a Java VM with support for Dynamic Software Updating
+\item Most-featured, best-performing DSU system for Java
+\item Naturally extends existing VM services
+\item Supports about two years worth of updates
+\end{itemize}
+\begin{block}{}
+\emph{Dynamic software updating in managed languages can be achieved in a
+safe, flexible and efficient manner.}
+\end{block}
+\begin{center}
+Source code and other information:
+\url{http://www.cs.utexas.edu/~suriya/jvolve}
+% Also available in the Jikes
+% RVM research archive.
+\end{center}
+\end{frame}
+
+% \begin{frame}{Research plan}%{A Sub-title is optional}
+% \begin{center}
+% \begin{large}
+% Bridge the gap between static and dynamic languages
+% \end{large}
+% \end{center}
+% \begin{itemize}
+% \item Static Languages: Java, C\#
+%   \begin{itemize}
+%   \item Compile-time type safety
+%   \item Static analysis
+%   \item High performance VMs
+%   \end{itemize}
+% \item Dynamic Languages: Python, Ruby
+%   \begin{itemize}
+%   \item Expressive
+%   \item Concise programs, easy to write/understand
+%   \item No compile-time guarantees
+%   \end{itemize}
+% \end{itemize}
+% \begin{center}
+% \begin{large}
+% Improved safety and performance of Dynamic languages
+% \end{large}
+% \end{center}
+% \end{frame}
+% 
+% \begin{frame}{Solutions}%{A Sub-title is optional}
+% \begin{itemize}
+% \item Diamondback Ruby: Static type checking for Ruby
+% \item Languages targeting the JVM: Clojure, Groovy, etc.
+% \item Dynamic Language VMs: Unladen Swallow, PyPy
+% \item Gradual typing
+% \item DaVinci project: Dynamic language support in JVM
+% \item Static Typing Where Possible, Dynamic Typing When Needed
+% \end{itemize}
+% \end{frame}
+% 
+% \begin{frame}{Conclusion}%{A Sub-title is optional}
+% \begin{itemize}
+% \item Work towards improving the robustness of software systems
+% \item Current work: A VM-based Dynamic Software Updating solution
+% \item In the future: Robust Dynamic Languages
+% \end{itemize}
+% \end{frame}
+
+\appendix
+\begin{frame}[allowframebreaks]{References}%{A Sub-title is optional}
+\bibliographystyle{apalike}
+\bibliography{paper.bib}
+\end{frame}

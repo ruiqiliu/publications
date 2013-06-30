@@ -1,0 +1,63 @@
+\begin{figure}[p]
+\lstset{frame=single}
+\BC \begin{tabular}{@{}c@{}}
+% \begin{minipage}{0.85\textwidth}
+% \begin{lstlisting}[title={(a) Default \UPT-generated transformer}]
+% public static void jvolveObject(
+%             LinkedList to, r0_LinkedList from) {
+%   to.head = from.head;
+%   to.tail = null; // no such field in from
+% }
+% \end{lstlisting}
+% \end{minipage} \\
+\begin{minipage}{0.9\textwidth}
+\begin{lstlisting}[title={(a) Explicitly traversing old and new version objects}]
+public static void jvolveObject(
+            LinkedList to, r0_LinkedList from) {
+  to.head = from.head;
+  Node prev = null;
+  Node current = from.head;
+  while (current != null) {
+    prev = current;
+    if (! VM.is_transformed(current)) {
+      r0_Node current_old = VM.old_version_object(current);
+      current = current_old.next;
+    } else {
+      current = current.next;
+    }
+  }
+  to.tail = prev;
+}
+\end{lstlisting}
+\end{minipage} \\
+\begin{minipage}{0.9\textwidth}
+\begin{lstlisting}[title={(b) Explicitly transforming new version objects}]
+public static void ensure_transformed(Object o) {
+  if (! is_transformed(o)) {
+    // The jvolveObject method corresponding to the
+    // object's type is invoked using reflection.
+    jvolveObject(o, old_version_object(o));
+  }
+}
+public static void jvolveObject(
+            LinkedList to, r0_LinkedList from) {
+  to.head = from.head;
+  Node prev = null;
+  Node current = from.head;
+  while (current != null) {
+    prev = current;
+    VM.ensure_transformed(current);
+    current = current.next;
+  }
+  to.tail = prev;
+}
+\end{lstlisting}
+\end{minipage}
+\end{tabular}
+\vspace*{-2.6ex}
+\hangcaption{New World Model: Object Transformers to convert a
+singly-linked list into a doubly-linked list\label{fig:setting-tail-field}}
+\EC
+\lstset{frame=none}
+\VspaceFixForHangcaption
+\end{figure}

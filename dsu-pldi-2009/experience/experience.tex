@@ -1,0 +1,32 @@
+\section{Experience}
+\label{sec:experience}
+
+To evaluate \DSU, we used it to update three open-source servers written
+in Java: the Jetty webserver\footnote{\url{http://www.mortbay.org}},
+JavaEmailServer,\footnote{\url{http://www.ericdaugherty.com/java/mailserver/}}
+an SMTP and POP e-mail server, and CrossFTP server.\footnote{\url{http://www.crossftp.com/}}
+These programs belong to a class that
+should benefit from DSU because they typically run continuously. DSU
+would enable deployments to incorporate bug fixes or add new features
+without having to halt currently-running sessions.  
+
+We explored
+updates corresponding to releases made over roughly one to two years
+of each program's lifetime.  Of the 22 updates we considered, \DSU{} could
+support 20 of them---the two updates we could not apply changed
+classes with infinitely-running methods, and thus no safe point could
+be reached.  To our knowledge, no existing DSU system
+for Java could support all these updates; indeed, previous systems
+with simple support for updating method bodies would be able to handle only 9 of the 22 updates.  Although \DSU{} cannot support every
+update, it is the first DSU system for Java
+that has been shown to support changes to realistic programs as they
+occur in practice over a long period of time.
+
+In the rest of this section, we first examine the performance impact of
+\DSU{}, and then look at updates to each of the three applications in
+detail.
+
+\input{experience/performance}
+\input{experience/experience-jetty}
+\input{experience/experience-jes}
+\input{experience/experience-crossftp}

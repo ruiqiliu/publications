@@ -1,0 +1,129 @@
+\subsection{Class and Object Transformers}
+\label{subsec:transformers}
+
+For classes whose signatures have changed, an object
+transformer\index{object transformer} method  initializes a new version of
+the object based on the old version. For example, consider the class
+{\tt Point} in Figure~\ref{fig:point}. The {\tt Point} class in the old
+version represents points in a 2-dimensional space with fields {\tt x} and
+{\tt y}. After the update, the new version represents points in a
+3-dimensional space with the additional field {\tt z}. The object transformer's
+job is to modify each object instance of type {\tt Point} in the heap to conform to its
+new class definition. Class transformers serve a similar purpose and update
+static fields, rather than instance fields.  The \ac{UPT} generates default
+class and object transformers automatically, retaining unchanged fields and
+initializing new or changed ones.  The default object transformer, show in
+Figure~\ref{fig:point}~(c)  for our changed \texttt{Point} class copies
+fields {\tt x} and {\tt y} from an old object to a transformed object and
+initializes {\tt z} to zero.
+
+\input{100-floats/point-example}
+
+% For example, consider a class \texttt{List} with field
+% \texttt{next} of type \texttt{List} and an update that adds a new
+% \texttt{int} field {\tt x} to \texttt{List}. The object transformer's
+% job is to modify each object instance of type \texttt{List} to conform
+% to its new class definition. Class transformers serve a similar
+% purpose and update static fields, rather than instance
+% fields.  The \ac{UPT} generates default class and object transformers
+% automatically, retaining unchanged fields and initializing new or
+% changed ones.  The default object transformer for our changed
+% \texttt{List} copies the \texttt{next} field from an old object to a
+% transformed object and initializes {\tt x} to zero, i.e,
+% \texttt{transformed.next = old.next} and \texttt{transformed.x = 0}.
+
+\input{100-floats/jes-transformer-code}
+
+For our example from JavaEmailServer in
+Figure~\ref{fig:jes-string-emailaddress-example}, the \UPT identifies that
+the \User and {\tt ConfigurationManager} classes have changed, and produces
+default object transformers.  The programmer elects to modify the object
+transformer for the class \User, as illustrated in
+Figure~\ref{fig:jes-transformer-code}.
+  
+Object and class transformer methods are simply \static methods in the
+class \JT, which is created by \UPT and loaded by \JV at update time. The
+class transformer method \JC takes an instance of the new class as a dummy
+argument. Standard overloading in Java distinguishes the \JC methods for
+different classes. (In our example, \JC does nothing.) The object
+transformer method \JO takes two reference arguments: \TO, the
+uninitialized new version of the object, and \FROM, the old version of
+the object. We prepend a version number to the names of old classes to
+distinguish them from the new versions. Based on the \UPT specification,
+but before the VM loads the \JT class, the VM renames the old class in all
+its internal data structures.  This renaming makes the class name space and
+the \JT class type-correct. In our example, the VM renames the old version
+of \User to class \oUser, which is the type of the \FROM argument to
+the \JO method in the new \User class. The \oUser class contains only field
+definitions from the original class; all methods have been removed since
+the updated program may not call them, as discussed below.
+
+A typical transformer initializes a new field to its default value (e.g.,
+{\tt 0} for integers or \NULL for references) and copies references to
+the old values.  In the example, the first three lines simply copy the
+previous values of {\tt username}, {\tt domain}, and {\tt password}.  A
+more interesting case is the field type change to {\tt forwardedAddresses}.
+The default transformer function would initialize the {\tt
+forwardedAddresses} field to \NULL because of the type change.
+The customized update function in Figure~\ref{fig:jes-transformer-code}
+instead allocates a new array
+of {\tt EmailAddress}es and initializes them to substrings of the {\tt
+String} objects from the old array.  
+
+Because the transformer class is separate from the old and new object
+classes, the Java type system would normally forbid the transformer, access
+to their \private fields. There is no obvious solution to this problem
+that conforms to the Java type system during an update. We could define object transformers
+as methods of the old changed classes, which would grant access to the old
+fields, but not the new ones.  Defining transformers as methods of the new
+changed class has the reverse problem. Also, the Java type system would
+disallow writes to \final fields from within the transformer
+functions. A \final field is ``write once'' fields and can be written
+to only in constructor methods.  To avoid these problems, we compile our
+transformation class separately.  We extend the JastAdd Java-to-bytecode
+extensible compiler \cite{JastAddJ} to ignore access modifiers (e.g., \private
+and \protectd) and allow methods to assign to \final
+fields only during an update.  Bytecode that ignores these modifiers would not normally verify.
+% so we have to modify the \VM to allow it in this special
+% circumstance.
+\RVM, on which \JV is built, does not implement a
+bytecode verifier.  Aside from this exceptional case, \JV classes are
+compiled normally and would pass verification. The \VM executes these
+Java functions normally, because they are otherwise standard Java. Since
+the transformation class is only active and available during the update,
+after the update the system no longer accesses the transformer functions.
+% the \VM may delete it after transformation.
+Separating transformers from
+updated classes avoids cluttered class files at run-time, and makes dynamic
+updating more transparent to developers.
+
+Supported in its full generality, a transformer method may reference any
+object reachable from the global (\static) namespace of both the old
+and new classes, and read or write fields or call methods on the old
+version of an updated object and/or any objects reachable from it. \JV
+presents a more limited interface (similar to past
+work~\cite{ritzau00dynamic,Mala00a}). In particular, the only access to the
+new class namespace is via the \TO pointer, whose fields are
+uninitialized. The old class namespace is accessible, with two caveats.
+First, fields of old objects may be dereferenced, but only if the update
+has not changed the object's class, or if it has, after the referenced
+objects are transformed to conform to the new class definition. Second, no
+methods may be called on any object whose class was updated. In
+Figure~\ref{fig:jes-transformer-code} class \oUser is defined in terms of
+the fields it contains; no methods are shown. As explained in
+Section~\ref{sec:xformers}, these limitations stem from the goal of keeping
+our garbage collector-based traversal safe and relatively simple. This
+interface is sufficient to handle all of the updates we tested.
+Section~\ref{sec:transformer-model} goes into detail on how our
+implementation influences our model for object transformers, its
+limitations and alternative approaches.
+
+%MWH: moved/modified from 3.5
+An alternative programming model would be that transformers could dereference
+\FROM object fields and see the \emph{old} objects, rather than the
+transformed ones.  Boyapati et al.~\cite{boyapati03lazy} implement this
+model, as described in Section~\ref{sec:boyapati}. Our experience and that of
+others~\cite{k42usenix,neamtiu06dsu,neamtiu09stump,upstare} indicate
+that our model expresses many updates well.  We leave to future work a
+detailed investigation of the semantics and expressiveness of both
+models.

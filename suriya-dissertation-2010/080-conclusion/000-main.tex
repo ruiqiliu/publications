@@ -1,0 +1,23 @@
+
+\chapter{Conclusion\label{chap:conc}}
+
+This dissertation presents \JV, a Java Virtual Machine with support for
+Dynamic Software Updating. \JV is the most fully-featured, best-performing DSU
+implementation for Java to date. The key contribution of this dissertation is
+showing how to achieve safe, flexible, and efficient dynamic software
+updating by extending existing Virtual Machine services including dynamic
+class loading, thread synchronization, return barriers, on-stack
+replacement, just-in-time compilation, and garbage collection. We
+demonstrate \JV's success by applying updates for one to two years worth of
+releases for three programs: Jetty webserver, JavaEmailServer, and CrossFTP
+server.
+
+This dissertation explores state transformers with behavior that depends on
+each object's state, and uses such transformers to repair application state
+at update time for certain classes of bugs. This dissertation also
+introduces a novel dynamic analysis to automatically generate
+object-specific transformers.
+
+Our work demonstrates how dynamic software updating support can be
+integrated into modern VMs, and that doing so has the potential to
+significantly improve software availability by reducing downtime.

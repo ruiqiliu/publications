@@ -1,0 +1,32 @@
+\begin{figure}[t]
+\lstset{frame=single}
+\begin{center}
+\begin{tabular}{@{}c@{}}
+\begin{minipage}{0.78\textwidth}
+\begin{lstlisting}
+  public class TokenMarker {
+    private TokenHandler tokenHandler;
+    public void markTokens(TokenHandler th)  {
+      this.tokenHandler = th;
+      // lots of processing
+      ...
+      ...
++     this.tokenHandler = null;
+    }
+  }
+\end{lstlisting}
+\end{minipage} \\
+(a) Patch applied by SVN revision 14027. \\[1ex]
+\begin{minipage}{0.78\textwidth}
+\begin{lstlisting}
+public static void jvolveObject(TokenMarker tm) {
+  tm.tokenMarker = null;
+}
+\end{lstlisting}
+\end{minipage} \\
+(b) State transformer
+\end{tabular}
+\caption{jEdit update: SVN revision 14027\label{fig:r14027}}
+\end{center}
+\lstset{frame=none}
+\end{figure}

@@ -1,0 +1,177 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Now, we show semispace with objects being updated.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{
+\begin{frame}[fragile]{\DSU{} garbage collector}%{A Sub-title is optional}
+\setbeamercovered{invisible}
+\begin{columns}[t]
+\begin{column}[T]{0.67\paperwidth}
+\begin{tikzpicture}
+\begin{scope}
+  % objects
+  \uncover<1>{       \node[field] (root) at \objectRoot {root};                        }
+  \uncover<2->{      \node[new space black field] (root) at \objectRoot {root};        }
+                     \oldSpaceObject{A}{\objectA}
+                     \oldSpaceObject{B}{\objectB}
+                     \oldSpaceObject[dsu v0 object]{C}{\objectC}
+                     \oldSpaceObject{D}{\objectD}
+                     \oldSpaceObject{E}{\objectE}
+                     \oldSpaceObject[dsu v0 object]{F}{\objectF}
+                     \oldSpaceObject{G}{\objectG}
+  % forwarding pointers
+  \uncover<2->{      \forwardingPointer{A}                             }
+  \uncover<3->{      \forwardingPointer{B}
+                     \dsuForwardingPointer{C}                          }
+  \uncover<4->{      \forwardingPointer{D}
+                     \forwardingPointer{E}                             }
+  \uncover<5->{      \dsuForwardingPointer{F}
+                     \forwardingPointer{G}                             }
+  % pointer arrows
+  \uncover<1>   {    \path[regular]     (root.east)  to [out=330,in=120] (A.140)    ;          }
+  \uncover<1>   {    \path[regular]     (A 0.center) to                (B.90)     ;            }
+  \uncover<1>   {    \path[regular]     (A 1.center) to                (C.135)    ;            }
+  \uncover<1-2> {    \path[regular]     (B 0.center) to                (D.135)    ;            }
+  \uncover<1-2> {    \path[regular]     (B 1.center) to                (E.90)     ;            }
+  \uncover<1-2> {    \path[regular]     (C 0.center) to                (F.135)    ;            }
+  \uncover<1-2> {    \path[regular]     (C 1.center) to                (G.90)     ;            }
+  \uncover<1-4> {    \path[regular]     (F 0.center) to                (A)        ;            }
+                                                                      
+  \uncover<2> {    \path[transparent]   (root.east)  to [out=0,in=120] (A.140)    ;            }
+  \uncover<2> {    \path[transparent]   (A 0.center) to                (B.90)     ;            }
+  \uncover<2> {    \path[transparent]   (A 1.center) to                (C.135)    ;            }
+  \uncover<3> {    \path[transparent]   (B 0.center) to                (D.135)    ;            }
+  \uncover<3> {    \path[transparent]   (B 1.center) to                (E.90)     ;            }
+  \uncover<3> {    \path[transparent]   (C 0.center) to                (F.135)    ;            }
+  \uncover<3> {    \path[transparent]   (C 1.center) to                (G.90)     ;            }
+  \uncover<5> {    \path[transparent]   (F 0.center) to                (A)        ;            }
+
+  \draw[draw,thin] (-4,-2.5) rectangle (4,0.5);
+  \draw (4,0.5) node[anchor=north east,inner sep=1pt,font=\tiny] {FromSpace};
+
+\end{scope}
+\begin{scope}[yshift=-3.75cm]
+  % objects
+  \uncover<2>   {    \newSpaceGreyObject{A'}{\objectAprime}                          }
+  \uncover<3->  {    \newSpaceBlackObject{A'}{\objectAprime}                         }
+
+  \uncover<3>   {    \newSpaceGreyObject{B'}{\objectBprime}                          }
+  \uncover<4->  {    \newSpaceBlackObject{B'}{\objectBprime}                         }
+
+  \uncover<3-4> {    \dsuNewSpaceGreyObject{C'}{\objectCprime}                       }
+  \uncover<5-10>{    \dsuNewSpaceBlackObject{C'}{\objectCprime}                      }
+  \uncover<3->  {    \newSpaceVersionOneEmptyObject{C'}{\objectCprimeVersionOne}     }
+
+  \uncover<4-5> {    \newSpaceGreyObject{D'}{\objectDprime}                          }
+  \uncover<6->  {    \newSpaceBlackObject{D'}{\objectDprime}                         }
+
+  \uncover<4-6> {    \newSpaceGreyObject{E'}{\objectEprime}                          }
+  \uncover<7->  {    \newSpaceBlackObject{E'}{\objectEprime}                         }
+
+  \uncover<5-7> {    \dsuNewSpaceGreyObject{F'}{\objectFprime}                       }
+  \uncover<8-10>{    \dsuNewSpaceBlackObject{F'}{\objectFprime}                      }
+  \uncover<5->  {    \newSpaceVersionOneEmptyObject{F'}{\objectFprimeVersionOne}     }
+
+  \uncover<5-8> {    \newSpaceGreyObject{G'}{\objectGprime}                          }
+  \uncover<9->  {    \newSpaceBlackObject{G'}{\objectGprime}                         }
+
+  % pointer arrows
+  \uncover<2->  {    \path[regular] (root.west)   to [out=220,in=95] (A'.north west);    }
+  \uncover<2>   {    \path[regular] (A' 0.center) to [out=130,in=180] (B.west);
+                     \path[regular] (A' 1.center) to [out=70,in=180]  (C.west);           }
+  \uncover<3->  {    \path[regular] (A' 0.center) to [out=80,in=135]  (B'.150);          
+                     \path[regular] (A' 1.center) to [out=270,in=110] (C' v1.north west); }
+                                                                                         
+  \uncover<3>   {    \path[regular] (B' 0.center) to                  (D.south);         
+                     \path[regular] (B' 1.center) to                  (E.south);          }
+  \uncover<4->  {    \path[regular] (B' 0.center) to [out=300,in=240] (D'.215);          
+                     \path[regular] (B' 1.center) to [out=330,in=240] (E'.215);           }
+                                                                                         
+  \uncover<3-4> {    \path[regular] (C' 0.center) to                  (F.south);         
+                     \path[regular] (C' 1.center) to                  (G.south west);     }
+  \uncover<5-10>{    \path[regular] (C' 0.center) to [out=255,in=105]  (F' v1.north west);          
+                     \path[regular] (C' 1.center) to [out=70,in=150]  (G'.150);           }
+                                                                                         
+  \uncover<5-7> {    \path[regular] (F' 0.center) to [out=30,in=325]  (A);                }
+  \uncover<8-10>{    \path[regular] (F' 0.center) to [out=215,in=330] (A'.215);           }
+
+  % transparent arrows
+  \uncover<3>   {    \path[transparent] (A' 0.center) to [out=130,in=180] (B.west);
+                     \path[transparent] (A' 1.center) to [out=70,in=180]  (C.west);       }
+
+  \uncover<4>   {    \path[transparent] (B' 0.center) to                  (D.south);
+                     \path[transparent] (B' 1.center) to                  (E.south);      }
+
+  \uncover<5>   {    \path[transparent] (C' 0.center) to                  (F.south);
+                     \path[transparent] (C' 1.center) to                  (G.south west); }
+
+  \uncover<8>   {    \path[transparent] (F' 0.center) to [out=30,in=325]  (A);            }
+
+  % v1 arrows
+  \uncover<10-> {    \path[regular] (C' v1 0.center) to [out=30,in=120]   (F' v1.north west);
+                     \path[regular] (C' v1 1.center) to                   (G'.210);          
+                     \path[regular] (F' v1 0.center) to [out=180,in=315]  (A'.215);
+                }
+  
+
+  \draw[draw,thin] (-4,-2) rectangle (4,0.5);
+  \draw (4,-2) node[anchor=south east,inner sep=1pt,font=\tiny] {ToSpace};
+\end{scope}
+\end{tikzpicture}
+\end{column}
+\begin{column}[T]{0.25\paperwidth}
+\begin{block}{}
+\begin{tikzpicture}
+\tikzstyle{column 2}=[anchor=west]
+\matrix [row sep=0.5ex] {
+\node[dsu v0 field] {};          & \node {\tiny To be transformed}; \\
+\node[dsu v1 empty field] {};    & \node {\tiny $v_1$ object}; \\
+};
+\end{tikzpicture}
+\end{block}
+
+\begin{block}{}
+\begin{footnotesize}
+\only<1>{
+The same heap as before. Objects to be transformed are highlighted.
+}
+\only<2>{
+Copy A.
+}
+\only<3>{
+Scan A'. Copy B and C. In addition an empty object C'$v_1$ is allocated.
+\alert{A' points to this copy and not the old one.}
+}
+\only<4>{
+Scan B'.
+}
+\only<5>{
+Scan C'.
+}
+\only<6>{
+Scan D'.
+}
+\only<7>{
+Scan E'.
+}
+\only<8>{
+Scan F'.
+}
+\only<9>{
+GC is now complete. No field can point to C'$v_0$ or F'$v_0$. Pointers to C and
+F point to $v_1$ (empty) objects. \texttt{memcpy(v\_1, v\_0);} will give us a valid
+heap.}
+\only<10>{
+Setting fields of C'$v_1$ and F'$v_1$.
+}
+\only<11>{
+C'$v_0$ and F'$v_0$ can be reclaimed.
+}
+\end{footnotesize}
+\end{block}
+\end{column}
+\end{columns}
+\end{frame}
+}
+
+% vim:tw=0:nospell

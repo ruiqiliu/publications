@@ -1,0 +1,27 @@
+Good morning.
+
+This is joint work with Michael Hicks at the Univ. of Maryland and my
+advisor Kathryn McKinley. This talk is about Jvolve, a Java Virtual Machine
+with Dynamic Software Updating support.
+
+Software developers update applications by fixing bugs and adding new
+features. These updates find their way into deployed systems. The common
+way to update an application is to stop it, and restart with the new
+version. This situation is not desirable in several contexts. Some mission
+critical applications just cannot tolerate downtime. I have come to know
+that the ESA employs a primitive form of online
+updates for managed langauge code in its satellites. If you are an online
+retailer any downtime will result in loss in revenue. And, I am sure we all
+desire not having to restart our OS after a software update.
+
+One solution is Dynamic Software Updating or DSU for short. This is what we
+mean by DSU.
+
+The left of the screen shows a process running version 1 of an application.
+On the right is a process running version 2. DSU means going from the
+picture on the left to that on the right. This typically involves checking
+that the system is in a safe state for the update, and if so, updating code
+and data. The main innovations in our work lie in how we enforce safe
+points for the update, and how we udpate data.
+
+Rather than 

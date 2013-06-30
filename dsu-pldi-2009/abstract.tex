@@ -1,0 +1,29 @@
+\subsection*{Abstract}
+Software evolves to fix bugs and add features. Stopping and restarting
+programs to apply changes is inconvenient and often costly.  Dynamic
+software updating (DSU) addresses this problem by updating programs
+while they execute, but existing DSU systems for managed languages do
+not support many updates that occur in practice and are inefficient.
+This paper presents the design and implementation of \DSU, a
+DSU-enhanced Java VM.  Updated programs may add, delete, and replace fields
+and methods anywhere within the class hierarchy.  \DSU{} implements
+these updates by adding to and coordinating VM classloading,
+just-in-time compilation, scheduling, return barriers, on-stack
+replacement, and garbage collection.  \DSU{} is \emph{safe}: its use
+of bytecode verification and VM thread synchronization ensures that an
+% ISSUE: no bytecode verification in JikesRVM
+update will always produce type-correct executions. \DSU{} is
+\emph{flexible}: it can support 20 of 22 updates to three
+open-source programs---Jetty web server, JavaEmailServer, and CrossFTP
+server---based on actual releases occurring over 1 to 2 years.
+%REFACTOR: though slight refactorings would allow the other updates.
+\DSU{} is \emph{efficient}: performance experiments show that
+\DSU{} incurs \emph{no overhead} during steady-state execution.  These
+results demonstrate that this work is a significant step towards
+practical support for 
+dynamic updates in virtual machines for managed languages.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "pldi64"
+%%% End: 

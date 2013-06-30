@@ -1,0 +1,408 @@
+   --------------------------------------------------------------------------
+
+                                   Review #1
+
+   --------------------------------------------------------------------------
+
+     Summary
+
+     This paper describes a VM-based approach for dynamically updating
+     applications written in managed languages. Specifically, the approach is
+     presented and implemented for the Java language. The approach leverages
+     common virtual machine features, such as dynamic class loading, JIT
+     compilation, and garbage collection. The authors present the approach
+     and an empirical evaluation where they assess the effectiveness and
+     efficiency of the approach on two real systems and changes.
+
+     Strength
+
+     Strengths:
+
+     - The idea of leveraging common VM features to support and implement
+     dynamic updating is interesting and novel (as far as I know).
+
+     - The approach is implemented, although not available.
+
+     - The paper is well written and easy to understand.
+
+     Weakness
+
+     Weaknesses:
+
+     - The main weakness of the paper is the evaluation section. The
+     experiments presented do not adequately support the claims of the
+     authors.
+
+     - The degree of novelty of the work is a bit limited. There are already
+     a considerable number of existing approaches for dynamic software
+     updating, and it is not clear whether Jvolve is a sizable advance of the
+     state of the art.
+
+     Comments
+
+     As stated in the discussion of strengths and weaknesses, this paper
+     presents an interesting approach that appears to have several benefits
+     over existing mechanisms for dynamically updating applications. However,
+     the empirical evaluation does not adequately support the authors'
+     claims.
+
+     One claim that the authors make is that the approach can handle updates
+     that occur in real software. To support this claim, they report that
+     Jvolve was able to successfully perform 16 out of 19 real updates of two
+     programs. I do not agree that this result provides such strong evidence
+     of Jvolve's effectiveness. First, a 15% failure rate is not negligible.
+     Second, one of the updates required a manual modification of the code,
+     and this type of modifications may not always be feasible. Third, the
+     three updates that were not successful seem to be the most complex ones
+     considered. The authors state that handling these three cases would
+     require only small modifications to their technique, but that part of
+     the discussion is fairly vague and not convincing (at least, too vague
+     for me to judge how feasible or easy the modifications would be to
+     implement).
+
+     Another issue is that some important details about the studies are
+     missing. Nothing is said on the workload used to run the two software
+     subjects when assessing the success rate of Jvolve. Because the state of
+     the call stack determines whether an update can be applied or not, the
+     specific inputs used can considerably affect the results (e.g., updates
+     performed during a "shallow" execution are more likely to be successful
+     than updates performed while the server is being thoroughly exercised).
+     Related to this point, when were the updates applied? Updates applied
+     before execution (i.e., in an idle state) are not as representative as
+     updates applied during execution. Moreover, I would expect that
+     performing updates during execution may have a negative effect on the
+     success rate of Jvolve. The authors should rerun the experiments several
+     times while performing updates at random times during the execution.
+     Finally, how were the updates applied? Was each update applied to a
+     clean copy of the previous version or were updates applied to a
+     previously updated version? The latter would be preferable and more
+     convincing.
+
+     A direct comparison with other updating techniques, if possible, would
+     strengthen the paper considerably. In particular, it would allow the
+     reader to assess whether there are updates that other techniques could
+     not handle and Jvolve could (or the other way around). It would also
+     allow for comparing performances. For example, some techniques impose a
+     constant, low runtime overhead, whereas Jvolve imposes a higher
+     overhead, but only during updates. How long does the application must
+     run before the constant overhead outweighs the one time cost?
+
+     Section 6.2 (Microbenchmarks) is also not fully convincing. I would have
+     liked to see larger numbers of objects considered. According to Section
+     6.1, updating Jetty resulted in a pause time of approximately 1340 ms
+     due to garbage collection. This figure is higher than any of the figures
+     reported for GC in table 4, which seems to indicate that the numbers
+     used in the microbenchmarks are not representative. Increasing the
+     number of objects to 1 or even 10 million would create a more convincing
+     argument. Section 6.2 would also benefit from some discussion that
+     places these numbers in context. What is a "normal" amount of objects
+     for different applications and how many can be expected to need
+     updating?
+
+     Minor comments/typos:
+
+     The caption for Table 3 should be made more descriptive.
+
+     Page 6: "their TIB pointers and object layout remains valid"
+
+     -> "their TIB pointers and object layout remain valid"
+
+     Page 8: "from each of version to the next"
+
+     -> "from each version to the next"
+
+     Questions for Authors
+
+     Most of these questions mirror my comments in the "Detailed Comments"
+     section, which the authors should also address.
+
+     How were updates were applied to Jetty and JavaEmailServer? Was each
+     update applied to a clean copy of the previous version or were updates
+     applied to previously updated versions? When were the updates applied,
+     during idle times or during execution? What workloads were used for the
+     executions considered? Is there any evidence that such executions are
+     representative of real executions?
+
+     In table 4, why is the pause time for updating 50% of 100,000 objects so
+     much less than the pause time for updating 100% of 50,000 objects? I
+     would expect them to be very close (the times for updating 10% of
+     100,000 objects and 100% of 10,000 objects are similar).
+
+     Were the measurements repeated multiple times when investigating the
+     response time of Jetty? Multiple runs might reduce some of the
+     variability in Figure 5 and make it easier to interpret.
+
+     Why were the five configurations in Table 3 chosen? 5.1.9 Jvolve and
+     5.1.10 Jikes don't seem to add much and complicate Figure 5.
+
+     Can the technique support some form of rollback? Other techniques, such
+     as Polus, can.
+
+   --------------------------------------------------------------------------
+
+   --------------------------------------------------------------------------
+
+                                   Review #2
+
+   --------------------------------------------------------------------------
+
+     Summary
+
+     The paper discusses how the Jikes RVM can be enhanced to support dynamic
+     updates for Java. In particular, the authors treat the transformation of
+     existing objects due to the change of their class representation in
+     depth.
+
+     Strength
+
+     The authors provide a nice approach to update existing objects to the
+     new class representation based on the garbage-collector.
+
+     Weakness
+
+     The paper aims to address the challenges of managed languages, but fails
+     to explicitly state those. Instead, it describes some challenges of
+     object-oriented languages, but the proposed system does not handle some
+     of the OO-specific core issues, such as inheritance.
+
+     Comments
+
+     The handling of transforming objects to the new class representation is
+     very detailed and well explained.
+
+     I believe that the paper would benefit from a discussion about the
+     challenges of managed languages and, in particular, the challanges of
+     the chosen object-oriented language Java. On the one hand, the paper
+     aims to address the challenges of managed languages, but does not
+     explicitly state those. On the other hand, the paper states that a VM
+     provides full control about the execution of an application and thus
+     dynamic updating should be easier than with C/C++.
+
+     It seems that most challenges are because of the object-orientation of
+     Java, and not because it is a managed language. This is also indicated
+     in Sect. 3.2: ".., an update that deletes a field from a parent class
+     will affect the class's descendants." The paper also identifies the
+     alteration of the class hierarchy to be desirable but challenging.
+     Nevertheless, the system do not allow alterations of the class
+     hierarchy.
+
+     I also think that the paper would also benefit from a discussion about
+     the allowed changes. Although the update model is very flexible and
+     provides for a number of changes, I didn't find a justification for the
+     supported changes, besides the "observed" changes in two applications.
+
+     Questions for Authors
+
+     1. Which parts of Jvolve are fully automatic and do not require user
+     interaction? Clearly, object transformation functions must be completed
+     by the user. But what about other changes such as renaming of classes or
+     interfaces, fields and methods? How do you detect and handle the
+     renaming of classes or interfaces, fields and methods? What happens to
+     removed classes and their existing objects?
+
+     2. What are the challenges of managed languages? What are the challanges
+     of object-oriented languages?
+
+     3. Regarding the Sect. Performance
+
+     (a) Fig. 5: The request rate seems to vary a lot. Does this figure
+     provide a meaningful statement?
+
+     (b) Table 4: Maybe I did not understand something, but why is the object
+     transformation function not linear? Could you explain the following
+     discrepancy?
+
+     I plotted the tables as charts to better understand the numbers.
+
+     The garbage collection is linear and seems perfectly OK. We would also
+     expect a linear function for the object transformation, as the time to
+     transform 'n' objects should equal the time to transform one object
+     'n'-times. (I assume that the time to iterate over the data structures
+     is included in the garbage collection time.)
+
+     Instead the function is linear only for small object arrays (i.e., 1000
+     and 10000). For the bigger two arrays (i.e., 50000 and 100000), the
+     function is linear only up to a fraction of 0.5 of changed objects.
+
+     Furthermore, I would expect the time to transform a certain number of
+     changed objects to be approx. the same, independent of the total array
+     size. While this holds for:
+
+     1000 objects: 1000 * 1.0 == 10000 * 0.1: 8.89 ~ 9.55 10000 objects:
+     10000 * 1.0 == 100000 * 0.1: 85.39 ~ 86.97 5000 objects: 10000 * 0.5 ==
+     50000 * 0.1: 44.05 ~ 42.92
+
+     it is not the case for: 50000 objects: 50000 * 1.0 != 100000 * 0.5:
+     1423.34 >> 511.02
+
+     4. Other minor suggestions:
+
+     Page 1, last sentence of first paragraph: ..., and efficient enough to
+     have little or no impact <on> application performance.
+
+     Fig. 4 (b): Shouldn't it say "array of pending transforms" instead of
+     "list of pending xforms"?
+
+     Page 10, last sentence before the conclusion. Shouldn't it say, "... as
+     illustrated by the <Jvolve> pause report above".
+
+     Table 4 would benefit from being displayed as graphs.
+
+   --------------------------------------------------------------------------
+
+   --------------------------------------------------------------------------
+
+                                   Review #3
+
+   --------------------------------------------------------------------------
+
+     Summary
+
+     The authors describe JVOLVE, a modification of the Jikes RVM, that
+     dynamically applies software updates to Java applications as they run.
+     Standard VM services such as dynamic class loading, garbage collection
+     and JIT compilation are leveraged to enable the dynamic software
+     updates.
+
+     Strength
+
+     Dynamic software updates are useful for long-running server-style
+     applications, which are increasingly written in managed runtimes. The
+     enhancements to a stop-the-world copying garbage collector allow this to
+     be done without any overhead to the running application, except during
+     the update itself.
+
+     Weakness
+
+     Dynamic updates are only applied to version changes of 2 applications,
+     and performance data is only given for one version change in one
+     application. JVOLVE does not support JIT inlining (as of submission),
+     which is an important optimization for Java. With inlining support, the
+     costs of DSU will change.
+
+     Comments
+
+     This paper describes support for dynamic software update (DSU) in a
+     managed runtime, namely the Jikes RVM. The key idea is to take advantage
+     of a stop-the-world copying garbage collector to update existing objects
+     from the old version to the new one as part of copying live objects.
+     This allows updates to include changes to class signatures, without
+     imposing any ongoing overhead to the running application, which is an
+     improvement over prior work. Class hierarchy changes are not supported.
+
+     JVOLVE is evaluated by considering the updates to (only) two Java
+     applications. It handles 16/19 updates. As this is the basis for the
+     authors' argument that the system is practical, it seems skimpy, even if
+     it is better than the JDrums and DVM evaluations. The authors point out
+     that the modifications supported by JVOLVE do allow most of the updates
+     to Jetty and JavaEmailServer to be loaded. I can't help but wonder how
+     representative the updates in these applications are and if other
+     significant applications include class hierarchy changes and cannot be
+     handled.
+
+     The requirement that no invocations of changed methods be active when an
+     update occurs seems like a significant additional design consideration
+     for applications. (JavaEmailServer had to be modified to work around
+     this limitation.) More discussion is required to convince me that this
+     is not a show-stopper for many realistic applications. Even when
+     programs contain DSU safe points where no updated methods are on any
+     thread stack, it isn't clear how likely it is that JVOLVE will be able
+     to apply an update. The approach described gives up if the next VM yield
+     point (after DSU is initiated) is not safe. For multi-threaded
+     applications, it seems quite likely that some thread will have an
+     offending method on its stack. Resolving this would require some
+     mechanism to stop each thread as it reaches a DSU safe point, and only
+     then apply the update. But this would also have to detect improperly
+     structured applications where a thread running a non-terminating event
+     loop will never reach a DSU safe point. The approach of giving up and
+     having the user try to apply the update again is simplistic and
+     unsatisfactory.
+
+     JVOLVE as submitted requires JIT inlining to be turned off. Inlining is
+     a very important optimization for Java. Hence details of how it can be
+     handled are essential. Also, the evaluation of runtime performance and
+     pause time may change when inlining is working. (which the authors hope
+     it will be "in the final version of the paper".)
+
+     The JVOLVE approach requires a stop-the-world collector. There are good
+     reasons why a JVM may want to run continuous, or pauseless collectors --
+     especially in long-running production settings with large heaps. Perhaps
+     a system could be fitted out with a pauseless collector for regular GC
+     and a stop-the-world version for updates so that the lengthy delays are
+     only encountered during infrequent update events. It would be good if
+     the paper discussed this.
+
+     Overall, I find the main idea intuitive and appealing. It would have
+     been nice to read a little more about transformers earlier in the paper,
+     but otherwise it was quite readable.
+
+     Questions for Authors
+
+     - Did any requests to Jetty time out during any of the software updates?
+
+     - Can you supply more details on how the strategy you propose for
+     supporting inlining would work?
+
+     - You construct "old" class names from a class name and a version
+     number. Where does that version number come from?
+
+   --------------------------------------------------------------------------
+
+   --------------------------------------------------------------------------
+
+                                   Review #4
+
+   --------------------------------------------------------------------------
+
+     Summary
+
+     The authors describe the initial implementation of a system that allows
+     dynamic software updates for managed languages.
+
+     Strength
+
+     The paper makes it point cogently and is well-written and clear.
+
+     Weakness
+
+     The work is preliminary. It makes assumptions that probably won't hold
+     up in practice. It is obvious the authors barely had their
+     implementation working when they submitted the paper.
+
+     Comments
+
+     The authors describe JVolve, a modified version of the Jikes RVM meant
+     to support dynamic software updating. The dynamic software update
+     consists of three steps: (1)a tool diffs the new and old version of the
+     program (2) user writes object transfomers (3) update is deployed by
+     halting all threads and invoking the GC.
+
+     The paper is well-written and cogently makes it points. However, the
+     research contribution is slim and the work is clearly preliminary. It's
+     already clear that systems based on virtual machines should do better
+     than systems without them (like C/C++). It is more challenging to come
+     up with a realistic design that works in practice, to evaluate the
+     system, and to come up with long-term lessons. It isn't clear that their
+     design is actual useful in practice at this time, the evaluation is
+     weak, and the lessons are still unclear.
+
+     For example, the authors do a good job of setting up a framework for
+     evaluating a dynamic software update. They take some small, real-world
+     Java programs (<50K in length) and create a series of updates from one
+     version to the next. The authors also look at the effect of GC on
+     microbenchmarks. However, it is clear in practice that halting all
+     threads and then inducing a full garbage collection will have
+     difficulties in practice for applications that must be soft-realtime.
+     Thus, it's more important to to realistically define what is acceptable
+     and what is not for various kinds of programs and actually look at the
+     latency of an update.
+
+     Another example, which the authors encounter, is their decision to not
+     update until all referenced methods are no longer on the call stack.
+     Clearly, for a long-running application, you could get into a situation
+     where you can never update. This indicates, at the least, that program
+     authors may need to be put hooks into to guarantee that their system can
+     be updated. The authors actually discover that one of their programs
+     cannot be updated at one point because of this restriction.
+
+   --------------------------------------------------------------------------

@@ -1,0 +1,28 @@
+
+Slide 1:
+Software applications change all the time. Developers fix existing bugs and
+add new features. This means deployed systems must be updated.  The
+straightforward way to update such system is to stop a running application,
+apply the update and restart it. Some applications must run "non-stop",
+providing continuous and uninterrupted service. Stopping such applications
+might result in safety concerns, revenue losses or at the very least
+inconvenience to system adminstrators and users. So, stopping such
+applications is not desirable.
+
+Slide 2:
+An application where stopping and restarting is not desirable is a personal
+operating system. We all have been inconvenienced when we have to restart
+our systems because of a software update. Another application that I came
+across recently, that I found interesting: This is behind the scenes of the
+website LinkedIn, a social networking site for professionals. They maintain
+an in-memory cache of their network graph called "The Cloud". It takes
+about 8 hours to rebuild an instance. Clearly, it is desirable to not have
+to restart this application to perform an update.
+
+Slide 3:
+The main issue with restarting applications is loss of state. One can avoid
+disruption in service by moving state outside the process. For example, web
+servers and application servers have state outside the process in databases
+and browser cookies. People have used redunant systems to support updates.
+These solutions are not always applicable. Ideally, we would like to update
+the state of an application in-place, in-memory.

@@ -1,0 +1,18 @@
+\section{Conclusions}
+\label{sec:conc}
+
+This paper presents \DSU, a Java virtual machine with support for
+dynamic software updating.  \DSU{} is the most full-featured,
+best-performing implementation of DSU for Java published to date.  We
+demonstrate its flexibility and safety by successfully applying updates
+for one to two years worth of releases for three programs: Jetty
+webserver, JavaEmailServer, and CrossFTP server.  \DSU{} imposes no
+overhead during a program's steady-state  execution.  
+\DSU's DSU support builds naturally
+on top of existing VM services, including dynamic class loading,
+thread synchronization, return barriers, on-stack replacement, JIT compilation, and
+garbage collection.  It is probably optimistic to believe that DSU
+will be able to support every update.  Nevertheless, our results
+demonstrate that dynamic software updating support can be naturally
+incorporated into modern VMs, and that doing so has the potential to
+significantly improve software availability by reducing downtime.

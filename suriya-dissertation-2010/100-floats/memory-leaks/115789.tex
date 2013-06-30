@@ -1,0 +1,39 @@
+\begin{figure}[p]
+\begin{center}
+\begin{minipage}{0.6\textwidth}
+\begin{lstlisting}[frame=single]
+   class Editor { int refCount; }
+
+   class History {
+     Editor editor;
+     void dispose() {
+       this.editor = null;
+     }
+   }
+
+   public class NavigationHistory {
+     ArrayList<History> history;
+     ArrayList<Editor> editors;
+
+     void disposeEntry(History h) {
+       if (h.editor == null) return;
+       h.editor.refCount--;
+       if (h.editor.refCount == 0)
+         editors.remove(h.editor);
+       h.dispose();
+     }
+
+     void updateNavigationHistory() {
+       for (History h : history)
+         if (...) {
+           history.remove(h);
+-          h.dispose();
++          disposeEntry(h);
+         }
+     }
+   }
+\end{lstlisting}
+\end{minipage} \\
+\caption{Eclipse IDE memory leak patch: Bug \#115789\label{fig:115789-patch}}
+\end{center}
+\end{figure}

@@ -1,0 +1,67 @@
+
+% This is for rubber.
+% rubber: rules rules.ini
+
+\documentclass[12pt]{report}
+\usepackage{utdiss2}
+
+\usepackage{dingbat}
+\usepackage{textcomp}
+\usepackage{pifont}
+\usepackage{booktabs}
+\usepackage[final]{graphicx}
+% rotating includes graphicx. No need to explicitly include graphicx.
+\usepackage[final]{rotating}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hangcaption}
+\usepackage{float}
+\usepackage{acronym}
+\usepackage[final]{listings}
+\usepackage{xspace}
+% \usepackage{makeidx}
+% \makeindex
+\usepackage[usenames]{color}
+\usepackage[override]{cmtt}
+\usepackage[final,
+            pdftex,
+            pdfauthor=Suriya\ Subramanian,
+            pdftitle=Dynamic\ Software\ Updates:\ A\ VM-Centric\ Approach]{hyperref}
+% \usepackage{showlabels}
+
+\input{003-spacing}
+\input{006-hyphenation}
+
+\begin{document}
+\lstset{
+  numbers=left,
+  numberstyle=\scriptsize,
+  language=Java,
+  basicstyle=\small\ttfamily,
+  lineskip=-0.25ex,
+  basewidth=0.5em,
+  captionpos=b,
+  xleftmargin=3ex,
+}
+\input{005-abbreviations}
+
+\input{010-frontmatter}
+
+\input{030-intro/main}
+\input{040-background/000-main}
+\input{050-system/000-main}
+\input{055-state-transformers/000-main}
+\input{060-experience/005-main}
+\input{070-related/000-main}
+\input{080-conclusion/000-main}
+
+{\raggedright
+\bibliographystyle{abbrv}
+\bibliography{090-paper}
+}
+
+% \printindex
+
+\input{110-vita}
+
+\end{document}

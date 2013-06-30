@@ -1,0 +1,29 @@
+\chapter{Related Work}
+\label{chap:related}
+
+Researchers have designed and implemented dynamic updating solutions in a variety of contexts, ranging from
+theoretical models of updates and safety, to language design for dynamic
+updating, to practical \USD systems for C and Java, and to operating systems
+with \USD support. In this chapter, we compare our VM-centric approach to
+DSU with related work on implementing \USD for managed languages, C, and
+C++.
+
+\input{070-related/005-c-systems}
+\input{070-related/010-java-systems}
+\input{070-related/030-other-systems}
+
+\input{100-floats/related-table}
+
+\section{Summary}
+Table~\ref{tab:related} summarises features, strengths, and limitations of four
+DSU systems for C/C++ --- Ginseng, Upstare, Ksplice, and K42; updates in a
+persistent object store; and three DSU systems for Java --- JDrums, DVM,
+and Jvolve. The table denotes advantages of a system with a `\Y',
+disadvantages with `\N', and neutral features with a `\Z'.
+But for Upstare's generic stack reconstruction support, Jvolve
+is superior to every other DSU system in one or more ways.
+
+This recent surge in the design and development of dynamic updating system
+shows a rising demand for highly available software and the limitations in
+other systems reveal the difficulties inherent in combining performance,
+efficiency, and flexibility as we did in \JV.

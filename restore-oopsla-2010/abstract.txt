@@ -1,0 +1,16 @@
+  Dynamic software updating (DSU) systems eliminate costly downtime by
+  dynamically fixing bugs and adding features to executing programs.
+  Given a static *code* patch, most DSU systems can construct the
+  run-time code changes automatically.  However, a dynamic update must
+  also specify how to change the running program's execution *state*,
+  e.g., its stack and heap, to be compatible with the new code.
+  Constructing such *state transformations* correctly and
+  automatically remains an open problem.  This paper presents a
+  solution called Targeted Object Synthesis (TOS).  TOS first executes
+  the same tests on the old and new program versions separately,
+  observing the program state at key points.  Given two corresponding
+  states, TOS *matches* corresponding objects between the two
+  versions, and *synthesizes* the simplest-possible function to
+  transform old version objects to their corresponding new versions.
+  We show the efficacy of TOS by inferring transformation functions
+  for actual updates to four open-source server programs.
